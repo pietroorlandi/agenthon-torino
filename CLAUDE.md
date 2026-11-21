@@ -22,6 +22,7 @@ Il dataset sintetico della demo (`src/web/data.js`) simula **Bottega Sabauda**, 
 - Il dataset contiene ordini (privati e negozi), email a/da fornitori, corrieri e clienti, chat tra colleghi su promozioni attive e problemi, documenti, task, memoria e azioni.
 - Dettagli, storie pre-piantate e permessi: [docs/scenario.md](docs/scenario.md). **Se cambi i dati o il contesto, aggiorna quel file.**
 - **Regola di prodotto — le fonti non sono verità**: il Brain confronta le nuove informazioni con la memoria approvata; se contraddicono (es. «sconto massimo 30%» vs 20% approvato) vanno in **quarantena** e le decide chi ha l'autorità (scarta e dimentica / accetta e aggiorna). Non vanno mai usate per rispondere prima. Meccanismo: `claim` sulle fonti, `fact` + `authority` sulla memoria in `data.js`; `detectConflicts()` in `app.js`.
+- **Regola di prodotto — i buchi di conoscenza si colmano**: se il Brain non sa rispondere a una domanda aziendale, non inventa. Apre una richiesta al reparto competente (`TOPIC_OWNERS` in `data.js`), che scrive il fatto e la domanda a cui risponde. Il fatto entra in memoria approvato e chi aveva chiesto viene avvisato. Le domande fuori perimetro ricevono solo «non lo so». Codice: `routeQuestion()`, `openGap()`, `saveGap()` in `app.js`.
 - Data "di oggi" nella demo: 21/11 ~08:10 (Black Friday il 27/11).
 
 ## Vincoli tecnici da ricordare

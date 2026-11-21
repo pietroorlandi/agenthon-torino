@@ -120,7 +120,15 @@ tr.low .bar span { background: var(--warn); }
 .mem.approved, .action.executed { border-left: 4px solid var(--ok); }
 .mem.rejected, .action.rejected { border-left: 4px solid #bbb; opacity: .7; }
 .mem.rejected .mem-text { text-decoration: line-through; }
-.quar { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; display: grid; gap: 6px; }
+.tag.gap { background: #efe6fa; color: #7a3fc0; }
+.msg.brain.gap .msg-body { border-left: 4px solid #9b59d0; }
+.gapc { background: #fff; border: 1px solid var(--line); border-left: 4px solid #9b59d0; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; display: grid; gap: 6px; }
+.gapc.answered { border-left-color: var(--ok); }
+.gapc.dismissed { border-left-color: #bbb; opacity: .75; }
+.gapc.locked { color: var(--muted); background: #f3f2ef; }
+.gapc textarea, .gapc input, .gapc select { font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 6px; width: 100%; }
+.gapc select { width: auto; }
+.quar {background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; display: grid; gap: 6px; }
 .quar.pending { border-left: 4px solid var(--bad); background: #fffaf9; }
 .quar.banned { border-left: 4px solid #bbb; opacity: .75; }
 .quar.accepted { border-left: 4px solid var(--ok); }

@@ -25,6 +25,8 @@ function initialState() {
     actions: structuredClone(ACTIONS),
     quarantine: [],   // claims that contradict approved memory, waiting for an authorised person
     banned: {},       // sourceId -> true: banned sources are forgotten
+    gaps: [],         // knowledge gaps: questions nobody documented, assigned to the competent role
+    extraSources: [], // notes written by people when they fill a gap
     dm: {},
     unread: {},
     log: [],
@@ -56,7 +58,7 @@ const dateKey = (d) => {
 };
 
 // Sources visible right now (live ones appear only after their demo event).
-const liveSources = () => SOURCES.filter((s) => !s.live || state.conflictFired);
+const liveSources = () => [...SOURCES.filter((s) => !s.live || state.conflictFired), ...state.extraSources];
 
 // ---------- quarantine: do not trust sources blindly ----------
 // For every source claim, compare it with the approved memory item having the same fact key.
@@ -84,10 +86,36 @@ function getSource(id) {
     return { id, type: "store", title: `Store admin — scorte ${sku}`, from: "sistema", date: "live", access: ["all"],
       body: `${p.name}: ${p.stock} pz in magazzino (soglia ${p.threshold}), ${p.sold7d} venduti negli ultimi 7 giorni.${p.blocked ? " Vendita sospesa." : ""}` };
   }
-  return SOURCES.find((s) => s.id === id);
+  return SOURCES.find((s) => s.id === id) || state.extraSources.find((s) => s.id === id);
 }
 
-const TYPE_ICON = { email: "📧", chat: "💬", doc: "📄", task: "☑️", store: "🛒" };
+const TYPE_ICON = { email: "📧", chat: "💬", doc: "📄", task: "☑️", store: "🛒", note: "📝" };
+
+// ---------- knowledge gaps ----------
+// Which role could know the answer to a question? (TOPIC_OWNERS in data.js; null = out of company scope)
+function routeQuestion(q) {
+  const scored = TOPIC_OWNERS.map((t) => ({ t, score: t.keywords.filter((k) => q.includes(norm(k))).length })).filter((x) => x.score > 0);
+  return scored.sort((a, b) => b.score - a.score)[0]?.t || null;
+}
+
+const STOPWORDS = new Set(["quale", "quali", "quando", "quanto", "quanta", "quanti", "quante", "perche", "della", "delle", "degli", "dello", "nella", "nelle", "negli", "alla", "alle", "agli", "dalla", "dalle", "abbiamo", "nostro", "nostra", "nostri", "nostre", "questo", "questa", "sono", "possiamo", "posso", "dobbiamo", "funziona", "funzionano"]);
+// Index keywords for a fact written by a person: significant words of the question, cut to a 6-char stem.
+const deriveKeywords = (text) => [...new Set(norm(text).split(/[^a-z0-9]+/).filter((w) => w.length >= 5 && !STOPWORDS.has(w)).map((w) => w.slice(0, 6)))];
+
+function openGap(question, asker, topic) {
+  const key = norm(question).replace(/[^a-z0-9 ]/g, "").trim();
+  const existing = state.gaps.find((g) => g.key === key && g.status === "open");
+  if (existing) return { gap: existing, isNew: false };
+  const gap = { id: `G${state.gaps.length + 1}`, key, question, askedBy: asker.id, owner: topic.role, topicLabel: topic.label, status: "open", time: now() };
+  state.gaps.push(gap);
+  const owner = userWithRole(topic.role);
+  if (owner && owner.id !== asker.id) {
+    pushBrain(owner.id, { from: "brain", kind: "alert", gapId: gap.id,
+      text: `<b>📝 Buco di conoscenza da colmare</b><br>${esc(asker.name)} (${asker.roleLabel}) ha chiesto: «${esc(question)}». Non è nella memoria e sembra di tua competenza (${esc(topic.label)}). Puoi scrivere la risposta e la domanda a cui risponde in <i>Memoria → Da documentare</i>?` });
+  }
+  return { gap, isNew: true };
+}
+const openGaps = (role) => state.gaps.filter((g) => g.status === "open" && g.owner === role);
 
 function citeChips(ids) {
   if (!ids?.length) return "";
@@ -104,6 +132,8 @@ function buildBrief(user, s) {
   const pendingMem = s.memory.filter((m) => m.status === "pending" && canSee(m.access, user.role)).length;
   const quar = s.quarantine.filter((q) => q.status === "pending" && q.authority.includes(user.role));
   quar.forEach((q) => items.unshift({ text: `🛡️ <b>Informazione in quarantena</b>: «${esc(q.claim.text)}» contraddice la memoria approvata. Non la uso finché non decidi in <i>Memoria</i>.`, sources: [q.sourceId] }));
+  const gaps = (s.gaps || []).filter((g) => g.status === "open" && g.owner === user.role);
+  if (gaps.length) items.push({ text: `📝 Hai <b>${gaps.length} domande da documentare</b> che nessuno aveva mai scritto (es. «${esc(gaps[0].question)}»).`, sources: [] });
   if (pendingMem) items.push({ text: `Hai <b>${pendingMem} elementi di memoria</b> da revisionare.`, sources: [] });
 
   return { from: "brain", kind: "brief", time: "08:00", items,
@@ -117,7 +147,8 @@ function scoreItem(item, q) {
 
 function askBrain(question, user) {
   const q = norm(question);
-  const best = (list) => list.map((m) => ({ m, score: scoreItem(m, q) })).filter((x) => x.score > 0).sort((a, b) => b.score - a.score)[0]?.m;
+  // minScore: facts written by people (gap answers) need ≥2 matching words, to avoid matching on one generic word
+  const best = (list) => list.map((m) => ({ m, score: scoreItem(m, q) })).filter((x) => x.score >= (x.m.minScore || 1)).sort((a, b) => b.score - a.score)[0]?.m;
 
   const approved = best(state.memory.filter((m) => m.status === "approved"));
   if (approved) {
@@ -134,8 +165,23 @@ function askBrain(question, user) {
   let text = "🤷 <b>Non lo so.</b> Non c'è nulla nella memoria approvata che risponda a questa domanda, e non voglio inventare.";
   if (pending && canSee(pending.access, user.role)) {
     text += `<br><span class="muted">C'è un elemento <b>in attesa di revisione</b> che potrebbe essere rilevante: lo userò solo dopo che qualcuno lo avrà approvato in Memoria.</span>`;
+    return { from: "brain", kind: "unknown", text };
   }
-  return { from: "brain", kind: "unknown", text };
+
+  // Knowledge gap: nobody ever documented it. If it's a company topic, ask the competent person to write it down.
+  const topic = routeQuestion(q);
+  if (!topic) {
+    text += `<br><span class="muted">È fuori dal perimetro di Bottega Sabauda: non c'è nessuno a cui chiederlo internamente.</span>`;
+    return { from: "brain", kind: "unknown", text };
+  }
+  const { gap, isNew } = openGap(question, user, topic);
+  const owner = userWithRole(topic.role);
+  const ownerTxt = owner.id === user.id ? "Sembra di <b>tua</b> competenza" : `Sembra di competenza <b>${ROLE_LABELS[topic.role]}</b> (${esc(topic.label)})`;
+  text += `<br>📝 ${ownerTxt}: è un'informazione aziendale che qualcuno conosce ma che non è mai stata scritta. `
+    + (owner.id === user.id ? `Puoi documentarla tu in <i>Memoria → Da documentare</i>.`
+      : isNew ? `Ho chiesto a <b>${owner.name}</b> di documentarla: quando risponde te lo scrivo qui.`
+      : `C'è già una richiesta aperta a <b>${owner.name}</b> su questa domanda.`);
+  return { from: "brain", kind: "gap", text, gapId: gap.id };
 }
 
 // ---------- rendering ----------
@@ -143,7 +189,7 @@ function render() {
   $("#tabs").innerHTML = TABS.map((t) => {
     const badge = t.id === "chat" && state.unread[state.userId] ? `<span class="badge">${state.unread[state.userId]}</span>` : "";
     const pend = t.id === "actions" ? state.actions.filter((a) => a.status === "pending" && a.owner === me().role).length : 0;
-    const pendMem = t.id === "memory" ? state.memory.filter((m) => m.status === "pending" && canSee(m.access, me().role)).length + pendingQuarantine(me().role).length : 0;
+    const pendMem = t.id === "memory" ? state.memory.filter((m) => m.status === "pending" && canSee(m.access, me().role)).length + pendingQuarantine(me().role).length + openGaps(me().role).length : 0;
     const b2 = pend || pendMem ? `<span class="badge amber">${pend || pendMem}</span>` : "";
     return `<button class="tab ${state.tab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}${badge}${b2}</button>`;
   }).join("");
@@ -167,6 +213,7 @@ function viewGuide() {
     ["La memoria la curano le persone", "In <b>Memoria</b> approva il fatto su DHL. Poi in Chat chiedi: <i>“Quale corriere usiamo per l'estero da dicembre?”</i> (prima dell'approvazione risponde “non lo so”).", "memory"],
     ["Non si fida ciecamente delle fonti", "La battuta sul «50% al Black Friday» in #generale contraddice il -20% approvato: il Brain non la usa, la mette in <b>quarantena</b>. Come Marco (Shop) in <b>Memoria</b> scegli <i>Scarta e dimentica</i> o <i>Accetta</i>. Per un caso live: in <b>Store</b> premi <i>Simula messaggio in contrasto</i> (qualcuno scrive che lo sconto massimo è il 30% e lo applica a un ordine).", "memory"],
     ["Sa chi sta chiedendo", "Chiedi <i>“Qual è il margine di novembre?”</i> come Marco (Shop) e poi come Sara (Magazzino): solo lo Shop ottiene la risposta.", "chat"],
+    ["Colma i buchi di conoscenza", "Come Sara (Magazzino) chiedi <i>“Qual è l'ordine minimo per le nocciole?”</i>: non è scritto da nessuna parte, ma è un tema aziendale, quindi il Brain incarica Marco (Shop, fornitori). Passa a Marco → <b>Memoria → Da documentare</b>: scrive il fatto e la domanda a cui risponde. Sara riceve la risposta, e da lì in poi il Brain la sa.", "chat"],
     ["Cita le fonti", "Ogni risposta e ogni punto del brief ha i chip <b>Fonti</b>: cliccali per vedere l'originale (email, chat, doc, task, store).", "chat"],
     ["Ammette i limiti", "Chiedi <i>“Quanti dipendenti ha il nostro concorrente?”</i> oppure <i>“Entro quando ordinare per ricevere prima di Natale?”</i> (c'è solo una bozza non approvata): risponde “Non lo so”.", "chat"],
     ["Propone soltanto", "In <b>Azioni</b> ci sono bozze in attesa (rimborso, pagamento fornitore, quarantena lotto, avvisi ai clienti…). Nulla cambia nello Store finché una persona del reparto giusto non approva.", "actions"],
@@ -189,11 +236,12 @@ function renderMsg(m) {
     return `<div class="msg"><span class="avatar" style="background:${u.color}">${u.avatar}</span><div class="msg-body"><div class="msg-head"><b>${u.name}</b> <span class="muted">${m.time}</span></div><div>${esc(m.text)}</div></div></div>`;
   }
   const tag = { brief: `<span class="tag proactive">PROATTIVO · nessuno l'ha chiesto</span>`, alert: `<span class="tag alert">ALERT PROATTIVO</span>`,
-    denied: `<span class="tag denied">ACCESSO NEGATO</span>`, unknown: `<span class="tag unknown">NON LO SO</span>`, answer: `<span class="tag ok">DALLA MEMORIA APPROVATA</span>`, done: `<span class="tag ok">ESEGUITO DOPO APPROVAZIONE</span>` }[m.kind] || "";
+    denied: `<span class="tag denied">ACCESSO NEGATO</span>`, unknown: `<span class="tag unknown">NON LO SO</span>`, answer: `<span class="tag ok">DALLA MEMORIA APPROVATA</span>`, gap: `<span class="tag gap">BUCO DI CONOSCENZA · RICHIESTA APERTA</span>`, done: `<span class="tag ok">ESEGUITO DOPO APPROVAZIONE</span>` }[m.kind] || "";
   let body = `<div>${m.text}</div>`;
   if (m.items) body += `<ul class="brief">${m.items.map((it) => `<li>${it.text}${citeChips(it.sources)}</li>`).join("")}</ul>`;
   body += citeChips(m.sources);
   if (m.actionId) body += `<button class="primary small" data-goto="actions">Vedi azione in attesa →</button>`;
+  if (m.gapId && state.gaps.find((g) => g.id === m.gapId)?.owner === me().role) body += `<button class="primary small" data-goto="memory">Documenta ora →</button>`;
   return `<div class="msg brain ${m.kind}"><span class="avatar brain-av">🧠</span><div class="msg-body"><div class="msg-head"><b>Brain</b> <span class="app-tag">APP</span> <span class="muted">${m.time}</span> ${tag}</div>${body}</div></div>`;
 }
 
@@ -213,7 +261,7 @@ function viewChat() {
 
   let main;
   if (state.channel === "brain") {
-    const suggestions = ["Quale corriere usiamo per l'estero da dicembre?", "Che sconto facciamo per il Black Friday?", "Posso cumulare NATALE10 e BENVENUTO5?", "I gianduiotti contengono latte?", "Come funzionano i rimborsi?", "Qual è lo sconto massimo applicabile a un ordine?", "Qual è il margine di novembre?", "Entro quando ordinare per ricevere prima di Natale?", "Quanti dipendenti ha il nostro concorrente?"];
+    const suggestions = ["Quale corriere usiamo per l'estero da dicembre?", "Che sconto facciamo per il Black Friday?", "Posso cumulare NATALE10 e BENVENUTO5?", "I gianduiotti contengono latte?", "Come funzionano i rimborsi?", "Qual è lo sconto massimo applicabile a un ordine?", "Qual è l'ordine minimo per le nocciole?","Qual è il margine di novembre?", "Entro quando ordinare per ricevere prima di Natale?", "Quanti dipendenti ha il nostro concorrente?"];
     main = `<div class="chat-main">
       <div class="chat-head"><b>🧠 Brain</b> <span class="muted">· messaggi diretti con ${u.name} (${u.roleLabel})</span></div>
       <div class="messages" id="messages">${state.dm[u.id].map(renderMsg).join("")}</div>
@@ -295,10 +343,29 @@ function viewMemory() {
     const visible = canSee(m.access, u.role);
     if (!visible) return `<div class="mem locked">🔒 Elemento riservato a ${roleList(m.access)}</div>`;
     return `<div class="mem ${m.status}">
+      ${m.question ? `<div class="muted small">❓ Risponde a: «${esc(m.question)}»</div>` : ""}
       <div class="mem-text">${esc(m.text)}</div>
       <div class="mem-meta muted">Proposto da ${m.proposedBy} · visibile a: ${roleList(m.access)}${m.approvedBy ? ` · approvato da ${m.approvedBy}` : ""}${m.rejectedBy ? ` · rifiutato da ${m.rejectedBy}` : ""}</div>
       ${citeChips(m.sourceIds)}
       ${m.status === "pending" ? `<div class="row"><button class="primary small" data-mem-approve="${m.id}">✓ Approva</button><button class="danger small" data-mem-reject="${m.id}">✕ Rifiuta</button></div>` : ""}
+    </div>`;
+  };
+  const gapCard = (g) => {
+    const asker = USERS[g.askedBy];
+    const mine = g.owner === u.role;
+    const status = { open: `<span class="tag gap">DA DOCUMENTARE</span>`, answered: `<span class="tag ok">DOCUMENTATA da ${esc(g.decidedBy)}</span>`, dismissed: `<span class="tag unknown">CHIUSA da ${esc(g.decidedBy)} · informazione non esistente</span>` }[g.status];
+    const head = `<div class="row between"><b>«${esc(g.question)}»</b>${status}</div>
+      <div class="muted small">Chiesto da ${esc(asker.name)} (${asker.roleLabel}) alle ${g.time} · assegnato a ${ROLE_LABELS[g.owner]} (${esc(g.topicLabel)})</div>`;
+    if (!mine || g.status !== "open") return `<div class="gapc ${g.status} ${mine ? "" : "locked"}">${head}${g.status === "answered" ? `<div>${esc(g.answer)}</div>` : ""}</div>`;
+    const other = asker.role !== u.role ? `<option value="${u.role},${asker.role}">Solo ${ROLE_LABELS[u.role]} e ${ROLE_LABELS[asker.role]}</option>` : "";
+    return `<div class="gapc open">${head}
+      <label class="small muted">Il fatto (la risposta)</label>
+      <textarea id="gap-fact-${g.id}" rows="2" placeholder="es. Ordine minimo nocciole alla Cooperativa Nocciola Langhe: 100 kg, in multipli di 25 kg, consegna diretta al laboratorio."></textarea>
+      <label class="small muted">La domanda a cui risponde (serve al Brain per ritrovarlo)</label>
+      <input id="gap-q-${g.id}" value="${esc(g.question)}">
+      <div class="row"><label class="small muted">Chi può vederlo</label>
+        <select id="gap-acc-${g.id}"><option value="all">Tutti i reparti</option>${other}<option value="${u.role}">Solo ${ROLE_LABELS[u.role]}</option></select></div>
+      <div class="row"><button class="primary small" data-gap-save="${g.id}">✓ Salva in memoria</button><button class="danger small" data-gap-dismiss="${g.id}">✕ Non esiste / non è di mia competenza</button></div>
     </div>`;
   };
   const quarCard = (q) => {
@@ -317,6 +384,9 @@ function viewMemory() {
   };
   return `<section class="page"><h1>🧠 Memoria condivisa</h1>
     <p class="muted">Il Brain estrae fatti dalle fonti e li propone. Solo gli elementi <b>approvati</b> da una persona vengono usati per rispondere. Le informazioni che <b>contraddicono</b> la memoria approvata non vengono mai usate: finiscono in quarantena per chi ha l'autorità di decidere.</p>
+    ${state.gaps.length ? `<h2>📝 Da documentare <span class="muted">(${state.gaps.filter((g) => g.status === "open").length} aperte)</span></h2>
+      <p class="muted small">Domande a cui il Brain non sapeva rispondere ma che qualcuno in azienda conosce. La persona competente scrive il fatto e la domanda a cui risponde: entra subito in memoria, a sua firma.</p>
+      ${state.gaps.map(gapCard).join("")}` : ""}
     ${state.quarantine.length ? `<h2>🛡️ Quarantena <span class="muted">(${state.quarantine.filter((q) => q.status === "pending").length} da decidere)</span></h2>${state.quarantine.map(quarCard).join("")}` : ""}
     ${groups.map(([st, label]) => {
       const list = state.memory.filter((m) => m.status === st);
@@ -429,6 +499,39 @@ function decideQuarantine(id, accept) {
   render();
 }
 
+// The competent person fills a knowledge gap: the fact + the question it answers become approved memory
+// (written by the authorised person), backed by a note source; the asker is notified.
+function saveGap(id) {
+  const g = state.gaps.find((x) => x.id === id);
+  const fact = $(`#gap-fact-${id}`).value.trim();
+  const question = $(`#gap-q-${id}`).value.trim() || g.question;
+  if (!fact) { toast("Scrivi il fatto prima di salvarlo."); return; }
+  const access = $(`#gap-acc-${id}`).value.split(",");
+  const u = me();
+  const src = { id: `kn-${id}`, type: "note", title: `Risposta di ${u.name}: ${question}`, from: u.id, date: `21/11 ${now()}`, access, body: fact };
+  state.extraSources.push(src);
+  const mem = { id: `K${state.memory.filter((m) => m.id.startsWith("K")).length + 1}`, text: fact, question, sourceIds: [src.id], access,
+    status: "approved", proposedBy: u.name, approvedBy: u.name, keywords: deriveKeywords(question), minScore: 2 };
+  state.memory.push(mem);
+  Object.assign(g, { status: "answered", answer: fact, decidedBy: u.name });
+  state.log.unshift({ time: now(), text: `${u.name} ha documentato: «${question}»` });
+  const asker = USERS[g.askedBy];
+  const msg = { from: "brain", kind: "answer", sources: [src.id],
+    text: `📝 <b>${esc(u.name)}</b> ha risposto alla tua domanda «${esc(g.question)}»:<br>${esc(fact)}<br><span class="muted">L'ho aggiunto alla memoria: da ora lo so anche io.</span>` };
+  if (canSee(access, asker.role)) pushBrain(asker.id, msg);
+  else pushBrain(asker.id, { from: "brain", kind: "denied", text: `${esc(u.name)} ha documentato la risposta a «${esc(g.question)}», ma l'ha resa visibile solo a ${roleList(access)}.` });
+  if (asker.id !== u.id) pushBrain(u.id, { from: "brain", kind: "done", text: `Grazie! Ho salvato in memoria la risposta a «${esc(question)}» e ho avvisato ${esc(asker.name)}.`, sources: [src.id] });
+  render();
+}
+
+function dismissGap(id) {
+  const g = state.gaps.find((x) => x.id === id);
+  Object.assign(g, { status: "dismissed", decidedBy: me().name });
+  state.log.unshift({ time: now(), text: `${me().name} ha chiuso la richiesta «${g.question}» (informazione non esistente)` });
+  if (g.askedBy !== me().id) pushBrain(g.askedBy, { from: "brain", kind: "unknown", text: `${esc(me().name)} ha chiuso la tua domanda «${esc(g.question)}»: l'informazione non esiste o non è di sua competenza. Continuo a non saperlo, e non invento.` });
+  render();
+}
+
 function fireConflict() {
   state.conflictFired = true;
   state.orders.unshift(structuredClone(LIVE_CONFLICT.order));
@@ -486,6 +589,8 @@ document.addEventListener("click", (e) => {
   else if (d.quarBan) decideQuarantine(d.quarBan, false);
   else if (d.quarAccept) decideQuarantine(d.quarAccept, true);
   else if (t.id === "fireConflict") fireConflict();
+  else if (d.gapSave) saveGap(d.gapSave);
+  else if (d.gapDismiss) dismissGap(d.gapDismiss);
   else if (t.id === "fireEvent") fireEvent();
   else if (t.id === "modalClose") $("#modal").hidden = true;
   else if (t.id === "resetBtn") { state = initialState(); render(); }

@@ -31,7 +31,7 @@ Programmata: Black Friday **-20%** dal 27 al 30/11 (esclusi Calendari e B2B), da
 | Tipo | Quantità | Note |
 |---|---|---|
 | Ordini | 25 (+1 live) | B2C e B2B (negozi), corriere, stato, note; totali calcolati da articoli + promo + spedizione |
-| Email | 22 | fornitori (laboratorio, packaging), corrieri (BRT, GLS, DHL), clienti e negozi, conferme di spedizione, newsletter |
+| Email | 23 | fornitori (laboratorio, cooperativa nocciole, packaging), corrieri (BRT, GLS, DHL), clienti e negozi, conferme di spedizione, newsletter |
 | Chat | 54 (1 live) | 6 canali: `#generale`, `#promo`, `#magazzino`, `#spedizioni`, `#clienti`, `#shop` (alcuni bloccati per ruolo) |
 | Documenti | 9 | calendario promo, regole sconti, policy resi, procedura spedizioni/magazzino, FAQ allergeni, listino B2B, margini, condizioni fornitore |
 | Task | 5 | cumulo codici, inventario, DHL, picking Black Friday, FAQ |
@@ -52,6 +52,7 @@ I dati sono in un unico file; le fonti hanno id mnemonici (`em-` email, `ch-` ch
 9. **Indirizzo errato** (#10479) e **collo in giacenza** (#10476).
 10. **B2B**: Dolce Vita Torino chiede 20 kg di sfuso, a magazzino ce ne sono 15.
 11. **Evento simulato** (bottone in Store): un'influencer fa vendere 118 classici in un'ora → alert a Magazzino + bozza di riordino da 600 pz.
+12. **Buco di conoscenza**: Sara (Magazzino) chiede «Qual è l'ordine minimo per le nocciole?». Le nocciole si comprano dalla Cooperativa Nocciola Langhe e vanno al laboratorio (`em-nocciole`), ma la regola sull'ordine minimo non è scritta da nessuna parte. Il Brain risponde «non lo so» e apre una richiesta a Marco (Shop, fornitori e acquisti), che la documenta.
 
 ## Permessi (cosa vede chi)
 - Margini e report: solo Shop. Contratto fornitore e listino B2B: Shop + Magazzino. Fattura sollecito: solo Shop.
@@ -66,3 +67,13 @@ Il Brain **non considera vero ciò che legge**. Per ogni fonte estrae le afferma
 - l'autorità sceglie **Scarta e dimentica** (fonte bandita, mai più usata; se serve si corregge l'ordine coinvolto) oppure **Accetta e aggiorna la memoria**.
 Gli altri reparti vedono solo che esiste un elemento in quarantena, non il contenuto.
 Nella demo l'estrazione dei `claim` è pre-annotata nei dati; con Gemini diventerà un passo del Brain (stesso formato).
+
+## Buchi di conoscenza ("da documentare")
+Quando il Brain non trova nulla nella memoria (né approvata né in revisione):
+1. **Capisce se la domanda riguarda l'azienda** confrontandola con le competenze dei reparti (`TOPIC_OWNERS` in `data.js`). Se non riguarda l'azienda (es. «quanti dipendenti ha il concorrente?») dice solo «non lo so» e non apre nulla.
+2. Se riguarda l'azienda, **apre una richiesta al reparto competente** (es. nocciole → Shop, che gestisce fornitori e acquisti). La persona riceve un messaggio proattivo e la richiesta compare in *Memoria → Da documentare*. Una domanda uguale già aperta non viene duplicata.
+3. La persona competente scrive **il fatto** e **la domanda a cui risponde** (precompilata, modificabile) e sceglie chi può vederlo. Il fatto entra in memoria **già approvato**, perché lo firma chi ha l'autorità, ed è citato come fonte «📝 Risposta di …». Le parole chiave vengono ricavate dalla domanda e ne servono almeno 2 per far scattare la risposta.
+4. Chi aveva chiesto riceve la risposta in chat. Da lì in poi il Brain la sa.
+5. In alternativa la persona chiude la richiesta con «Non esiste / non è di mia competenza», e chi aveva chiesto viene avvisato.
+
+Nella demo l'instradamento è per parole chiave; con Gemini il Brain classificherà la domanda e sceglierà il reparto (stessa struttura di `TOPIC_OWNERS`).

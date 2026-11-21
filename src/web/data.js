@@ -121,7 +121,10 @@ const SOURCES = [
   mail("em-listino", "commerciale@laboratorio-santanna.example", "marco", "20/11 10:05", ["shop", "magazzino"],
     "Aggiornamento listino dal 1° gennaio",
     "Per il forte rincaro del cacao, dal 1° gennaio il listino sale del 3,5% su tutta la gamma. Gli ordini confermati entro il 31/12 mantengono i prezzi attuali."),
-  mail("em-ormea", "commerciale@scatolificio-ormea.example", "sara", "17/11 10:40", ["magazzino", "shop"],
+  mail("em-nocciole", "ordini@cooperativa-nocciola-langhe.example", "sara", "18/11 11:05", ["magazzino", "shop"],
+    "Consegna nocciole al Laboratorio Sant'Anna",
+    "Confermiamo la consegna di 300 kg di nocciole Tonda Gentile del Piemonte IGP presso il Laboratorio Sant'Anna, per vostro conto (produzione crema gianduja), il 24/11. Prezzo 14,20€/kg."),
+  mail("em-ormea","commerciale@scatolificio-ormea.example", "sara", "17/11 10:40", ["magazzino", "shop"],
     "Preventivo scatole Box Natale",
     "Preventivo per scatole Box Natale 600g con carta oro: minimo 2.000 pezzi a 0,62€/pz, consegna in 10 giorni lavorativi dalla conferma. Cartoni esterni 40x30 disponibili a magazzino, 0,48€/pz."),
 
@@ -314,10 +317,10 @@ const MEMORY = [
     keywords: ["lotto", "l26-1108", "etichetta", "caffe", "richiamo"] },
   { id: "M10", text: "Tutti i gianduiotti contengono nocciole e latte; i fondenti 70% possono contenere tracce di latte. Possibili tracce di altra frutta a guscio e soia.",
     sourceIds: ["dc-faq"], access: ["all"], status: "approved", proposedBy: "Brain", approvedBy: "Giulia Rossi",
-    keywords: ["latte", "allergen", "allergi", "nocciol", "contengono", "glutine", "soia"] },
+    keywords: ["latte", "allergen", "allergi", "contengono", "glutine", "soia"] },
   { id: "M11", text: "Laboratorio Sant'Anna: lead time 5 giorni lavorativi, ordine minimo 200 pz per referenza, pagamento a 30 giorni, penale 3% per ritardi oltre 3 giorni.",
     sourceIds: ["dc-contratto-lab"], access: ["shop", "magazzino"], status: "approved", proposedBy: "Brain", approvedBy: "Sara Conti",
-    keywords: ["laboratorio", "fornitore", "lead time", "riordino", "minimo", "penale", "produzione"] },
+    keywords: ["laboratorio", "sant'anna", "lead time", "riordino", "penale", "produzione"] },
   { id: "M12", text: "Le consegne dei 300 Gianduiotti fondenti 70% slittano al 28/11 (ritardo sul cacao); i 400 classici restano confermati per il 25/11.",
     sourceIds: ["em-lab-conferma", "ch-m5"], access: ["magazzino", "shop"], status: "pending", proposedBy: "Brain",
     keywords: ["fondenti", "ritardo", "cacao", "28/11", "classici"] },
@@ -327,6 +330,22 @@ const MEMORY = [
   { id: "M14", text: "Magazzino: gestione FIFO per lotto; i lotti non conformi vanno in quarantena (scaffale Q) e segnalati subito.",
     sourceIds: ["dc-magazzino"], access: ["magazzino", "spedizioni"], status: "approved", proposedBy: "Brain", approvedBy: "Sara Conti",
     keywords: ["fifo", "quarantena", "lotto non conforme", "scaffale", "inventario"] },
+];
+
+// ---------- knowledge gaps: who could know what is not in memory ----------
+// When the Brain can't answer, it checks whether the question is about the company (matches a topic below).
+// If so, it opens a "da documentare" request to the owner role, who writes the fact + the question it answers.
+// No match (e.g. competitors) = out of scope: plain "non lo so", no request.
+// Mock of the LLM routing step; keywords are normalised substrings (no accents).
+const TOPIC_OWNERS = [
+  { role: "shop", label: "fornitori, acquisti, prezzi, promozioni e pagamenti",
+    keywords: ["fornitor", "acquist", "ordine minimo", "nocciol", "materie prime", "cacao", "prezz", "listino", "promo", "sconto", "margin", "contratt", "pagament", "fattur", "sito", "newsletter"] },
+  { role: "magazzino", label: "scorte, lotti, scaffali e imballaggi",
+    keywords: ["scort", "magazzin", "lott", "scaffal", "inventari", "quarantena", "imball", "cartoni", "scaden", "conserv", "stagionalit"] },
+  { role: "spedizioni", label: "corrieri, consegne e ritiri",
+    keywords: ["corrier", "spedizion", "consegn", "ritir", "pacc", "collo", "colli", "tracking", "giacenz", "dhl", "brt", "gls"] },
+  { role: "clienti", label: "clienti, reclami, resi e allergeni",
+    keywords: ["client", "reclam", "ticket", "reso", "resi", "rimbors", "allergen", "faq"] },
 ];
 
 // ---------- quarantine ("coda di scarto") ----------
