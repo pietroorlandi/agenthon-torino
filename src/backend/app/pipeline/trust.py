@@ -32,10 +32,20 @@ def compute_trust(brain, src: Source) -> tuple[str, str]:
         return "known_external", f"Contatto noto: {known[domain].org}"
     if domain in company.consumer_domains:
         return "unknown", "Privato (cliente o sconosciuto)"
+    base = _base(domain)
     for dom, org in [(c.domain, c.org) for c in company.contacts] + [(company.internal_domain, company.name)]:
-        if levenshtein(domain, dom) <= 2:
+        known_base = _base(dom)
+        # same name on another TLD (santanna.com vs santanna.example) or a near-identical name
+        near = levenshtein(base, known_base) <= 2 if min(len(base), len(known_base)) >= 5 else base == known_base
+        if levenshtein(domain, dom) <= 2 or near:
             return "lookalike", f"Il dominio {domain} somiglia a {dom} ({org}) ma non è lo stesso"
     return "unknown", "Dominio sconosciuto"
+
+
+def _base(domain: str) -> str:
+    """Registrable name without the TLD: 'mail.laboratorio-santanna.com' → 'laboratorio-santanna'."""
+    parts = domain.split(".")
+    return parts[-2] if len(parts) >= 2 else domain
 
 
 def attribution(brain, src: Source) -> Optional[str]:

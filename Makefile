@@ -3,7 +3,7 @@ PY := src/backend/.venv/bin/python
 SERVICE ?= company-brain
 REGION ?= europe-west4
 
-.PHONY: setup dev demo test check build docker deploy
+.PHONY: setup dev demo test smoke check build docker deploy
 
 setup:            ## venv Python + dipendenze frontend
 	test -d src/backend/.venv || python3 -m venv src/backend/.venv
@@ -20,6 +20,9 @@ demo: build       ## un solo processo: build frontend + FastAPI su http://localh
 test:             ## test delle garanzie (offline, LLM_MODE=off)
 	cd src/backend && .venv/bin/python -m pytest -q
 	cd src/frontend && npx tsc --noEmit
+
+smoke:            ## copione + attacchi via HTTP sul server acceso (URL=https://... per Cloud Run). Resetta la demo
+	$(PY) scripts/smoke.py $(URL)
 
 check:            ## verifica Vertex + ElevenLabs con la configurazione di .env
 	cd src/backend && .venv/bin/python check_vertex.py

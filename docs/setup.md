@@ -38,6 +38,9 @@ Poi, in PowerShell dalla cartella del repo:
 | `make test` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 test` |
 | `make demo` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 demo` |
 | `bash scripts/gcp-join.sh <id>` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 join <id>` |
+| `make smoke` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 smoke [url]` |
+
+Su Windows `localhost` prova prima IPv6: per il backend usa `127.0.0.1:8000` (lo smoke test e il proxy di Vite lo fanno già), altrimenti ogni richiesta perde circa 2 secondi. Se il backend sembra non vedere le modifiche al codice, controlla con `netstat -ano | findstr :8000` che non ci sia un vecchio processo ancora in ascolto.
 
 `gcp-setup.sh`, `gcp-add-member.sh` e il deploy restano su Linux: li lancia l'owner del progetto. In alternativa a tutto questo funziona anche WSL (Ubuntu) con i comandi Linux.
 
@@ -49,6 +52,8 @@ make dev       # FastAPI :8000 + Vite :5173 → apri http://localhost:5173
 make test      # test delle garanzie (offline) + typecheck del frontend
 make demo      # alternativa a un solo processo: build + http://localhost:8000
 ```
+
+**Smoke test** (`make smoke` / `scripts\win.ps1 smoke` / `python scripts/smoke.py https://<servizio>.run.app`): percorre il copione e gli attacchi principali via HTTP e stampa ✓/✗. I ✗ sono garanzie di fiducia e devono passare in ogni `LLM_MODE`; i ~ dipendono dal copione deterministico e in `live` possono cambiare legittimamente. Usalo dopo ogni deploy e prima del pitch.
 
 Con `GOOGLE_CLOUD_PROJECT` vuoto il backend va da solo in `LLM_MODE=off`. In alto a destra la UI mostra la modalità attiva.
 

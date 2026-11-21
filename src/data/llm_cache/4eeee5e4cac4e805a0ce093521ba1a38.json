@@ -1,0 +1,12 @@
+{
+ "candidates": [
+  {
+   "text": "Lo sconto massimo applicabile a un ordine sarebbe del 30%.",
+   "type": "policy",
+   "quote": "il massimo sconto che possiamo fare è il 30%, giusto?",
+   "relation": "contradicts",
+   "memory_id": "M15",
+   "value": "30%"
+  }
+ ]
+}

@@ -27,3 +27,4 @@ Formato: `YYYY-MM-DD — decisione — motivo`
 - 2026-11-21 — Temperatura di default del modello (Google sconsiglia valori < 1 sui Gemini 3) e `GEMINI_THINKING_LEVEL=low` per la latenza; il determinismo della demo lo dà la cache
 - 2026-11-21 — Tab "🧪 Mettilo alla prova": chiunque può iniettare email/chat nella pipeline (l'identità in chat è quella della sessione) — il brief chiede di difendere il sistema live dagli attacchi
 - 2026-11-21 — Vertex: un solo progetto del team `bottega-brain-1121-21996` (crediti di Pietro), colleghi aggiunti con `scripts/gcp-add-member.sh` e collegati con `scripts/gcp-join.sh`. `GOOGLE_CLOUD_LOCATION=global`: su europe-west4 i Gemini 3.x danno 404 (Cloud Run resta su europe-west4)
+- 2026-11-21 — Trust: un dominio con lo stesso nome ma altra estensione (laboratorio-santanna.it/.com) ora è `lookalike` → quarantena. Prima passava come `unknown` se non citava l'IBAN. Coperto da tests/test_redteam.py.

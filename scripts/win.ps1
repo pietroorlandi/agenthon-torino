@@ -4,6 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\win.ps1 dev
 #   powershell -ExecutionPolicy Bypass -File scripts\win.ps1 join bottega-brain-1121-21996
 #   powershell -ExecutionPolicy Bypass -File scripts\win.ps1 check | test | demo
+#   powershell -ExecutionPolicy Bypass -File scripts\win.ps1 smoke [https://<service>.run.app]
 param(
   [Parameter(Position = 0)][string]$Task = "help",
   [Parameter(Position = 1)][string]$Project = ""
@@ -48,7 +49,8 @@ switch ($Task) {
   }
   "dev" {
     # Backend in a second window, Vite in this one. Close both windows to stop.
-    $be = "Set-Location '$Backend'; & '$Py' -m uvicorn app.main:app --reload --port 8000"
+    # --reload-dir app: watch only our code (changes in .venv / OneDrive otherwise confuse the reloader)
+    $be = "Set-Location '$Backend'; & '$Py' -m uvicorn app.main:app --reload --reload-dir app --port 8000"
     Start-Process powershell -ArgumentList "-NoExit", "-Command", $be
     Write-Host "Backend avviato in un'altra finestra (:8000). Apri http://localhost:5173"
     Push-Location $Frontend; npm run dev; Pop-Location
@@ -63,6 +65,12 @@ switch ($Task) {
   }
   "check" {
     Push-Location $Backend; Run $Py @("check_vertex.py"); Pop-Location
+  }
+  "smoke" {
+    # Full demo script + attacks over HTTP against the running backend (resets the demo). Optional URL as 2nd arg.
+    $env:PYTHONIOENCODING = "utf-8"
+    $argv = @((Join-Path $Root "scripts\smoke.py")); if ($Project) { $argv += $Project }
+    Run $Py $argv
   }
   "join" {
     if (-not $Project) { throw "Uso: scripts\win.ps1 join <project-id>" }
@@ -81,6 +89,6 @@ switch ($Task) {
     Write-Host "Fatto. Verifica con: powershell -ExecutionPolicy Bypass -File scripts\win.ps1 check"
   }
   default {
-    Write-Host "Comandi: setup | dev | demo | test | check | join <project-id>"
+    Write-Host "Comandi: setup | dev | demo | test | check | smoke [url] | join <project-id>"
   }
 }

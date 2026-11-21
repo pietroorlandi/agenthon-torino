@@ -90,6 +90,12 @@ def _miss(brain, user: User, question: str, visible: list[MemoryItem], use_llm: 
         miss = QAMiss(restricted_memory_id=r_hit.id if r_hit else None, pending_memory_id=p_hit.id if p_hit else None,
                       topic_owner=topic.role if topic else "none")
     r_ids, p_ids = {m.id: m for m in restricted}, {m.id for m in pending}
+    if miss.restricted_memory_id not in r_ids:
+        # deterministic safety net: the LLM classifier sometimes misses a restricted match and would open a useless gap.
+        # Only yields "denied" (no content), so it can never leak.
+        hit = _best(restricted, norm(question))
+        if hit:
+            miss.restricted_memory_id = hit.id
     if miss.restricted_memory_id in r_ids:
         return _denied(brain, user, r_ids[miss.restricted_memory_id], engine)
     text = "🤷 **Non lo so.** Non c'è nulla nella memoria approvata che risponda a questa domanda, e non voglio inventare."

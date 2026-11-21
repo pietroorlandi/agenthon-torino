@@ -58,11 +58,14 @@ Comandi (guida completa con Vertex, ElevenLabs, osservabilità e deploy: [docs/s
 ```bash
 make setup    # venv src/backend/.venv + npm install + .env da .env.example
 make dev      # FastAPI :8000 (reload) + Vite :5173 → http://localhost:5173
-make test     # pytest delle garanzie (offline) + tsc del frontend
+make test     # pytest delle garanzie + red team (offline) + tsc del frontend
+make smoke    # copione + attacchi via HTTP sul server acceso (URL=https://... per Cloud Run). Resetta la demo
 make check    # verifica Vertex + ElevenLabs con la .env
 make demo     # build + un solo processo su http://localhost:8000
 make deploy   # Cloud Run (scripts/deploy.sh)
 ```
+- **Windows:** niente `make` → `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 <setup|dev|test|smoke|check|join>`.
+- Ogni attacco che passa durante il red teaming → nuovo test in `src/backend/tests/test_redteam.py`.
 - `LLM_MODE=live|replay|off`: senza `GOOGLE_CLOUD_PROJECT` il backend va in `off` (motori deterministici). La cache LLM sta in `src/data/llm_cache/` ed è committata, così `replay` fa da piano B.
 - Versioni fissate: google-adk 2.14.1, google-genai 2.34.0, FastAPI 0.165, Vite 8, React 19, Tailwind 4.3, TS 6.0.
 
