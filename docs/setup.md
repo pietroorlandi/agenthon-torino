@@ -21,6 +21,21 @@ Ogni livello funziona da solo: se Vertex o ElevenLabs non rispondono, la demo co
   ```
 - Docker: opzionale (solo per provare l'immagine in locale con `make docker`).
 
+### Windows: usa WSL
+Makefile e script sono bash, quindi su Windows si lavora **dentro WSL (Ubuntu)**. Una volta sola:
+1. PowerShell **come amministratore**: `wsl --install -d Ubuntu-24.04`, poi riavvia il PC. Al primo avvio Ubuntu chiede utente e password Linux.
+2. Da qui in poi **tutti i comandi vanno nel terminale Ubuntu**, non in PowerShell:
+   ```bash
+   sudo apt update && sudo apt install -y make git python3-venv python3-pip curl
+   curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs
+   curl -sSL https://sdk.cloud.google.com | bash && exec -l $SHELL      # gcloud (solo per Gemini)
+   cd ~ && git clone https://github.com/pietroorlandi/agenthon-torino.git && cd agenthon-torino
+   ```
+   Clona il repo **nella home di Ubuntu (`~`)**, non in `/mnt/c/...`: lì npm e il reload sono lentissimi.
+3. VS Code: installa l'estensione **WSL**, poi `code .` dal terminale Ubuntu.
+4. `http://localhost:5173` si apre normalmente dal browser di Windows.
+5. Login `gcloud`: se il browser non si apre da solo, copia il link stampato nel terminale e incollalo nel browser di Windows.
+
 ## 2. Livello A — avvio offline (2 minuti)
 
 ```bash
