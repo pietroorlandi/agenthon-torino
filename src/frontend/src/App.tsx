@@ -38,7 +38,8 @@ export default function App() {
   const [sourceId, setSourceId] = useState<string | null>(null);
   const { data: state, error } = useQuery({
     queryKey: ["state", userId], queryFn: api.state,
-    refetchInterval: (q) => (q.state.data?.outbox.some((o) => o.delivery === "sending") ? 1500 : false), // real email in flight
+    // real email in flight, or Gemini still writing drafts / briefs in background
+    refetchInterval: (q) => (q.state.data?.llm_busy || q.state.data?.outbox.some((o) => o.delivery === "sending") ? 1500 : false),
   });
   const { run, busy } = useAct();
   useEffect(() => { if (state) record(state); }, [state]); // snapshots for the Brain view, even while it is closed

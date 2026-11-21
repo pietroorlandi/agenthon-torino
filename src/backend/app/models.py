@@ -103,8 +103,37 @@ class Candidate(BaseModel):
     value: Optional[str] = Field(default=None, description="Valore confrontabile (es. '30%'), se c'è")
 
 
+EffectName = Literal["refund", "intercept", "reorder", "block", "payment", "quarantine", "notify"]
+
+
+class ProposedAction(BaseModel):
+    effect: EffectName = Field(description="Tipo di azione che una persona dovrebbe approvare")
+    order_id: Optional[str] = Field(default=None, description="Numero ordine (es. '#10481') per refund / intercept")
+    sku: Optional[str] = Field(default=None, description="SKU del prodotto per reorder / block")
+    qty: Optional[int] = Field(default=None, description="Quantità, solo per reorder")
+    quote: str = Field(description="Citazione LETTERALE dalla fonte che giustifica l'azione")
+    reason: str = Field(description="Perché serve, in una frase in italiano")
+
+
 class Extraction(BaseModel):
     candidates: list[Candidate] = []
+    actions: list[ProposedAction] = Field(default=[], description="Azioni da proporre a una persona; lista vuota se non serve nulla")
+
+
+class ActionText(BaseModel):
+    title: str = Field(description="Titolo breve dell'azione (max 90 caratteri), con ordine/importo se pertinenti")
+    why: str = Field(description="Perché serve adesso, 1-2 frasi, solo dai fatti forniti")
+    draft: str = Field(description="Testo completo pronto da inviare dopo l'approvazione")
+    cited_source_ids: list[str] = Field(description="Id delle fonti usate")
+
+
+class BriefLine(BaseModel):
+    text: str = Field(description="1-2 frasi in italiano, il punto chiave in **grassetto**")
+    sources: list[str] = Field(description="Id delle fonti che lo provano")
+
+
+class BriefText(BaseModel):
+    items: list[BriefLine]
 
 
 class QAAnswer(BaseModel):
@@ -214,7 +243,8 @@ class Action(BaseModel):
     sku: Optional[str] = None
     qty: Optional[int] = None
     decided_by: Optional[str] = None
-    draft_by: str = "Brain"
+    draft_by: str = "testo di riserva"
+    text_engine: str = "riserva"  # gemini | cache | agente | riserva (seed text, LLM not available)
     edited_by: Optional[str] = None
 
 

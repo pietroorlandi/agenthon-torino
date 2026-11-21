@@ -105,8 +105,14 @@ export function TodayView() {
 
       <TasksSection />
 
-      {news.length > 0 && (
+      {state.brief.engine === "writing" && (
         <Section title="Cosa devi sapere">
+          <p className="card muted text-sm">Gemini sta leggendo email, chat e documenti del tuo reparto per prepararti il brief…</p>
+        </Section>
+      )}
+      {news.length > 0 && (
+        <Section title="Cosa devi sapere" hint={{ riserva: "Brief di riserva: Gemini non disponibile.", gemini: "Scritto da Gemini dalle fonti che puoi vedere.",
+          cache: "Scritto da Gemini dalle fonti che puoi vedere." }[state.brief.engine as string]}>
           <ul className="card space-y-3">
             {news.map((it, i) => <li key={i}><RichText text={it.text} /><Cites ids={it.sources} /></li>)}
           </ul>

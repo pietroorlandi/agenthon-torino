@@ -1,0 +1,37 @@
+{
+ "items": [
+  {
+   "text": "Il Laboratorio Sant'Anna richiede il **ritiro immediato del lotto L26-1108** di Gianduiotti al caffè per etichetta priva dell'allergene latte, mentre alle 10:00 è programmata una newsletter promozionale su questo prodotto; la trovi in *Oggi*.",
+   "sources": [
+    "em-lotto",
+    "em-newsletter",
+    "ch-sh5",
+    "ch-c6"
+   ]
+  },
+  {
+   "text": "La **fattura n. 889 di 3.450€ è scaduta il 15/11** e il fornitore avverte che potrebbe rivedere le priorità di produzione in vista delle consegne natalizie; la trovi in *Oggi*.",
+   "sources": [
+    "em-fattura",
+    "em-lab-conferma"
+   ]
+  },
+  {
+   "text": "I codici sconto NATALE10 e BENVENUTO5 sono risultati cumulabili nel checkout, generando stanotte **14 ordini con doppio sconto** e azzerando i margini sui Box Natale.",
+   "sources": [
+    "ch-sh2",
+    "tk-cumulo",
+    "dc-sconti"
+   ]
+  },
+  {
+   "text": "I Gianduiotti fondenti 70% sono a sole 38 unità (sotto la soglia di 60) e la **nuova consegna slitta al 28/11**, lasciando il prodotto scoperto all'inizio del Black Friday del 27/11.",
+   "sources": [
+    "em-lab-conferma",
+    "ch-m5",
+    "STORE-GIA-FON",
+    "ch-m6"
+   ]
+  }
+ ]
+}

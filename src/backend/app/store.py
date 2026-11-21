@@ -74,8 +74,15 @@ class Brain:
             self.overnight: dict[str, list[str]] = {}     # role → what happened during the night
             self.mails: dict[str, list[dict]] = {u.id: [] for u in self.company.users}  # morning brief emails, one per day
             self._seed_conflicts()
-            self.send_morning_briefs()
+            # background LLM writing (services/writer.py): a reset invalidates jobs still running for the old state
+            self.epoch = getattr(self, "epoch", 0) + 1
+            self.writing: set[str] = set()
+            self.llm_brief: dict[str, tuple[list[BriefItem], str]] = {}
             self.log("system", "demo.reset", "Demo riportata allo stato iniziale (21/11 08:10)")
+            from .services import writer  # local import: avoids a cycle
+
+            # Gemini writes the action texts and the day-1 morning briefs; each brief is sent (chat + Posta) when ready
+            writer.start(self)
 
     @property
     def date(self) -> str:
@@ -83,13 +90,16 @@ class Brain:
 
     def send_morning_briefs(self) -> None:
         """Snapshot of today's brief per person: in the chat (DM) and as the morning email in Posta."""
+        for u in self.company.users:
+            self.send_morning_brief(u)
+
+    def send_morning_brief(self, u: User) -> None:
         from .services.brief import build_brief, email_subject  # local import: avoids a cycle
 
-        for u in self.company.users:
-            b = build_brief(self, u)
-            self.push(u.id, kind="brief", text=b["text"], items=b["items"], time="08:00")
-            self.mails[u.id].append({"date": self.date, "subject": email_subject(self.date), "text": b["text"],
-                                     "items": [i.model_dump() for i in b["items"]]})
+        b = build_brief(self, u)
+        self.push(u.id, kind="brief", text=b["text"], items=b["items"], time="08:00", engine=b["engine"])
+        self.mails[u.id].append({"date": self.date, "subject": email_subject(self.date), "text": b["text"],
+                                 "items": [i.model_dump() for i in b["items"]]})
 
     def _seed_conflicts(self) -> None:
         """Seed claims (pre-annotated extraction) that contradict approved memory go to quarantine, never to memory."""

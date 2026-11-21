@@ -153,7 +153,7 @@ export function SourceModal({ id, onClose }: { id: string; onClose: () => void }
                 {dev && (
                   <div className="muted mt-2 space-y-0.5">
                     <div>Fiducia mittente: {s.trust} — {s.trust_reason}</div>
-                    <div>Triage: {s.triage} ({s.triage_engine}) — {s.triage_reason}</div>
+                    <div>Triage: {s.triage} ({ENGINE_LABEL[s.triage_engine ?? ""] ?? s.triage_engine}) — {s.triage_reason}</div>
                   </div>
                 )}
               </div>
@@ -165,9 +165,15 @@ export function SourceModal({ id, onClose }: { id: string; onClose: () => void }
   );
 }
 
+// Who produced a text: Gemini, or a scripted fallback because the LLM was not available (always said explicitly)
+const ENGINE_LABEL: Record<string, string> = {
+  gemini: "Gemini", cache: "Gemini (cache)", copione: "copione: Gemini non disponibile", riserva: "testo di riserva: Gemini non disponibile",
+  fallback: "motore deterministico", "parole chiave": "parole chiave: Gemini non disponibile",
+};
+
 export function EngineBadge({ engine }: { engine?: string | null }) {
   if (!engine) return null;
-  return <span className="font-mono text-[10px] text-stone-400">{engine}</span>;
+  return <span className="font-mono text-[10px] text-stone-400">{ENGINE_LABEL[engine] ?? engine}</span>;
 }
 
 // Section heading with a count, used by every page

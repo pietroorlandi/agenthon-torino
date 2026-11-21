@@ -45,6 +45,7 @@ export interface ActionView {
   id: string; status: "pending" | "executed" | "rejected"; locked?: boolean; owner_label: string;
   title?: string; why?: string; draft?: string; source_ids?: string[]; decided_by?: string | null;
   draft_by?: string; edited_by?: string | null; can_decide?: boolean; effect?: string;
+  text_engine?: "gemini" | "cache" | "agente" | "riserva"; writing?: boolean;
 }
 
 export interface Product { sku: string; name: string; price: number; stock: number; threshold: number; sold7d: number; blocked: boolean; incoming: number }
@@ -56,7 +57,8 @@ export interface State {
   now: string; me: User; users: User[]; roles: Record<Role, string>; knowledge_topics: { id: string; label: string }[];
   channels: { id: string; locked: boolean }[];
   dm: Message[]; unread: number;
-  brief: { text: string; time: string; items: BriefItem[] };
+  brief: { text: string; time: string; items: BriefItem[]; engine: "gemini" | "cache" | "riserva" | "writing" | "codice" };
+  llm_busy: boolean;
   day: number; tasks: { open: Task[]; done: { text: string; op: string }[] }; mails: MorningMail[];
   memory: MemoryView[]; quarantine: QuarantineView[]; gaps: GapView[]; actions: ActionView[]; outbox: OutboxItem[];
   sources: SourceView[]; hidden_sources: number;

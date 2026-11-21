@@ -1,0 +1,13 @@
+{
+ "candidates": [
+  {
+   "text": "Le etichette correttive con «contiene LATTE» per il lotto L26-1108 saranno consegnate lunedì 24/11 entro le 12:00, e dopo la rietichettatura i pezzi potranno essere rimessi in vendita solo previa conferma scritta del laboratorio.",
+   "type": "decision",
+   "quote": "Vi confermiamo che le etichette correttive con la dicitura «contiene LATTE» per il lotto L26-1108 saranno consegnate lunedì 24/11 entro le 12:00. Dopo la rietichettatura potrete rimettere in vendita i pezzi solo dopo una nostra conferma scritta.",
+   "relation": "new",
+   "memory_id": "M9",
+   "value": "24/11"
+  }
+ ],
+ "actions": []
+}

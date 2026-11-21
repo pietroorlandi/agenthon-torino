@@ -296,7 +296,7 @@ async def action_agent_draft(aid: str, user: User = Depends(current_user)):
         raise HTTPException(503, "Agente bozze non disponibile (serve LLM_MODE=live): la bozza attuale resta invariata")
     with brain.lock:
         valid = [s for s in res["cited"] if (src := brain.source(s)) and can_see(src.access, user.role)]
-        a.draft, a.draft_by = res["draft"], "agente ADK"
+        a.draft, a.draft_by, a.text_engine = res["draft"], "agente ADK (Gemini)", "agente"
         a.source_ids = list(dict.fromkeys(a.source_ids + valid))
         brain.log("agent:draft", "action.drafted", f"Bozza di {a.id} riscritta dall'agente (fonti: {', '.join(valid) or 'nessuna'})", access=[a.owner], refs=[a.id])
         return _ok(user)

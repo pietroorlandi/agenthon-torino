@@ -1,0 +1,13 @@
+{
+ "candidates": [],
+ "actions": [
+  {
+   "effect": "refund",
+   "order_id": "#10474",
+   "sku": null,
+   "qty": null,
+   "quote": "ho ricevuto oggi il mio ordine #10474 ma la scatola era completamente schiacciata e metà dei gianduiotti sono rotti. Vi allego le foto. Vorrei essere rimborsato.",
+   "reason": "Il cliente richiede il rimborso per ordine #10474 arrivato danneggiato, allegando foto della merce rotta."
+  }
+ ]
+}
