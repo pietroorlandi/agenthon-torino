@@ -1,5 +1,6 @@
 // Company Brain — demo UI (step 1: fully client-side, mock answer engine).
 // The function `askBrain()` is the single point to swap with a Gemini backend later.
+// Dataset (users, channels, products, orders, sources, memory, actions) lives in data.js.
 
 const TABS = [
   { id: "guide",   label: "🎯 Guida demo" },
@@ -10,8 +11,6 @@ const TABS = [
   { id: "actions", label: "✅ Azioni" },
   { id: "sources", label: "📁 Fonti" },
 ];
-
-const CHANNELS = ["generale", "ordini", "tech", "finance"];
 
 let state;
 
@@ -24,11 +23,15 @@ function initialState() {
     orders: structuredClone(ORDERS),
     memory: structuredClone(MEMORY),
     actions: structuredClone(ACTIONS),
+    quarantine: [],   // claims that contradict approved memory, waiting for an authorised person
+    banned: {},       // sourceId -> true: banned sources are forgotten
     dm: {},
     unread: {},
     log: [],
     eventFired: false,
+    conflictFired: false,
   };
+  detectConflicts(s);
   for (const id of Object.keys(USERS)) {
     s.dm[id] = [buildBrief(USERS[id], s)];
     s.unread[id] = 1;
@@ -44,13 +47,42 @@ const now = () => new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minu
 const me = () => USERS[state.userId];
 const canSee = (access, role) => access.includes("all") || access.includes(role);
 const userWithRole = (role) => Object.values(USERS).find((u) => u.role === role);
+const who = (x) => USERS[x]?.name || x;
+const roleList = (access) => access.map((r) => ROLE_LABELS[r]).join(", ");
+// "21/11 07:20" -> sortable number
+const dateKey = (d) => {
+  const m = /(\d\d)\/(\d\d)(?: (\d\d):(\d\d))?/.exec(d);
+  return m ? +m[2] * 1e6 + +m[1] * 1e4 + (+m[3] || 0) * 100 + (+m[4] || 0) : 0;
+};
+
+// Sources visible right now (live ones appear only after their demo event).
+const liveSources = () => SOURCES.filter((s) => !s.live || state.conflictFired);
+
+// ---------- quarantine: do not trust sources blindly ----------
+// For every source claim, compare it with the approved memory item having the same fact key.
+// A different value is NOT used and NOT proposed as memory: it is queued for the memory's authority roles.
+function detectConflicts(s) {
+  const created = [];
+  for (const src of SOURCES.filter((x) => x.claim && (!x.live || s.conflictFired))) {
+    const mem = s.memory.find((m) => m.status === "approved" && m.fact?.key === src.claim.key);
+    if (!mem || mem.fact.value === src.claim.value) continue;
+    if (s.quarantine.some((q) => q.sourceId === src.id)) continue;
+    const live = src.id === LIVE_CONFLICT.sourceId;
+    const q = { id: `Q${s.quarantine.length + 1}`, sourceId: src.id, memoryId: mem.id, claim: src.claim, authority: mem.authority || mem.access,
+      status: "pending", orderId: live ? LIVE_CONFLICT.order.id : null };
+    s.quarantine.push(q);
+    created.push(q);
+  }
+  return created;
+}
+const pendingQuarantine = (role) => state.quarantine.filter((q) => q.status === "pending" && q.authority.includes(role));
 
 function getSource(id) {
   if (id.startsWith("STORE-")) {
     const sku = id.slice(6);
     const p = state.products.find((x) => x.sku === sku);
     return { id, type: "store", title: `Store admin — scorte ${sku}`, from: "sistema", date: "live", access: ["all"],
-      body: `${p.name}: ${p.stock} pz in magazzino (soglia ${p.threshold}), ${p.sold7d} venduti negli ultimi 7 giorni.` };
+      body: `${p.name}: ${p.stock} pz in magazzino (soglia ${p.threshold}), ${p.sold7d} venduti negli ultimi 7 giorni.${p.blocked ? " Vendita sospesa." : ""}` };
   }
   return SOURCES.find((s) => s.id === id);
 }
@@ -66,23 +98,12 @@ function citeChips(ids) {
 }
 
 // ---------- proactive brief (the Brain speaks first) ----------
+// Items per role live in data.js (BRIEF_ITEMS); here we only add the dynamic part.
 function buildBrief(user, s) {
-  const items = [];
+  const items = [...(BRIEF_ITEMS[user.role] || [])];
   const pendingMem = s.memory.filter((m) => m.status === "pending" && canSee(m.access, user.role)).length;
-
-  if (user.role === "finance") {
-    items.push({ text: "<b>Fattura n. 889 scaduta</b> (3.450€, fornitore cioccolato) — è arrivato un sollecito. Ho preparato il pagamento: è in <i>Azioni</i>, aspetta la tua approvazione.", sources: ["S6"] });
-    items.push({ text: "Margine lordo di novembre al <b>38,4%</b>. Il vermouth resta il prodotto più redditizio (52%).", sources: ["S3"] });
-  }
-  if (user.role === "tech") {
-    items.push({ text: "<b>Errori 502 dal gateway di pagamento</b> sugli ordini esteri da stanotte. Probabilmente collegato all'ordine #10480 (DE) con pagamento fallito.", sources: ["S4"] });
-    items.push({ text: "Il task <b>Migrazione API pagamenti</b> scade il 25/11 ed è al 60%.", sources: ["S5"] });
-  }
-  if (user.role === "ops") {
-    items.push({ text: "Il cliente dell'ordine <b>#10478</b> chiede un rimborso per grissini rotti. Rientra nella policy (sotto 100€): la bozza è in <i>Azioni</i>.", sources: ["S7", "S8"] });
-    items.push({ text: "<b>Nocciole IGP sotto scorta</b> (18 pz, soglia 25).", sources: ["STORE-NOC-IGP"] });
-    items.push({ text: "È arrivata un'email sul <b>nuovo corriere per l'estero da dicembre</b>. Ne ho estratto un fatto: va revisionato in <i>Memoria</i>.", sources: ["S1"] });
-  }
+  const quar = s.quarantine.filter((q) => q.status === "pending" && q.authority.includes(user.role));
+  quar.forEach((q) => items.unshift({ text: `🛡️ <b>Informazione in quarantena</b>: «${esc(q.claim.text)}» contraddice la memoria approvata. Non la uso finché non decidi in <i>Memoria</i>.`, sources: [q.sourceId] }));
   if (pendingMem) items.push({ text: `Hai <b>${pendingMem} elementi di memoria</b> da revisionare.`, sources: [] });
 
   return { from: "brain", kind: "brief", time: "08:00", items,
@@ -101,7 +122,7 @@ function askBrain(question, user) {
   const approved = best(state.memory.filter((m) => m.status === "approved"));
   if (approved) {
     if (!canSee(approved.access, user.role)) {
-      const owners = approved.access.map((r) => ROLE_LABELS[r]).join(", ");
+      const owners = roleList(approved.access);
       const contact = userWithRole(approved.access[0]);
       return { from: "brain", kind: "denied",
         text: `🔒 L'informazione esiste, ma è riservata al team <b>${owners}</b>: non posso condividerla con il ruolo ${user.roleLabel}.${contact ? ` Puoi chiedere a ${contact.name}.` : ""}` };
@@ -122,7 +143,7 @@ function render() {
   $("#tabs").innerHTML = TABS.map((t) => {
     const badge = t.id === "chat" && state.unread[state.userId] ? `<span class="badge">${state.unread[state.userId]}</span>` : "";
     const pend = t.id === "actions" ? state.actions.filter((a) => a.status === "pending" && a.owner === me().role).length : 0;
-    const pendMem = t.id === "memory" ? state.memory.filter((m) => m.status === "pending" && canSee(m.access, me().role)).length : 0;
+    const pendMem = t.id === "memory" ? state.memory.filter((m) => m.status === "pending" && canSee(m.access, me().role)).length + pendingQuarantine(me().role).length : 0;
     const b2 = pend || pendMem ? `<span class="badge amber">${pend || pendMem}</span>` : "";
     return `<button class="tab ${state.tab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}${badge}${b2}</button>`;
   }).join("");
@@ -142,20 +163,22 @@ function render() {
 
 function viewGuide() {
   const checks = [
-    ["Parla per primo", "Apri <b>Chat → 🧠 Brain</b>: c'è il brief delle 08:00 che nessuno ha chiesto. Poi in <b>Store</b> premi <i>Simula evento</i>: arriva un alert a Operations.", "chat"],
-    ["La memoria la curano le persone", "In <b>Memoria</b> approva il fatto su DHL e rifiuta quello sul 50% di sconto. Poi in Chat chiedi: <i>“Quale corriere usiamo per l'estero da dicembre?”</i> (prima dell'approvazione risponde “non lo so”).", "memory"],
-    ["Sa chi sta chiedendo", "Chiedi <i>“Qual è il margine di novembre?”</i> come Giulia (Finance) e poi come Marco (Tech): solo Finance ottiene la risposta.", "chat"],
-    ["Cita le fonti", "Ogni risposta e ogni punto del brief ha i chip <b>Fonti</b>: cliccali per vedere l'originale.", "chat"],
-    ["Ammette i limiti", "Chiedi <i>“Quanti dipendenti ha il nostro concorrente?”</i>: risponde “Non lo so”.", "chat"],
-    ["Propone soltanto", "In <b>Azioni</b> ci sono bozze in attesa. Nulla cambia nello Store finché una persona non approva.", "actions"],
-    ["Si inserisce nella giornata del team", "Chat stile Slack + <b>Email del mattino</b> per ogni persona.", "email"],
+    ["Parla per primo", "Apri <b>Chat → 🧠 Brain</b>: c'è il brief delle 08:00 che nessuno ha chiesto. Poi in <b>Store</b> premi <i>Simula evento</i>: un picco di ordini manda i classici sotto scorta e arriva un alert a Magazzino.", "chat"],
+    ["La memoria la curano le persone", "In <b>Memoria</b> approva il fatto su DHL. Poi in Chat chiedi: <i>“Quale corriere usiamo per l'estero da dicembre?”</i> (prima dell'approvazione risponde “non lo so”).", "memory"],
+    ["Non si fida ciecamente delle fonti", "La battuta sul «50% al Black Friday» in #generale contraddice il -20% approvato: il Brain non la usa, la mette in <b>quarantena</b>. Come Marco (Shop) in <b>Memoria</b> scegli <i>Scarta e dimentica</i> o <i>Accetta</i>. Per un caso live: in <b>Store</b> premi <i>Simula messaggio in contrasto</i> (qualcuno scrive che lo sconto massimo è il 30% e lo applica a un ordine).", "memory"],
+    ["Sa chi sta chiedendo", "Chiedi <i>“Qual è il margine di novembre?”</i> come Marco (Shop) e poi come Sara (Magazzino): solo lo Shop ottiene la risposta.", "chat"],
+    ["Cita le fonti", "Ogni risposta e ogni punto del brief ha i chip <b>Fonti</b>: cliccali per vedere l'originale (email, chat, doc, task, store).", "chat"],
+    ["Ammette i limiti", "Chiedi <i>“Quanti dipendenti ha il nostro concorrente?”</i> oppure <i>“Entro quando ordinare per ricevere prima di Natale?”</i> (c'è solo una bozza non approvata): risponde “Non lo so”.", "chat"],
+    ["Propone soltanto", "In <b>Azioni</b> ci sono bozze in attesa (rimborso, pagamento fornitore, quarantena lotto, avvisi ai clienti…). Nulla cambia nello Store finché una persona del reparto giusto non approva.", "actions"],
+    ["Si inserisce nella giornata del team", "Chat stile Slack con 6 canali + <b>Email del mattino</b> per ogni persona, in base al suo reparto.", "email"],
   ];
   return `<section class="page">
     <h1>Company Brain — il collega che sa, e parla per primo</h1>
-    <p class="muted">Bottega Sabauda è un e-commerce torinese di prodotti tipici. Il Brain osserva email, chat, task, documenti e lo store,
-    mantiene una memoria condivisa curata dal team e avvisa ognuno di ciò che richiede attenzione. Cambia utente in alto a destra.</p>
+    <p class="muted">Bottega Sabauda è un negozio online torinese specializzato in <b>gianduiotti</b>. Quattro comparti: <b>magazzino</b>, <b>servizio clienti</b>, <b>shop</b> e <b>spedizioni</b> (verso utenti finali e negozi).
+    Il Brain osserva email, chat, task, documenti e lo store, mantiene una memoria condivisa curata dal team e avvisa ognuno di ciò che richiede attenzione. Cambia utente in alto a destra.</p>
     <div class="team">${Object.values(USERS).map((u) => `<div class="person"><span class="avatar" style="background:${u.color}">${u.avatar}</span><div><b>${u.name}</b><br><span class="muted">${u.roleLabel}</span></div></div>`).join("")}</div>
-    <h2>I 7 check della giuria</h2>
+    <div class="scenario"><b>Scenario trasversale di oggi (21/11):</b> il laboratorio segnala che il lotto L26-1108 dei Gianduiotti al caffè ha l'etichetta senza l'allergene latte. Tocca <b>tutti e quattro i reparti</b>: Magazzino (quarantena), Shop (stop vendita e promo CAFFE15 + newsletter delle 10:00), Servizio clienti (una cliente allergica ha già scritto, avviso agli acquirenti) e Spedizioni (ordini in preparazione da non evadere). Guarda il brief di ognuno.</div>
+    <h2>I check della giuria</h2>
     <ol class="checks">${checks.map(([t, d, tab], i) => `<li><div><b>${i + 1}. ${t}</b><p>${d}</p></div><button class="primary small" data-goto="${tab}">Vai →</button></li>`).join("")}</ol>
   </section>`;
 }
@@ -176,13 +199,13 @@ function renderMsg(m) {
 
 function viewChat() {
   const u = me();
-  const channelMsgs = (ch) => SOURCES.filter((s) => s.type === "chat" && s.channel === ch && canSee(s.access, u.role));
+  const channelMsgs = (ch) => liveSources().filter((s) => s.type === "chat" && s.channel === ch && canSee(s.access, u.role)).sort((a, b) => dateKey(a.date) - dateKey(b.date));
   const side = `<aside class="sidebar">
       <div class="ws">Bottega Sabauda</div>
       <div class="side-h">Canali</div>
       ${CHANNELS.map((c) => {
-        const locked = c === "tech" && u.role !== "tech" || c === "finance" && u.role !== "finance";
-        return `<button class="side-item ${state.channel === c ? "active" : ""}" data-channel="${c}" ${locked ? "disabled" : ""}># ${c}${locked ? " 🔒" : ""}</button>`;
+        const locked = !canSee(c.access, u.role);
+        return `<button class="side-item ${state.channel === c.id ? "active" : ""}" data-channel="${c.id}" ${locked ? "disabled" : ""}># ${c.id}${locked ? " 🔒" : ""}</button>`;
       }).join("")}
       <div class="side-h">App</div>
       <button class="side-item ${state.channel === "brain" ? "active" : ""}" data-channel="brain">🧠 Brain ${state.unread[u.id] ? `<span class="badge">${state.unread[u.id]}</span>` : ""}</button>
@@ -190,7 +213,7 @@ function viewChat() {
 
   let main;
   if (state.channel === "brain") {
-    const suggestions = ["Quale corriere usiamo per l'estero da dicembre?", "Qual è il margine di novembre?", "Come funzionano i rimborsi?", "Come si fa il deploy del sito?", "Che sconto facciamo per il Black Friday?", "Quanti dipendenti ha il nostro concorrente?"];
+    const suggestions = ["Quale corriere usiamo per l'estero da dicembre?", "Che sconto facciamo per il Black Friday?", "Posso cumulare NATALE10 e BENVENUTO5?", "I gianduiotti contengono latte?", "Come funzionano i rimborsi?", "Qual è lo sconto massimo applicabile a un ordine?", "Qual è il margine di novembre?", "Entro quando ordinare per ricevere prima di Natale?", "Quanti dipendenti ha il nostro concorrente?"];
     main = `<div class="chat-main">
       <div class="chat-head"><b>🧠 Brain</b> <span class="muted">· messaggi diretti con ${u.name} (${u.roleLabel})</span></div>
       <div class="messages" id="messages">${state.dm[u.id].map(renderMsg).join("")}</div>
@@ -219,7 +242,7 @@ function viewEmail() {
     <div class="mail-head">
       <div><span class="muted">Da:</span> Brain &lt;brain@bottegasabauda.example&gt;</div>
       <div><span class="muted">A:</span> ${u.name} (${u.roleLabel})</div>
-      <div><span class="muted">Oggetto:</span> <b>Il tuo brief di venerdì 21 novembre</b></div>
+      <div><span class="muted">Oggetto:</span> <b>Il tuo brief del 21 novembre</b></div>
       <div class="muted">Inviata automaticamente alle 08:00 · nessuno l'ha richiesta</div>
     </div>
     <div class="mail-body">
@@ -230,29 +253,36 @@ function viewEmail() {
     </div></div></section>`;
 }
 
+const PROBLEM_STATUS = ["In attesa approvazione sconto", "Pagamento fallito", "In attesa pagamento", "Rimborso richiesto", "In giacenza", "Indirizzo errato"];
+
 function viewStore() {
   const low = state.products.filter((p) => p.stock < p.threshold).length;
   const revenue = state.products.reduce((n, p) => n + p.price * p.sold7d, 0);
+  const problems = state.orders.filter((o) => PROBLEM_STATUS.includes(o.status) || o.flag).length;
   return `<section class="page">
     <div class="row between"><h1>🛒 Store admin — Bottega Sabauda</h1>
-      <button class="primary" id="fireEvent" ${state.eventFired ? "disabled" : ""}>⚡ Simula evento: ${SIMULATED_EVENT.label}</button></div>
+      <div class="row">
+        <button class="primary" id="fireEvent" ${state.eventFired ? "disabled" : ""}>⚡ Simula evento: ${SIMULATED_EVENT.label}</button>
+        <button class="primary" id="fireConflict" ${state.conflictFired ? "disabled" : ""}>⚡ Simula ${LIVE_CONFLICT.label}</button>
+      </div></div>
     <div class="kpis">
       <div class="kpi"><span class="muted">Ordini oggi</span><b>${state.orders.filter((o) => o.date.startsWith("21/11")).length}</b></div>
       <div class="kpi"><span class="muted">Ricavi 7 giorni</span><b>${revenue.toLocaleString("it-IT", { style: "currency", currency: "EUR" })}</b></div>
       <div class="kpi ${low ? "warn" : ""}"><span class="muted">Prodotti sotto scorta</span><b>${low}</b></div>
+      <div class="kpi ${problems ? "warn" : ""}"><span class="muted">Ordini con problemi</span><b>${problems}</b></div>
     </div>
     <h2>Prodotti</h2>
     <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Prodotto</th><th>Prezzo</th><th>Scorta</th><th>Venduti 7gg</th></tr></thead><tbody>
       ${state.products.map((p) => {
         const pct = Math.min(100, (p.stock / (p.threshold * 3)) * 100);
         const lowCls = p.stock < p.threshold ? "low" : "";
-        return `<tr class="${lowCls}"><td>${p.sku}</td><td>${p.name}</td><td>${p.price.toFixed(2)}€</td>
+        return `<tr class="${lowCls}"><td>${p.sku}</td><td>${p.name}${p.blocked ? ` <span class="tag denied">VENDITA SOSPESA</span>` : ""}</td><td>${p.price.toFixed(2)}€</td>
           <td><div class="stock"><div class="bar"><span style="width:${pct}%"></span></div>${p.stock} pz ${lowCls ? "⚠️" : ""}${p.incoming ? ` <span class="tag ok">+${p.incoming} in arrivo</span>` : ""}</div></td><td>${p.sold7d}</td></tr>`;
       }).join("")}
     </tbody></table></div>
-    <h2>Ultimi ordini</h2>
-    <div class="table-wrap"><table><thead><tr><th>Ordine</th><th>Cliente</th><th>Paese</th><th>Totale</th><th>Stato</th><th>Data</th></tr></thead><tbody>
-      ${state.orders.map((o) => `<tr><td>${o.id}</td><td>${o.customer}</td><td>${o.country}</td><td>${o.total.toFixed(2)}€</td><td><span class="status s-${norm(o.status).replace(/\s+/g, "-")}">${o.status}</span></td><td>${o.date}</td></tr>`).join("")}
+    <h2>Ordini <span class="muted">(${state.orders.length} recenti, dal più nuovo)</span></h2>
+    <div class="table-wrap tall"><table><thead><tr><th>Ordine</th><th>Cliente</th><th>Tipo</th><th>Paese</th><th>Totale</th><th>Stato</th><th>Corriere</th><th>Data</th><th>Note</th></tr></thead><tbody>
+      ${state.orders.map((o) => `<tr><td>${o.id}</td><td>${esc(o.customer)}</td><td>${o.kind === "B2B" ? `<span class="tag proactive">NEGOZIO</span>` : "Privato"}</td><td>${o.country}</td><td>${o.total.toFixed(2)}€</td><td><span class="status s-${norm(o.status).replace(/\s+/g, "-")}">${o.status}</span></td><td>${o.carrier || "—"}</td><td>${o.date}</td><td class="muted">${esc(o.flag)}</td></tr>`).join("")}
     </tbody></table></div>
     ${state.log.length ? `<h2>Registro azioni eseguite</h2><ul class="log">${state.log.map((l) => `<li><span class="muted">${l.time}</span> ${esc(l.text)}</li>`).join("")}</ul>` : ""}
   </section>`;
@@ -263,16 +293,31 @@ function viewMemory() {
   const groups = [["pending", "Da revisionare"], ["approved", "Approvata — usata per rispondere"], ["rejected", "Rifiutata — mai usata"]];
   const card = (m) => {
     const visible = canSee(m.access, u.role);
-    if (!visible) return `<div class="mem locked">🔒 Elemento riservato a ${m.access.map((r) => ROLE_LABELS[r]).join(", ")}</div>`;
+    if (!visible) return `<div class="mem locked">🔒 Elemento riservato a ${roleList(m.access)}</div>`;
     return `<div class="mem ${m.status}">
       <div class="mem-text">${esc(m.text)}</div>
-      <div class="mem-meta muted">Proposto da ${m.proposedBy} · visibile a: ${m.access.map((r) => ROLE_LABELS[r]).join(", ")}${m.approvedBy ? ` · approvato da ${m.approvedBy}` : ""}${m.rejectedBy ? ` · rifiutato da ${m.rejectedBy}` : ""}</div>
+      <div class="mem-meta muted">Proposto da ${m.proposedBy} · visibile a: ${roleList(m.access)}${m.approvedBy ? ` · approvato da ${m.approvedBy}` : ""}${m.rejectedBy ? ` · rifiutato da ${m.rejectedBy}` : ""}</div>
       ${citeChips(m.sourceIds)}
       ${m.status === "pending" ? `<div class="row"><button class="primary small" data-mem-approve="${m.id}">✓ Approva</button><button class="danger small" data-mem-reject="${m.id}">✕ Rifiuta</button></div>` : ""}
     </div>`;
   };
+  const quarCard = (q) => {
+    const mem = state.memory.find((m) => m.id === q.memoryId);
+    const mine = q.authority.includes(u.role);
+    if (!mine) return `<div class="quar locked">🔒 Informazione in contrasto con la memoria — ${q.status === "pending" ? "in attesa di" : "decisa da"} ${roleList(q.authority)}</div>`;
+    const tag = { pending: `<span class="tag alert">IN QUARANTENA · NON USATA</span>`, banned: `<span class="tag denied">SCARTATA E DIMENTICATA da ${q.decidedBy}</span>`, accepted: `<span class="tag ok">ACCETTATA da ${q.decidedBy} · memoria aggiornata</span>` }[q.status];
+    return `<div class="quar ${q.status}">
+      <div class="row between"><b>Informazione in contrasto con la memoria</b>${tag}</div>
+      <div><span class="muted">Nuova (non verificata):</span> «${esc(q.claim.text)}»</div>
+      ${citeChips([q.sourceId])}
+      <div><span class="muted">In memoria (approvata da ${esc(mem.approvedBy || "il team")}):</span> ${esc(mem.text)}</div>
+      ${q.orderId ? `<div class="muted">⚠️ Qualcuno l'ha già applicata all'ordine <b>${q.orderId}</b>, ora in attesa di approvazione.</div>` : ""}
+      ${q.status === "pending" ? `<div class="row"><button class="danger small" data-quar-ban="${q.id}">🚫 Scarta e dimentica</button><button class="primary small" data-quar-accept="${q.id}">✓ Accetta e aggiorna la memoria</button></div>` : ""}
+    </div>`;
+  };
   return `<section class="page"><h1>🧠 Memoria condivisa</h1>
-    <p class="muted">Il Brain estrae fatti dalle fonti e li propone. Solo gli elementi <b>approvati</b> da una persona vengono usati per rispondere.</p>
+    <p class="muted">Il Brain estrae fatti dalle fonti e li propone. Solo gli elementi <b>approvati</b> da una persona vengono usati per rispondere. Le informazioni che <b>contraddicono</b> la memoria approvata non vengono mai usate: finiscono in quarantena per chi ha l'autorità di decidere.</p>
+    ${state.quarantine.length ? `<h2>🛡️ Quarantena <span class="muted">(${state.quarantine.filter((q) => q.status === "pending").length} da decidere)</span></h2>${state.quarantine.map(quarCard).join("")}` : ""}
     ${groups.map(([st, label]) => {
       const list = state.memory.filter((m) => m.status === st);
       return `<h2>${label} <span class="muted">(${list.length})</span></h2>${list.length ? list.map(card).join("") : `<p class="muted">Nessun elemento.</p>`}`;
@@ -302,20 +347,21 @@ function viewActions() {
 
 function viewSources() {
   const u = me();
-  const visible = SOURCES.filter((s) => canSee(s.access, u.role));
-  const hidden = SOURCES.length - visible.length;
+  const all = liveSources();
+  const visible = all.filter((s) => canSee(s.access, u.role)).sort((a, b) => dateKey(b.date) - dateKey(a.date));
+  const hidden = all.length - visible.length;
   return `<section class="page"><h1>📁 Fonti osservate</h1>
     <p class="muted">Email, chat, task e documenti che il Brain legge. Vedi solo quelle accessibili al ruolo <b>${u.roleLabel}</b>${hidden ? ` (${hidden} riservate ad altri team)` : ""}.</p>
-    <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Titolo</th><th>Da</th><th>Data</th><th>Accesso</th></tr></thead><tbody>
-      ${visible.map((s) => `<tr class="clickable" data-source="${s.id}"><td>${TYPE_ICON[s.type]} ${s.type}</td><td>${esc(s.title)}</td><td>${esc(USERS[s.from]?.name || s.from)}</td><td>${s.date}</td><td>${s.access.map((r) => ROLE_LABELS[r]).join(", ")}</td></tr>`).join("")}
+    <div class="table-wrap tall"><table><thead><tr><th>Tipo</th><th>Titolo</th><th>Da</th><th>Data</th><th>Accesso</th></tr></thead><tbody>
+      ${visible.map((s) => `<tr class="clickable" data-source="${s.id}"><td>${TYPE_ICON[s.type]} ${s.type}</td><td>${esc(s.title)}${state.banned[s.id] ? ` <span class="tag denied">BANDITA</span>` : ""}${state.quarantine.some((q) => q.sourceId === s.id && q.status === "pending") ? ` <span class="tag alert">IN QUARANTENA</span>` : ""}</td><td>${esc(who(s.from))}</td><td>${s.date}</td><td>${roleList(s.access)}</td></tr>`).join("")}
     </tbody></table></div></section>`;
 }
 
 function openSource(id) {
   const s = getSource(id);
   const body = canSee(s.access, me().role)
-    ? `<div class="muted">${TYPE_ICON[s.type]} ${s.type.toUpperCase()} · ${esc(USERS[s.from]?.name || s.from)} · ${s.date}</div><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p>`
-    : `<h2>🔒 Fonte riservata</h2><p>Questa fonte è accessibile solo a ${s.access.map((r) => ROLE_LABELS[r]).join(", ")}.</p>`;
+    ? `<div class="muted">${TYPE_ICON[s.type]} ${s.type.toUpperCase()} · ${esc(who(s.from))}${s.to ? ` → ${esc(who(s.to))}` : ""} · ${s.date}</div><h2>${esc(s.title)}</h2><p class="pre">${esc(s.body)}</p>`
+    : `<h2>🔒 Fonte riservata</h2><p>Questa fonte è accessibile solo a ${roleList(s.access)}.</p>`;
   $("#modalBody").innerHTML = body;
   $("#modal").hidden = false;
 }
@@ -339,13 +385,61 @@ function decideAction(id, approve) {
   a.status = approve ? "executed" : "rejected";
   a.decidedBy = me().name;
   if (approve) {
-    if (a.effect === "refund") state.orders.find((o) => o.id === "#10478").status = "Rimborsato";
-    if (a.effect === "reorder") state.products.find((p) => p.sku === "GIA-250").incoming = 200;
+    // Side effects on the store state, driven by the action's `effect` (see ACTIONS in data.js).
+    const order = a.orderId && state.orders.find((o) => o.id === a.orderId);
+    const product = a.sku && state.products.find((p) => p.sku === a.sku);
+    if (a.effect === "refund") order.status = "Rimborsato";
+    if (a.effect === "intercept") order.status = "Intercettato";
+    if (a.effect === "reorder") product.incoming = (product.incoming || 0) + a.qty;
+    if (a.effect === "block") product.blocked = true;
     state.log.unshift({ time: now(), text: `${me().name} ha approvato: ${a.title}` });
     pushBrain(state.userId, { from: "brain", kind: "done", text: `Fatto: <b>${esc(a.title)}</b>. L'ho eseguito solo dopo la tua approvazione.`, sources: a.sourceIds });
   } else {
     state.log.unshift({ time: now(), text: `${me().name} ha rifiutato: ${a.title} (nessuna modifica)` });
   }
+  render();
+}
+
+// Authorised person decides on a quarantined claim.
+//  ban    -> the source is banned and forgotten; the order that used the wrong info is corrected.
+//  accept -> the approved memory is updated with the new value.
+function decideQuarantine(id, accept) {
+  const q = state.quarantine.find((x) => x.id === id);
+  const mem = state.memory.find((m) => m.id === q.memoryId);
+  const order = q.orderId && state.orders.find((o) => o.id === q.orderId);
+  q.decidedBy = me().name;
+  if (accept) {
+    q.status = "accepted";
+    mem.text = q.claim.text;
+    mem.fact.value = q.claim.value;
+    mem.approvedBy = me().name;
+    mem.sourceIds = [...new Set([...mem.sourceIds, q.sourceId])];
+    if (order) { order.status = "In preparazione"; order.flag = "Sconto approvato dallo Shop"; }
+    state.log.unshift({ time: now(), text: `${me().name} ha accettato dalla quarantena: «${q.claim.text}» (memoria aggiornata)` });
+    pushBrain(state.userId, { from: "brain", kind: "done", text: `Ho aggiornato la memoria: <b>${esc(q.claim.text)}</b> Da ora risponderò così.`, sources: [q.sourceId] });
+  } else {
+    q.status = "banned";
+    state.banned[q.sourceId] = true;
+    if (order) {
+      order.status = "In preparazione"; order.total = LIVE_CONFLICT.correctTotal; order.flag = LIVE_CONFLICT.correctFlag;
+    }
+    state.log.unshift({ time: now(), text: `${me().name} ha scartato dalla quarantena: «${q.claim.text}» (fonte bandita)${order ? `; ordine ${order.id} riportato a ${order.total.toFixed(2)}€` : ""}` });
+    pushBrain(state.userId, { from: "brain", kind: "done", text: `Scartata e dimenticata: <b>${esc(q.claim.text)}</b> Non la userò mai.${order ? ` Ho riportato l'ordine ${order.id} allo sconto del 20% (${order.total.toFixed(2)}€).` : ""}`, sources: [q.sourceId] });
+  }
+  render();
+}
+
+function fireConflict() {
+  state.conflictFired = true;
+  state.orders.unshift(structuredClone(LIVE_CONFLICT.order));
+  const created = detectConflicts(state);
+  for (const q of created) {
+    for (const u of Object.values(USERS).filter((x) => q.authority.includes(x.role))) {
+      pushBrain(u.id, { from: "brain", kind: "alert", sources: [q.sourceId],
+        text: `<b>🛡️ Informazione in contrasto con la memoria</b><br>In #clienti ${esc(who(SOURCES.find((s) => s.id === q.sourceId).from))} scrive che «${esc(q.claim.text)}» e l'ha applicata all'ordine ${q.orderId}. In memoria risulta il <b>${esc(state.memory.find((m) => m.id === q.memoryId).fact.value)}</b>. Non l'ho usata: l'ho messa in quarantena, decidi in <i>Memoria</i> se scartarla o accettarla.` });
+    }
+  }
+  toast(`Il Brain non si è fidato del messaggio: l'ha messo in quarantena per ${roleList(created[0]?.authority || [])}.`);
   render();
 }
 
@@ -389,6 +483,9 @@ document.addEventListener("click", (e) => {
   else if (d.memReject) decideMemory(d.memReject, false);
   else if (d.actApprove) decideAction(d.actApprove, true);
   else if (d.actReject) decideAction(d.actReject, false);
+  else if (d.quarBan) decideQuarantine(d.quarBan, false);
+  else if (d.quarAccept) decideQuarantine(d.quarAccept, true);
+  else if (t.id === "fireConflict") fireConflict();
   else if (t.id === "fireEvent") fireEvent();
   else if (t.id === "modalClose") $("#modal").hidden = true;
   else if (t.id === "resetBtn") { state = initialState(); render(); }

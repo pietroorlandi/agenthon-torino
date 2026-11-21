@@ -16,6 +16,14 @@ Aggiornalo man mano: è la fonte di verità condivisa.
 Workflow autonomi, gestione richieste in entrata, analisi documenti, integrazione di più strumenti.
 (L'altra track, Generative AI per il marketing / Demetra, non è la nostra.) La sfida dettagliata esce all'apertura.
 
+## Scenario demo (contesto aziendale del dataset)
+Il dataset sintetico della demo (`src/web/data.js`) simula **Bottega Sabauda**, negozio online torinese **specializzato nella vendita di gianduiotti**.
+- **4 comparti** = i 4 ruoli dell'app: **magazzino**, **servizio clienti**, **shop** (include amministrazione/fornitori) e **spedizioni** (verso utenti finali e negozi).
+- Il dataset contiene ordini (privati e negozi), email a/da fornitori, corrieri e clienti, chat tra colleghi su promozioni attive e problemi, documenti, task, memoria e azioni.
+- Dettagli, storie pre-piantate e permessi: [docs/scenario.md](docs/scenario.md). **Se cambi i dati o il contesto, aggiorna quel file.**
+- **Regola di prodotto — le fonti non sono verità**: il Brain confronta le nuove informazioni con la memoria approvata; se contraddicono (es. «sconto massimo 30%» vs 20% approvato) vanno in **quarantena** e le decide chi ha l'autorità (scarta e dimentica / accetta e aggiorna). Non vanno mai usate per rispondere prima. Meccanismo: `claim` sulle fonti, `fact` + `authority` sulla memoria in `data.js`; `detectConflicts()` in `app.js`.
+- Data "di oggi" nella demo: 21/11 ~08:10 (Black Friday il 27/11).
+
 ## Vincoli tecnici da ricordare
 - Crediti Google Cloud $30/persona, validi 12 ore dal claim (sabato mattina).
 - **Gemini solo via Vertex AI** (non AI Studio: i crediti non si applicano). Modelli GA: `gemini-3.8-flash`, `gemini-3.5-flash`, `gemini-3.1-flash-lite`.
@@ -40,7 +48,8 @@ Quando lo stack è deciso, scrivi qui comandi di install/run/test.
 
 ## Struttura repo
 - `src/` — codice del progetto
-- `docs/` — brief, criteri, decisioni, script del pitch
+- `src/web/` — UI demo statica (`index.html`, `app.js`, `styles.css`) e dataset sintetico (`data.js`); si apre direttamente nel browser
+- `docs/` — brief, criteri, scenario demo, decisioni, script del pitch
 - `docs/decisions.md` — log delle decisioni (data, cosa, perché)
 - `.env.example` — variabili richieste; i segreti reali vanno in `.env` (mai committato)
 
