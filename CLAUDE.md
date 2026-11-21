@@ -14,6 +14,7 @@ Aggiornalo man mano: è la fonte di verità condivisa.
 
 ## Track: **Agentic AI per le aziende** (business) — Ariete Tech Solutions
 Workflow autonomi, gestione richieste in entrata, analisi documenti, integrazione di più strumenti.
+**Tema ufficiale: "Build an AI your team would trust"** — lavora in background, chiede prima di agire, ammette ciò che non sa, mai azioni senza approvazione umana. Verrà attaccata live da giuria e team rivali (robustezza > effetti speciali). Dettagli in docs/brief.md.
 (L'altra track, Generative AI per il marketing / Demetra, non è la nostra.) La sfida dettagliata esce all'apertura.
 
 ## Vincoli tecnici da ricordare
@@ -30,7 +31,8 @@ Innovazione · Coerenza con il brief · Fattibilità · Esecuzione · Pitch fina
 
 ## Stato attuale
 - [x] Track scelta: Agentic AI per le aziende
-- [ ] Brief ufficiale incollato in docs/brief.md
+- [x] Brief ufficiale incollato in docs/brief.md (Challenge A Company Brain / B Back Office Autopilot)
+- [ ] Challenge scelta: _A o B_
 - [ ] Stack deciso: _da decidere_ (vedi sezione Stack)
 - [ ] Ruoli assegnati
 
