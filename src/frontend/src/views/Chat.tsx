@@ -1,4 +1,4 @@
-import { Hash, Lock, Send } from "lucide-react";
+import { Hash, Loader2, Lock, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import type { Message } from "../types";
@@ -40,28 +40,67 @@ function BrainMsg({ m }: { m: Message }) {
   );
 }
 
+const THINKING_STEPS = ["Leggo la domanda…", "Controllo i permessi del tuo ruolo…", "Cerco nella memoria approvata…", "Verifico le fonti…", "Preparo la risposta…"];
+
+// Placeholder shown while /api/ask is still computing
+function ThinkingMsg() {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setStep((s) => Math.min(s + 1, THINKING_STEPS.length - 1)), 1400);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="flex gap-3" role="status" aria-live="polite">
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">B</span>
+      <div className="min-w-0 flex-1">
+        <div className="mb-0.5 text-xs"><b className="text-sm font-semibold">Brain</b> <span className="muted">sta pensando…</span></div>
+        <div className="flex items-center gap-2 text-stone-500">
+          <Loader2 size={15} className="animate-spin text-brand" />
+          <span>{THINKING_STEPS[step]}</span>
+          <span className="flex gap-1" aria-hidden>
+            {[0, 150, 300].map((d) => <span key={d} className="h-1.5 w-1.5 animate-bounce rounded-full bg-stone-400" style={{ animationDelay: `${d}ms` }} />)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ChatView() {
   const { state, dev } = useApp();
   const { run, busy } = useAct();
   const toast = useToast();
   const [channel, setChannel] = useState("brain");
   const [text, setText] = useState("");
+  const [pending, setPending] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
   const me = state.me;
   const users = Object.fromEntries(state.users.map((u) => [u.id, u]));
   const isBrain = channel === "brain";
-  const asked = state.dm.some((m) => m.sender === "user");
+  const thinking = pending !== null;
+  const asked = thinking || state.dm.some((m) => m.sender === "user");
   const channelMsgs = state.sources.filter((s) => !s.locked && s.type === "chat" && s.channel === channel)
     .sort((a, b) => key(a.date).localeCompare(key(b.date)));
 
-  useEffect(() => { box.current?.scrollTo(0, box.current.scrollHeight); }, [channel, state.dm.length, channelMsgs.length]);
+  useEffect(() => { box.current?.scrollTo({ top: box.current.scrollHeight, behavior: "smooth" }); }, [channel, state.dm.length, channelMsgs.length, pending]);
   useEffect(() => { if (isBrain && state.unread) api.read(); }, [isBrain, state.unread]);
+
+  // Show the question at once + a "thinking" placeholder until the answer (and refreshed state) arrives
+  const ask = async (q: string) => {
+    if (!q.trim() || thinking) return;
+    setPending(q.trim());
+    try {
+      await run(() => api.ask(q));  // run() also refetches the state
+    } finally {
+      setPending(null);
+    }
+  };
 
   const send = async () => {
     const t = text.trim();
     if (!t) return;
     setText("");
-    if (isBrain) { await run(() => api.ask(t)); return; }
+    if (isBrain) { await ask(t); return; }
     // a message in a channel goes through the real pipeline, with the session identity (not what the text claims)
     const r = await run(() => api.inject({ type: "chat", channel, body: t }));
     if (r && dev) toast(`Il Brain ha letto il messaggio: ${r.outcome ? OUTCOME_LABEL[r.outcome]?.[0] ?? r.outcome : ""}${r.reason ? ` — ${r.reason}` : ""}`);
@@ -100,6 +139,15 @@ export function ChatView() {
                   <div><div className="mb-0.5 text-xs"><b className="text-sm font-semibold">{me.name}</b> <span className="muted">{m.time}</span></div>{m.text}</div>
                 </div>
               ) : <BrainMsg key={m.id} m={m} />)}
+              {thinking && (
+                <>
+                  <div className="flex gap-3 opacity-80">
+                    <Avatar user={me} />
+                    <div><div className="mb-0.5 text-xs"><b className="text-sm font-semibold">{me.name}</b> <span className="muted">ora</span></div>{pending}</div>
+                  </div>
+                  <ThinkingMsg />
+                </>
+              )}
               {!asked && (
                 <div className="muted mt-auto text-center">
                   <p className="text-base text-stone-700">Chiedimi qualcosa sull'azienda.</p>
@@ -128,14 +176,14 @@ export function ChatView() {
           {isBrain && !asked && (
             <div className="mb-2 flex flex-wrap gap-1.5">
               {state.suggestions.slice(0, 4).map((q) => (
-                <button key={q} disabled={busy} onClick={() => run(() => api.ask(q))} className="rounded-full border border-stone-300 bg-white px-2.5 py-1 text-xs hover:border-stone-500">{q}</button>
+                <button key={q} disabled={busy} onClick={() => ask(q)} className="rounded-full border border-stone-300 bg-white px-2.5 py-1 text-xs hover:border-stone-500">{q}</button>
               ))}
             </div>
           )}
           <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); send(); }}>
             <input className="input" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off"
-              placeholder={isBrain ? "Scrivi una domanda…" : `Scrivi in #${channel} come ${me.name}…`} />
-            <button className="btn-primary" disabled={busy || !text.trim()} aria-label="Invia">{busy ? "…" : <Send size={16} />}</button>
+              placeholder={thinking ? "Il Brain sta pensando…" : isBrain ? "Scrivi una domanda…" : `Scrivi in #${channel} come ${me.name}…`} />
+            <button className="btn-primary" disabled={busy || thinking || !text.trim()} aria-label="Invia">{busy || thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}</button>
           </form>
         </div>
       </div>
