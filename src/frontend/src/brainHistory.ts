@@ -3,7 +3,7 @@ import type { State } from "./types";
 // Client-side snapshots of the brain, one per timeline step and user (the state is role-filtered).
 // h[step] is the latest state seen at that step, so h[done - 1] is the brain right before the last ▶ Avanti.
 export interface Counts { approved: number; pending: number; past: number; quarantine: number; gapsOpen: number; gapsAnswered: number; banned: number }
-export interface Snap { at: string; counts: Counts; mem: Record<string, string>; q: Record<string, string>; gaps: Record<string, string>; banned: string[] }
+export interface Snap { at: string; counts: Counts; mem: Record<string, string>; srcs: Record<string, number>; txt: Record<string, string>; q: Record<string, string>; gaps: Record<string, string>; banned: string[] }
 
 const hist: Record<string, Record<number, Snap>> = {};
 
@@ -21,6 +21,8 @@ export function snapOf(s: State): Snap {
       banned: banned.length,
     },
     mem: Object.fromEntries(s.memory.map((m) => [m.id, m.status])),
+    srcs: Object.fromEntries(s.memory.map((m) => [m.id, m.source_ids.length])),
+    txt: Object.fromEntries(s.memory.map((m) => [m.id, m.text ?? ""])),
     q: Object.fromEntries(s.quarantine.map((q) => [q.id, q.status])),
     gaps: Object.fromEntries(s.gaps.map((g) => [g.id, g.status])),
     banned,
@@ -46,6 +48,8 @@ export function diff(a: Snap, b: Snap, s: State): string[] {
     const t = text ? ` «${text.slice(0, 70)}${text.length > 70 ? "…" : ""}»` : " (riservato)";
     if (!a.mem[id]) out.push(`+ ${id} in memoria, ${MEM_LABEL[st]}${t}`);
     else if (a.mem[id] !== st) out.push(`${id}: ${MEM_LABEL[a.mem[id]]} → ${MEM_LABEL[st]}${t}`);
+    else if (a.txt[id] !== b.txt[id] && b.txt[id]) out.push(`${id} aggiornato, prima diceva «${a.txt[id].slice(0, 60)}…» → ora${t}`);
+    else if ((b.srcs[id] ?? 0) > (a.srcs[id] ?? 0)) out.push(`${id} confermato da una nuova fonte (${b.srcs[id]} fonti), nessun fatto nuovo${t}`);
   }
   for (const [id, st] of Object.entries(b.q)) {
     const q = s.quarantine.find((x) => x.id === id);
