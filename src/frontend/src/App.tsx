@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Play, RotateCcw, Wrench } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, getUser, setUser } from "./api";
 import { Brand } from "./brand";
+import { record } from "./brainHistory";
 import { AppContext, OUTCOME_LABEL, SourceModal, useAct, useToast, type Tab } from "./ui";
 import { AuditView, ObservabilityView } from "./views/Audit";
+import { BrainView } from "./views/Brain";
 import { ChatView } from "./views/Chat";
 import { MailView } from "./views/Mail";
 import { KnowledgeView } from "./views/Memory";
@@ -17,7 +19,7 @@ const USER_TABS: { id: Tab; label: string }[] = [
   { id: "today", label: "Oggi" }, { id: "chat", label: "Chat" }, { id: "mail", label: "Posta" }, { id: "knowledge", label: "Cosa sappiamo" },
 ];
 const DEV_TABS: { id: Tab; label: string }[] = [
-  { id: "store", label: "Store" }, { id: "sources", label: "Fonti" }, { id: "redteam", label: "Mettilo alla prova" },
+  { id: "brain", label: "Brain" }, { id: "store", label: "Store" }, { id: "sources", label: "Fonti" }, { id: "redteam", label: "Mettilo alla prova" },
   { id: "audit", label: "Audit" }, { id: "obs", label: "Osservabilità" },
 ];
 
@@ -36,6 +38,7 @@ export default function App() {
   const [sourceId, setSourceId] = useState<string | null>(null);
   const { data: state, error } = useQuery({ queryKey: ["state", userId], queryFn: api.state });
   const { run, busy } = useAct();
+  useEffect(() => { if (state) record(state); }, [state]); // snapshots for the Brain view, even while it is closed
   const toast = useToast();
 
   const setDev = (on: boolean) => {
@@ -107,6 +110,7 @@ export default function App() {
         {tab === "chat" && <ChatView />}
         {tab === "mail" && <MailView />}
         {tab === "knowledge" && <KnowledgeView />}
+        {tab === "brain" && <BrainView />}
         {tab === "store" && <StoreView />}
         {tab === "sources" && <SourcesView />}
         {tab === "redteam" && <RedTeamView />}
