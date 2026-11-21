@@ -1,0 +1,630 @@
+{
+  "products": [
+    {
+      "sku": "GIA-250",
+      "name": "Gianduiotti classici 250g",
+      "price": 12.9,
+      "stock": 142,
+      "threshold": 120,
+      "sold7d": 410
+    },
+    {
+      "sku": "GIA-500",
+      "name": "Gianduiotti classici 500g",
+      "price": 23.9,
+      "stock": 64,
+      "threshold": 50,
+      "sold7d": 168
+    },
+    {
+      "sku": "GIA-FON",
+      "name": "Gianduiotti fondenti 70% 250g",
+      "price": 13.9,
+      "stock": 38,
+      "threshold": 60,
+      "sold7d": 131
+    },
+    {
+      "sku": "GIA-LAT",
+      "name": "Gianduiotti al latte 250g",
+      "price": 12.9,
+      "stock": 96,
+      "threshold": 50,
+      "sold7d": 87
+    },
+    {
+      "sku": "GIA-CAF",
+      "name": "Gianduiotti al caffè 200g",
+      "price": 13.5,
+      "stock": 210,
+      "threshold": 40,
+      "sold7d": 19
+    },
+    {
+      "sku": "GIA-SAL",
+      "name": "Gianduiotti al sale marino 200g",
+      "price": 13.5,
+      "stock": 55,
+      "threshold": 30,
+      "sold7d": 42
+    },
+    {
+      "sku": "BOX-NAT",
+      "name": "Box Natale 600g",
+      "price": 34,
+      "stock": 88,
+      "threshold": 80,
+      "sold7d": 120
+    },
+    {
+      "sku": "BOX-ASS",
+      "name": "Box assortiti 1kg",
+      "price": 42,
+      "stock": 31,
+      "threshold": 40,
+      "sold7d": 52
+    },
+    {
+      "sku": "AVV-CAL",
+      "name": "Calendario dell'Avvento gianduiotti",
+      "price": 29.9,
+      "stock": 120,
+      "threshold": 60,
+      "sold7d": 74
+    },
+    {
+      "sku": "TAV-GIA",
+      "name": "Tavoletta gianduja 100g",
+      "price": 4.5,
+      "stock": 300,
+      "threshold": 100,
+      "sold7d": 205
+    },
+    {
+      "sku": "CRE-GIA",
+      "name": "Crema gianduja 300g",
+      "price": 8.9,
+      "stock": 150,
+      "threshold": 40,
+      "sold7d": 60
+    },
+    {
+      "sku": "GIA-B2B",
+      "name": "Gianduiotti classici sfusi 1kg (B2B)",
+      "price": 33.5,
+      "stock": 15,
+      "threshold": 20,
+      "sold7d": 22
+    }
+  ],
+  "orders": [
+    {
+      "id": "#10465",
+      "date": "14/11 10:20",
+      "customer": "E. Fabbri",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-CAF",
+          1
+        ],
+        [
+          "GIA-250",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Consegnato",
+      "carrier": "BRT",
+      "flag": "Lotto L26-1108",
+      "total": 32.3
+    },
+    {
+      "id": "#10466",
+      "date": "14/11 16:05",
+      "customer": "R. Conti",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-NAT",
+          1
+        ],
+        [
+          "TAV-GIA",
+          2
+        ]
+      ],
+      "promo": [
+        "NATALE10"
+      ],
+      "status": "Consegnato",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 45.5
+    },
+    {
+      "id": "#10467",
+      "date": "15/11 09:12",
+      "customer": "H. Müller",
+      "country": "DE",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-500",
+          2
+        ]
+      ],
+      "promo": [],
+      "status": "Consegnato",
+      "carrier": "GLS",
+      "flag": "",
+      "total": 59.7
+    },
+    {
+      "id": "#10468",
+      "date": "15/11 20:44",
+      "customer": "T. Esposito",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "AVV-CAL",
+          1
+        ],
+        [
+          "GIA-LAT",
+          1
+        ]
+      ],
+      "promo": [
+        "BENVENUTO5"
+      ],
+      "status": "Consegnato",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 43.7
+    },
+    {
+      "id": "#10469",
+      "date": "16/11 11:30",
+      "customer": "Caffè Vittoria",
+      "country": "IT",
+      "kind": "B2B",
+      "items": [
+        [
+          "GIA-B2B",
+          6
+        ],
+        [
+          "TAV-GIA",
+          24
+        ]
+      ],
+      "promo": [],
+      "status": "Consegnato",
+      "carrier": "BRT",
+      "flag": "Reclamo: 2 scatole mancanti",
+      "total": 271.2
+    },
+    {
+      "id": "#10470",
+      "date": "17/11 08:55",
+      "customer": "A. Greco",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-FON",
+          2
+        ],
+        [
+          "GIA-SAL",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Consegnato",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 47.2
+    },
+    {
+      "id": "#10471",
+      "date": "17/11 19:02",
+      "customer": "S. Bruno",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-250",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Consegnato",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 18.8
+    },
+    {
+      "id": "#10472",
+      "date": "18/11 09:40",
+      "customer": "Enoteca del Borgo",
+      "country": "IT",
+      "kind": "B2B",
+      "items": [
+        [
+          "BOX-ASS",
+          12
+        ]
+      ],
+      "promo": [],
+      "status": "Spedito",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 327.6
+    },
+    {
+      "id": "#10473",
+      "date": "18/11 12:15",
+      "customer": "J. Dupont",
+      "country": "FR",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-NAT",
+          1
+        ],
+        [
+          "CRE-GIA",
+          2
+        ]
+      ],
+      "promo": [
+        "NATALE10"
+      ],
+      "status": "Spedito",
+      "carrier": "GLS",
+      "flag": "",
+      "total": 60.3
+    },
+    {
+      "id": "#10474",
+      "date": "18/11 21:30",
+      "customer": "G. Marino",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "AVV-CAL",
+          3
+        ]
+      ],
+      "promo": [],
+      "status": "Spedito",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 89.7
+    },
+    {
+      "id": "#10475",
+      "date": "19/11 08:10",
+      "customer": "P. Neri",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-CAF",
+          2
+        ],
+        [
+          "TAV-GIA",
+          1
+        ]
+      ],
+      "promo": [
+        "CAFFE15"
+      ],
+      "status": "Spedito",
+      "carrier": "BRT",
+      "flag": "Lotto L26-1108",
+      "total": 33.35
+    },
+    {
+      "id": "#10476",
+      "date": "19/11 11:42",
+      "customer": "R. Gentile",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-ASS",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "In giacenza",
+      "carrier": "BRT",
+      "flag": "Destinatario assente (Milano)",
+      "total": 47.9
+    },
+    {
+      "id": "#10477",
+      "date": "19/11 18:20",
+      "customer": "L. Colombo",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-250",
+          4
+        ]
+      ],
+      "promo": [
+        "BENVENUTO5"
+      ],
+      "status": "Spedito",
+      "carrier": "BRT",
+      "flag": "",
+      "total": 52.5
+    },
+    {
+      "id": "#10478",
+      "date": "20/11 09:05",
+      "customer": "A. Schmidt",
+      "country": "DE",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-250",
+          3
+        ]
+      ],
+      "promo": [],
+      "status": "Spedito",
+      "carrier": "GLS",
+      "flag": "",
+      "total": 50.6
+    },
+    {
+      "id": "#10479",
+      "date": "20/11 12:10",
+      "customer": "G. Russo",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-NAT",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Indirizzo errato",
+      "carrier": "BRT",
+      "flag": "Via Po 12 invece di 112",
+      "total": 39.9
+    },
+    {
+      "id": "#10480",
+      "date": "20/11 17:20",
+      "customer": "Dolce Vita Torino",
+      "country": "IT",
+      "kind": "B2B",
+      "items": [
+        [
+          "GIA-B2B",
+          20
+        ]
+      ],
+      "promo": [],
+      "status": "In preparazione",
+      "carrier": "",
+      "flag": "Scorta insufficiente (15/20 kg)",
+      "total": 670
+    },
+    {
+      "id": "#10481",
+      "date": "20/11 19:31",
+      "customer": "P. Martin",
+      "country": "FR",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-NAT",
+          1
+        ],
+        [
+          "GIA-500",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Rimborso richiesto",
+      "carrier": "GLS",
+      "flag": "Collo danneggiato",
+      "total": 69.8
+    },
+    {
+      "id": "#10482",
+      "date": "20/11 22:10",
+      "customer": "S. Rinaldi",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "AVV-CAL",
+          1
+        ],
+        [
+          "TAV-GIA",
+          4
+        ]
+      ],
+      "promo": [],
+      "status": "Spedito",
+      "carrier": "BRT",
+      "flag": "Ritardo BRT +24/48h",
+      "total": 53.8
+    },
+    {
+      "id": "#10483",
+      "date": "21/11 02:10",
+      "customer": "A. Villa",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-NAT",
+          3
+        ],
+        [
+          "TAV-GIA",
+          1
+        ]
+      ],
+      "promo": [
+        "NATALE10",
+        "BENVENUTO5"
+      ],
+      "status": "In preparazione",
+      "carrier": "",
+      "flag": "Doppio sconto",
+      "total": 91.3
+    },
+    {
+      "id": "#10484",
+      "date": "21/11 07:15",
+      "customer": "M. Dubois",
+      "country": "FR",
+      "kind": "B2C",
+      "items": [
+        [
+          "AVV-CAL",
+          2
+        ],
+        [
+          "GIA-250",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "In attesa pagamento",
+      "carrier": "",
+      "flag": "PayPal: nessuna conferma",
+      "total": 84.6
+    },
+    {
+      "id": "#10485",
+      "date": "21/11 07:42",
+      "customer": "L. Ferrero",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-500",
+          1
+        ],
+        [
+          "BOX-NAT",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Spedito",
+      "carrier": "BRT",
+      "flag": "Ritardo BRT +24/48h",
+      "total": 57.9
+    },
+    {
+      "id": "#10486",
+      "date": "21/11 07:44",
+      "customer": "K. Weber",
+      "country": "DE",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-ASS",
+          1
+        ],
+        [
+          "GIA-500",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "Pagamento fallito",
+      "carrier": "",
+      "flag": "Carta rifiutata 2 volte",
+      "total": 77.8
+    },
+    {
+      "id": "#10487",
+      "date": "21/11 07:51",
+      "customer": "E. Lombardi",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-FON",
+          1
+        ],
+        [
+          "GIA-CAF",
+          2
+        ]
+      ],
+      "promo": [
+        "CAFFE15"
+      ],
+      "status": "In preparazione",
+      "carrier": "",
+      "flag": "Lotto L26-1108",
+      "total": 42.75
+    },
+    {
+      "id": "#10488",
+      "date": "21/11 07:58",
+      "customer": "C. Moretti",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "BOX-NAT",
+          2
+        ]
+      ],
+      "promo": [
+        "NATALE10",
+        "BENVENUTO5"
+      ],
+      "status": "In preparazione",
+      "carrier": "",
+      "flag": "Doppio sconto",
+      "total": 56.2
+    },
+    {
+      "id": "#10489",
+      "date": "21/11 08:05",
+      "customer": "F. Gallo",
+      "country": "IT",
+      "kind": "B2C",
+      "items": [
+        [
+          "GIA-250",
+          2
+        ],
+        [
+          "TAV-GIA",
+          1
+        ]
+      ],
+      "promo": [],
+      "status": "In preparazione",
+      "carrier": "",
+      "flag": "",
+      "total": 36.2
+    }
+  ]
+}

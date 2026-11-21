@@ -1,0 +1,318 @@
+[
+  {
+    "id": "M1",
+    "text": "Dal 1° dicembre le spedizioni verso l'UE passano a DHL Express, tariffa fissa 9,90€ a collo (≤2kg). Il contratto con GLS scade il 30/11.",
+    "source_ids": [
+      "em-dhl",
+      "ch-s11"
+    ],
+    "access": [
+      "spedizioni",
+      "clienti",
+      "shop"
+    ],
+    "status": "pending",
+    "proposed_by": "Brain",
+    "keywords": [
+      "corriere",
+      "spedizion",
+      "dhl",
+      "estero",
+      "dicembre",
+      "tariffa",
+      "gls"
+    ]
+  },
+  {
+    "id": "M3",
+    "text": "Black Friday: -20% dal 27/11 al 30/11 su tutto il catalogo, esclusi Calendari dell'Avvento e ordini B2B. Riservato: non comunicarlo ai clienti prima del 26/11.",
+    "source_ids": [
+      "dc-promo",
+      "ch-g6",
+      "ch-p9"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "black friday",
+      "sconto",
+      "promo",
+      "bf"
+    ],
+    "authority": [
+      "shop"
+    ],
+    "approved_by": "Marco Bianchi",
+    "fact": {
+      "key": "blackfriday.discount",
+      "value": "20%"
+    }
+  },
+  {
+    "id": "M15",
+    "text": "Sconto massimo applicabile a un ordine: 20% in totale (codici promo e sconti manuali compresi). Oltre il 20% non è consentito senza approvazione dello Shop.",
+    "source_ids": [
+      "dc-sconti"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "massimo",
+      "applicabil",
+      "manuale",
+      "manuali",
+      "sconti"
+    ],
+    "authority": [
+      "shop"
+    ],
+    "approved_by": "Marco Bianchi",
+    "fact": {
+      "key": "discount.max",
+      "value": "20%"
+    }
+  },
+  {
+    "id": "M4",
+    "text": "Margine lordo di novembre (al 20/11): 38,4% su 41.200€ di ricavi. Tavolette al 57%, Box Natale al 31%.",
+    "source_ids": [
+      "dc-margini"
+    ],
+    "access": [
+      "shop"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "margine",
+      "margini",
+      "ricavi",
+      "fatturato",
+      "novembre"
+    ],
+    "approved_by": "Marco Bianchi"
+  },
+  {
+    "id": "M5",
+    "text": "Prodotti danneggiati: rimborso completo entro 14 giorni dalla consegna, con foto. Fino a 100€ approva il Servizio clienti, sopra 100€ lo Shop.",
+    "source_ids": [
+      "dc-resi"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "rimbors",
+      "reso",
+      "resi",
+      "danneggiat",
+      "rott",
+      "schiacciat"
+    ],
+    "approved_by": "Giulia Rossi"
+  },
+  {
+    "id": "M6",
+    "text": "Spedizioni: ordini entro le 14:00 partono in giornata. Consegna Italia 24-48h (BRT), UE 3-5 giorni lavorativi.",
+    "source_ids": [
+      "dc-spedizioni",
+      "ch-s1"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "cut-off",
+      "cutoff",
+      "14:00",
+      "tempi",
+      "consegna",
+      "quanto ci mette",
+      "arriva"
+    ],
+    "approved_by": "Davide Greco"
+  },
+  {
+    "id": "M7",
+    "text": "Per ricevere i pacchi prima di Natale si consiglia di ordinare entro il 18/12 (Italia) e il 12/12 (UE). Date indicative, non garantite.",
+    "source_ids": [
+      "ch-s2",
+      "ch-s3"
+    ],
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "status": "pending",
+    "proposed_by": "Brain",
+    "keywords": [
+      "natale",
+      "ordinare",
+      "entro quando",
+      "scadenza",
+      "prima di natale",
+      "regalo"
+    ]
+  },
+  {
+    "id": "M8",
+    "text": "Promo attive: NATALE10 (-10% solo Box Natale, fino al 30/11), 2x1 tavolette (fino al 23/11), BENVENUTO5 (-5€ primo ordine >30€), spedizione gratis sopra 49€ (IT) / 79€ (estero). Si può usare un solo codice sconto per ordine.",
+    "source_ids": [
+      "dc-promo",
+      "ch-p1"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "cumul",
+      "codice",
+      "codici",
+      "promo",
+      "natale10",
+      "benvenuto5",
+      "2x1",
+      "tavolette",
+      "gratis"
+    ],
+    "approved_by": "Marco Bianchi"
+  },
+  {
+    "id": "M9",
+    "text": "Il lotto L26-1108 dei Gianduiotti al caffè 200g ha un'etichetta priva dell'allergene «contiene latte»: vendita da sospendere, giacenze da isolare, clienti da avvisare.",
+    "source_ids": [
+      "em-lotto"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "pending",
+    "proposed_by": "Brain",
+    "keywords": [
+      "lotto",
+      "l26-1108",
+      "etichetta",
+      "caffe",
+      "richiamo"
+    ]
+  },
+  {
+    "id": "M10",
+    "text": "Tutti i gianduiotti contengono nocciole e latte; i fondenti 70% possono contenere tracce di latte. Possibili tracce di altra frutta a guscio e soia.",
+    "source_ids": [
+      "dc-faq"
+    ],
+    "access": [
+      "all"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "latte",
+      "allergen",
+      "allergi",
+      "contengono",
+      "glutine",
+      "soia"
+    ],
+    "approved_by": "Giulia Rossi"
+  },
+  {
+    "id": "M11",
+    "text": "Laboratorio Sant'Anna: lead time 5 giorni lavorativi, ordine minimo 200 pz per referenza, pagamento a 30 giorni, penale 3% per ritardi oltre 3 giorni.",
+    "source_ids": [
+      "dc-contratto-lab"
+    ],
+    "access": [
+      "shop",
+      "magazzino"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "laboratorio",
+      "sant'anna",
+      "lead time",
+      "riordino",
+      "penale",
+      "produzione"
+    ],
+    "approved_by": "Sara Conti"
+  },
+  {
+    "id": "M12",
+    "text": "Le consegne dei 300 Gianduiotti fondenti 70% slittano al 28/11 (ritardo sul cacao); i 400 classici restano confermati per il 25/11.",
+    "source_ids": [
+      "em-lab-conferma",
+      "ch-m5"
+    ],
+    "access": [
+      "magazzino",
+      "shop"
+    ],
+    "status": "pending",
+    "proposed_by": "Brain",
+    "keywords": [
+      "fondenti",
+      "ritardo",
+      "cacao",
+      "28/11",
+      "classici"
+    ]
+  },
+  {
+    "id": "M13",
+    "text": "Listino B2B negozi: -35% sul listino pubblico, minimo 10 kg o 100€, spedizione gratuita sopra 300€, pagamento a 30 giorni. Le promo al pubblico non si applicano.",
+    "source_ids": [
+      "dc-b2b"
+    ],
+    "access": [
+      "shop",
+      "magazzino"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "b2b",
+      "negozi",
+      "negozio",
+      "ingrosso",
+      "listino"
+    ],
+    "approved_by": "Marco Bianchi"
+  },
+  {
+    "id": "M14",
+    "text": "Magazzino: gestione FIFO per lotto; i lotti non conformi vanno in quarantena (scaffale Q) e segnalati subito.",
+    "source_ids": [
+      "dc-magazzino"
+    ],
+    "access": [
+      "magazzino",
+      "spedizioni"
+    ],
+    "status": "approved",
+    "proposed_by": "Brain",
+    "keywords": [
+      "fifo",
+      "quarantena",
+      "lotto non conforme",
+      "scaffale",
+      "inventario"
+    ],
+    "approved_by": "Sara Conti"
+  }
+]

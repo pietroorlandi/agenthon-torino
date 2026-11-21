@@ -1,0 +1,208 @@
+{
+  "name": "Bottega Sabauda",
+  "internal_domain": "bottegasabauda.example",
+  "today": "21/11 08:10",
+  "users": [
+    {
+      "id": "sara",
+      "name": "Sara Conti",
+      "role": "magazzino",
+      "role_label": "Magazzino",
+      "avatar": "SC",
+      "color": "#3dbb7a"
+    },
+    {
+      "id": "giulia",
+      "name": "Giulia Rossi",
+      "role": "clienti",
+      "role_label": "Servizio clienti",
+      "avatar": "GR",
+      "color": "#e8a33d"
+    },
+    {
+      "id": "marco",
+      "name": "Marco Bianchi",
+      "role": "shop",
+      "role_label": "Shop",
+      "avatar": "MB",
+      "color": "#3d8be8"
+    },
+    {
+      "id": "davide",
+      "name": "Davide Greco",
+      "role": "spedizioni",
+      "role_label": "Spedizioni",
+      "avatar": "DG",
+      "color": "#9b59d0"
+    }
+  ],
+  "roles": {
+    "magazzino": "Magazzino",
+    "clienti": "Servizio clienti",
+    "shop": "Shop",
+    "spedizioni": "Spedizioni"
+  },
+  "channels": [
+    {
+      "id": "generale",
+      "access": [
+        "all"
+      ]
+    },
+    {
+      "id": "promo",
+      "access": [
+        "all"
+      ]
+    },
+    {
+      "id": "magazzino",
+      "access": [
+        "magazzino",
+        "spedizioni",
+        "shop"
+      ]
+    },
+    {
+      "id": "spedizioni",
+      "access": [
+        "spedizioni",
+        "magazzino",
+        "clienti"
+      ]
+    },
+    {
+      "id": "clienti",
+      "access": [
+        "clienti",
+        "spedizioni",
+        "shop"
+      ]
+    },
+    {
+      "id": "shop",
+      "access": [
+        "shop",
+        "clienti"
+      ]
+    }
+  ],
+  "topic_owners": [
+    {
+      "role": "shop",
+      "label": "fornitori, acquisti, prezzi, promozioni e pagamenti",
+      "keywords": [
+        "fornitor",
+        "acquist",
+        "ordine minimo",
+        "nocciol",
+        "materie prime",
+        "cacao",
+        "prezz",
+        "listino",
+        "promo",
+        "sconto",
+        "margin",
+        "contratt",
+        "pagament",
+        "fattur",
+        "sito",
+        "newsletter"
+      ]
+    },
+    {
+      "role": "magazzino",
+      "label": "scorte, lotti, scaffali e imballaggi",
+      "keywords": [
+        "scort",
+        "magazzin",
+        "lott",
+        "scaffal",
+        "inventari",
+        "quarantena",
+        "imball",
+        "cartoni",
+        "scaden",
+        "conserv",
+        "stagionalit"
+      ]
+    },
+    {
+      "role": "spedizioni",
+      "label": "corrieri, consegne e ritiri",
+      "keywords": [
+        "corrier",
+        "spedizion",
+        "consegn",
+        "ritir",
+        "pacc",
+        "collo",
+        "colli",
+        "tracking",
+        "giacenz",
+        "dhl",
+        "brt",
+        "gls"
+      ]
+    },
+    {
+      "role": "clienti",
+      "label": "clienti, reclami, resi e allergeni",
+      "keywords": [
+        "client",
+        "reclam",
+        "ticket",
+        "reso",
+        "resi",
+        "rimbors",
+        "allergen",
+        "faq"
+      ]
+    }
+  ],
+  "contacts": [
+    {
+      "domain": "laboratorio-santanna.example",
+      "org": "Laboratorio Dolciario Sant'Anna",
+      "kind": "supplier"
+    },
+    {
+      "domain": "cooperativa-nocciola-langhe.example",
+      "org": "Cooperativa Nocciola Langhe",
+      "kind": "supplier"
+    },
+    {
+      "domain": "scatolificio-ormea.example",
+      "org": "Scatolificio Ormea",
+      "kind": "supplier"
+    },
+    {
+      "domain": "brt.example",
+      "org": "BRT Italia",
+      "kind": "carrier"
+    },
+    {
+      "domain": "gls-fr.example",
+      "org": "GLS France",
+      "kind": "carrier"
+    },
+    {
+      "domain": "dhl-partner.example",
+      "org": "DHL Express",
+      "kind": "carrier"
+    },
+    {
+      "domain": "dolcevitatorino.example",
+      "org": "Dolce Vita Torino",
+      "kind": "client_b2b"
+    },
+    {
+      "domain": "mailer.example",
+      "org": "Piattaforma newsletter",
+      "kind": "service"
+    }
+  ],
+  "consumer_domains": [
+    "mail.example"
+  ]
+}

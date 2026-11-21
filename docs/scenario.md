@@ -1,7 +1,7 @@
 # Scenario demo — Bottega Sabauda
 
-Contesto fittizio su cui è costruito il dataset sintetico della demo (`src/web/data.js`).
-Se cambi il dataset, aggiorna anche questo file (e viceversa).
+Contesto fittizio su cui è costruito il dataset sintetico della demo: `src/data/seed/*.json` (letto dal backend; convertito dal vecchio `src/web/data.js`, che non è più aggiornato).
+Gli eventi che arrivano con ▶ Avanti sono in `src/data/seed/timeline.json`. Se cambi il dataset, aggiorna anche questo file (e viceversa).
 
 ## L'azienda
 **Bottega Sabauda** è un negozio online torinese **specializzato nella vendita di gianduiotti**.

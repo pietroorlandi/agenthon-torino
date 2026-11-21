@@ -18,12 +18,12 @@ Workflow autonomi, gestione richieste in entrata, analisi documenti, integrazion
 (L'altra track, Generative AI per il marketing / Demetra, non è la nostra.) La sfida dettagliata esce all'apertura.
 
 ## Scenario demo (contesto aziendale del dataset)
-Il dataset sintetico della demo (`src/web/data.js`) simula **Bottega Sabauda**, negozio online torinese **specializzato nella vendita di gianduiotti**.
+Il dataset sintetico della demo (`src/data/seed/*.json`, convertito dal vecchio `src/web/data.js`) simula **Bottega Sabauda**, negozio online torinese **specializzato nella vendita di gianduiotti**.
 - **4 comparti** = i 4 ruoli dell'app: **magazzino**, **servizio clienti**, **shop** (include amministrazione/fornitori) e **spedizioni** (verso utenti finali e negozi).
 - Il dataset contiene ordini (privati e negozi), email a/da fornitori, corrieri e clienti, chat tra colleghi su promozioni attive e problemi, documenti, task, memoria e azioni.
 - Dettagli, storie pre-piantate e permessi: [docs/scenario.md](docs/scenario.md). **Se cambi i dati o il contesto, aggiorna quel file.**
-- **Regola di prodotto — le fonti non sono verità**: il Brain confronta le nuove informazioni con la memoria approvata; se contraddicono (es. «sconto massimo 30%» vs 20% approvato) vanno in **quarantena** e le decide chi ha l'autorità (scarta e dimentica / accetta e aggiorna). Non vanno mai usate per rispondere prima. Meccanismo: `claim` sulle fonti, `fact` + `authority` sulla memoria in `data.js`; `detectConflicts()` in `app.js`.
-- **Regola di prodotto — i buchi di conoscenza si colmano**: se il Brain non sa rispondere a una domanda aziendale, non inventa. Apre una richiesta al reparto competente (`TOPIC_OWNERS` in `data.js`), che scrive il fatto e la domanda a cui risponde. Il fatto entra in memoria approvato e chi aveva chiesto viene avvisato. Le domande fuori perimetro ricevono solo «non lo so». Codice: `routeQuestion()`, `openGap()`, `saveGap()` in `app.js`.
+- **Regola di prodotto — le fonti non sono verità**: il Brain confronta le nuove informazioni con la memoria approvata; se contraddicono (es. «sconto massimo 30%» vs 20% approvato) vanno in **quarantena** e le decide chi ha l'autorità (scarta e dimentica / accetta e aggiorna). Non vanno mai usate per rispondere prima. Meccanismo: `fact` + `authority` sulla memoria nei seed; nel backend `reconcile()` in `pipeline/observe.py` e `add_quarantine_contradiction()` in `store.py`; decisioni in `services/curation.py`.
+- **Regola di prodotto — i buchi di conoscenza si colmano**: se il Brain non sa rispondere a una domanda aziendale, non inventa. Apre una richiesta al reparto competente (`topic_owners` in `src/data/seed/company.json`), che scrive il fatto e la domanda a cui risponde. Il fatto entra in memoria approvato e chi aveva chiesto viene avvisato. Le domande fuori perimetro ricevono solo «non lo so». Codice: `services/gaps.py` (`route_question`, `open_gap`, `answer_gap`) nel backend.
 - Data "di oggi" nella demo: 21/11 ~08:10 (Black Friday il 27/11).
 
 ## Vincoli tecnici da ricordare
@@ -54,11 +54,24 @@ Deciso (dettagli e motivazioni in [docs/architecture.md](docs/architecture.md) �
 - **Osservabilità:** OpenTelemetry → Cloud Trace, log JSON → Cloud Logging, pannello in app con costi e qualità dell'agente.
 - **Deploy:** un solo servizio Cloud Run (Dockerfile multi-stage), stato in memoria + seed + reset.
 
-Comandi di install/run/test: _da scrivere qui dopo lo scaffold._
+Comandi (guida completa con Vertex, ElevenLabs, osservabilità e deploy: [docs/setup.md](docs/setup.md)):
+```bash
+make setup    # venv src/backend/.venv + npm install + .env da .env.example
+make dev      # FastAPI :8000 (reload) + Vite :5173 → http://localhost:5173
+make test     # pytest delle garanzie (offline) + tsc del frontend
+make check    # verifica Vertex + ElevenLabs con la .env
+make demo     # build + un solo processo su http://localhost:8000
+make deploy   # Cloud Run (scripts/deploy.sh)
+```
+- `LLM_MODE=live|replay|off`: senza `GOOGLE_CLOUD_PROJECT` il backend va in `off` (motori deterministici). La cache LLM sta in `src/data/llm_cache/` ed è committata, così `replay` fa da piano B.
+- Versioni fissate: google-adk 2.14.1, google-genai 2.34.0, FastAPI 0.165, Vite 8, React 19, Tailwind 4.3, TS 6.0.
 
 ## Struttura repo
-- `src/` — codice del progetto
-- `src/web/` — UI demo statica (`index.html`, `app.js`, `styles.css`) e dataset sintetico (`data.js`); si apre direttamente nel browser
+- `src/backend/app/` — FastAPI: `main.py` (API), `store.py` (stato in memoria + filtri per ruolo), `llm.py` (unico punto verso Gemini: cache, fallback, metriche), `telemetry.py` (OpenTelemetry + contatori), `pipeline/` (trust, regole, triage, estrazione, riconciliazione), `services/` (qa, gaps, brief, actions, curation, clock, tts), `agents/draft_agent.py` (ADK), `views.py` (stato per utente). Test in `src/backend/tests/`
+- `src/frontend/` — Vite + React + TS + Tailwind: `src/App.tsx`, `src/ui.tsx` (componenti comuni), `src/views/*` (una vista per tab), `src/api.ts`, `src/types.ts` (contratto di `/api/state`)
+- `src/data/seed/*.json` — **dataset della demo, fonte di verità** (convertito da `data.js`): company, store, sources, memory, actions, brief, `timeline.json` (eventi di ▶ Avanti). `src/data/llm_cache/` — cache delle risposte Gemini
+- `src/web/` — UI statica dello step 1 (`data.js`, `app.js`): resta come fallback ma **non è più aggiornata**; i dati nuovi vanno nei JSON seed
+- `Dockerfile`, `Makefile`, `scripts/` — build, avvio e deploy
 - `docs/` — brief, criteri, scenario demo, decisioni, script del pitch
 - `docs/decisions.md` — log delle decisioni (data, cosa, perché)
 - `.env.example` — variabili richieste; i segreti reali vanno in `.env` (mai committato)

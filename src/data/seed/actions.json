@@ -1,0 +1,101 @@
+[
+  {
+    "id": "A1",
+    "title": "Rimborso ordine #10481 (P. Martin) — 69,80€",
+    "owner": "clienti",
+    "effect": "refund",
+    "why": "Il cliente segnala Box Natale schiacciato con foto, GLS ha riconosciuto il danno; la policy prevede rimborso completo sotto i 100€ (lo approva il Servizio clienti).",
+    "draft": "Chère Madame / Cher Monsieur Martin,\nnous sommes désolés pour ce désagrément. Nous avons procédé au remboursement complet de 69,80 € sur votre moyen de paiement d'origine.\n\nBottega Sabauda",
+    "source_ids": [
+      "ch-c3",
+      "em-cli-martin",
+      "dc-resi",
+      "em-gls-reclamo"
+    ],
+    "status": "pending",
+    "order_id": "#10481"
+  },
+  {
+    "id": "A2",
+    "title": "Pagare fattura n. 889 al Laboratorio Sant'Anna — 3.450€",
+    "owner": "shop",
+    "effect": "payment",
+    "why": "Fattura scaduta il 15/11, sollecito ricevuto il 20/11: il laboratorio ha accennato a rivedere le priorità di produzione, ed è il fornitore dei gianduiotti (prodotto più venduto).",
+    "draft": "Bonifico di 3.450€ a Laboratorio Dolciario Sant'Anna Srl, causale: Saldo fattura n. 889.",
+    "source_ids": [
+      "em-fattura",
+      "em-lab-conferma"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "A3",
+    "title": "Sospendere vendita Gianduiotti al caffè e promo CAFFE15",
+    "owner": "shop",
+    "effect": "block",
+    "why": "Il lotto L26-1108 ha un'etichetta senza l'allergene latte. La promo CAFFE15 è attiva e la newsletter delle 10:00 la promuove a 8.400 iscritti.",
+    "draft": "1) Nascondere GIA-CAF dallo shop.\n2) Disattivare il codice CAFFE15.\n3) Rimuovere il banner dalla newsletter «Il Natale è dolce» (parte alle 10:00).",
+    "source_ids": [
+      "em-lotto",
+      "em-newsletter",
+      "dc-promo"
+    ],
+    "status": "pending",
+    "sku": "GIA-CAF"
+  },
+  {
+    "id": "A4",
+    "title": "Quarantena lotto L26-1108 — 202 pz a scaffale",
+    "owner": "magazzino",
+    "effect": "quarantine",
+    "why": "Richiesta del laboratorio: isolare le giacenze del lotto. La procedura prevede lo scaffale Q per i lotti non conformi.",
+    "draft": "Spostare tutti i Gianduiotti al caffè 200g del lotto L26-1108 (202 pz) sullo scaffale Q e bloccarli a gestionale. Non evadere ordini che li contengono (#10487).",
+    "source_ids": [
+      "em-lotto",
+      "dc-magazzino"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "A5",
+    "title": "Avviso ai clienti che hanno acquistato il lotto L26-1108",
+    "owner": "clienti",
+    "effect": "notify",
+    "why": "Il lotto è stato venduto in 17 ordini (38 pz), tra cui #10465 e #10475. Una cliente allergica al latte ha già scritto.",
+    "draft": "Gentile cliente,\nil laboratorio ci ha segnalato che l'etichetta del lotto L26-1108 dei Gianduiotti al caffè 200g non riporta la dicitura «contiene latte». Il prodotto contiene latte: se sei allergico o intollerante, non consumarlo. Ti rimborsiamo l'acquisto, basta rispondere a questa mail.\n\nBottega Sabauda",
+    "source_ids": [
+      "em-lotto",
+      "em-cli-latte",
+      "dc-faq"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "A6",
+    "title": "Avviso ritardo BRT ai clienti Piemonte/Lombardia",
+    "owner": "clienti",
+    "effect": "notify",
+    "why": "BRT segnala +24/48h dal 21 al 28/11. Toccati almeno #10482 e #10485.",
+    "draft": "Gentile cliente,\ncausa sciopero e volumi del periodo natalizio il corriere ha comunicato un ritardo di 24-48 ore sul tuo ordine. Puoi seguire la spedizione dal link di tracking. Grazie per la pazienza!\n\nBottega Sabauda",
+    "source_ids": [
+      "em-brt-ritardo",
+      "ch-s9"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "A7",
+    "title": "Intercettare collo #10479 (G. Russo) — indirizzo errato",
+    "owner": "spedizioni",
+    "effect": "intercept",
+    "why": "Il cliente ha scritto via Po 12 invece di 112. BRT può intercettare il collo a 7€, senza garanzia; in alternativa rientra in sede e si rispedisce.",
+    "draft": "A BRT — richiesta di intercettazione collo ordine #10479, destinatario G. Russo. Correggere indirizzo in: via Po 112, Torino.",
+    "source_ids": [
+      "em-cli-russo",
+      "ch-s5",
+      "ch-s6"
+    ],
+    "status": "pending",
+    "order_id": "#10479"
+  }
+]

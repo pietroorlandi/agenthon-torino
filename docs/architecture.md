@@ -499,7 +499,10 @@ Regole per gli agenti ADK:
 - **Badge di stato coerenti ovunque:** `pending` giallo, `approved` verde, `rejected` grigio, `quarantine` rosso, `sent` blu.
 - **Versioni:** fissate in `package.json` al momento dello scaffold, nessuna dipendenza in più senza motivo.
 
-### 13.3 Struttura repo (proposta)
+### 13.3 Struttura repo
+> **Implementata (21/11)** con una differenza: il frontend sta in `src/frontend/` (non `src/web/`, che resta la UI statica dello step 1) e il backend in `src/backend/app/`. Dataset in `src/data/seed/*.json`. Comandi e configurazione in [setup.md](setup.md).
+
+Proposta originale:
 ```
 Dockerfile               # multi-stage: node (build web) → python (API + statici)
 src/

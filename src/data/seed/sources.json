@@ -1,0 +1,1176 @@
+[
+  {
+    "id": "em-sara-ordine",
+    "type": "email",
+    "title": "Riordino gianduiotti per il periodo natalizio",
+    "sender": "sara",
+    "date": "19/11 14:20",
+    "access": [
+      "magazzino",
+      "shop"
+    ],
+    "body": "Buongiorno,\nper il periodo natalizio vorremmo riordinare 400 Gianduiotti classici 250g e 300 Gianduiotti fondenti 70% 250g, con consegna richiesta entro il 25/11.\nGrazie,\nSara — Magazzino Bottega Sabauda",
+    "to": "produzione@laboratorio-santanna.example"
+  },
+  {
+    "id": "em-lab-conferma",
+    "type": "email",
+    "title": "Re: Riordino gianduiotti per il periodo natalizio",
+    "sender": "produzione@laboratorio-santanna.example",
+    "date": "20/11 16:02",
+    "access": [
+      "magazzino",
+      "shop"
+    ],
+    "body": "Confermiamo i 400 Gianduiotti classici 250g con consegna il 25/11. Per i 300 fondenti 70% c'è un ritardo sulla consegna del cacao dal porto di Genova: la consegna slitta al 28/11. Ricordiamo inoltre che la fattura n. 889 (3.450€) è scaduta il 15/11: finché non risulta saldata potremmo dover rivedere le priorità di produzione.",
+    "to": "sara"
+  },
+  {
+    "id": "em-fattura",
+    "type": "email",
+    "title": "Fattura n. 889 — sollecito di pagamento",
+    "sender": "amministrazione@laboratorio-santanna.example",
+    "date": "20/11 09:30",
+    "access": [
+      "shop"
+    ],
+    "body": "Vi ricordiamo che la fattura n. 889 di 3.450€ per la fornitura di gianduiotti è scaduta il 15/11. Vi preghiamo di procedere al saldo.",
+    "to": "marco"
+  },
+  {
+    "id": "em-lotto",
+    "type": "email",
+    "title": "URGENTE — Lotto L26-1108 Gianduiotti al caffè: etichetta non conforme",
+    "sender": "qualita@laboratorio-santanna.example",
+    "date": "21/11 06:30",
+    "access": [
+      "all"
+    ],
+    "body": "Durante un controllo interno abbiamo rilevato che il lotto L26-1108 (Gianduiotti al caffè 200g, 240 pezzi, consegnato il 12/11) è stato stampato con un'etichetta priva della dicitura allergene «contiene LATTE». Il prodotto non è pericoloso per chi non è allergico, ma l'etichetta non è conforme.\nVi chiediamo di: 1) sospendere subito la vendita del lotto; 2) isolare le giacenze; 3) avvisare i clienti che lo hanno già acquistato. Invieremo le etichette correttive entro lunedì 24/11.",
+    "to": "sara"
+  },
+  {
+    "id": "em-listino",
+    "type": "email",
+    "title": "Aggiornamento listino dal 1° gennaio",
+    "sender": "commerciale@laboratorio-santanna.example",
+    "date": "20/11 10:05",
+    "access": [
+      "shop",
+      "magazzino"
+    ],
+    "body": "Per il forte rincaro del cacao, dal 1° gennaio il listino sale del 3,5% su tutta la gamma. Gli ordini confermati entro il 31/12 mantengono i prezzi attuali.",
+    "to": "marco"
+  },
+  {
+    "id": "em-nocciole",
+    "type": "email",
+    "title": "Consegna nocciole al Laboratorio Sant'Anna",
+    "sender": "ordini@cooperativa-nocciola-langhe.example",
+    "date": "18/11 11:05",
+    "access": [
+      "magazzino",
+      "shop"
+    ],
+    "body": "Confermiamo la consegna di 300 kg di nocciole Tonda Gentile del Piemonte IGP presso il Laboratorio Sant'Anna, per vostro conto (produzione crema gianduja), il 24/11. Prezzo 14,20€/kg.",
+    "to": "sara"
+  },
+  {
+    "id": "em-ormea",
+    "type": "email",
+    "title": "Preventivo scatole Box Natale",
+    "sender": "commerciale@scatolificio-ormea.example",
+    "date": "17/11 10:40",
+    "access": [
+      "magazzino",
+      "shop"
+    ],
+    "body": "Preventivo per scatole Box Natale 600g con carta oro: minimo 2.000 pezzi a 0,62€/pz, consegna in 10 giorni lavorativi dalla conferma. Cartoni esterni 40x30 disponibili a magazzino, 0,48€/pz.",
+    "to": "sara"
+  },
+  {
+    "id": "em-dhl",
+    "type": "email",
+    "title": "Nuovo listino spedizioni estero",
+    "sender": "commerciale@dhl-partner.example",
+    "date": "19/11 10:12",
+    "access": [
+      "spedizioni",
+      "clienti",
+      "shop"
+    ],
+    "body": "Gentile Bottega Sabauda, confermiamo che dal 1° dicembre le spedizioni verso l'UE saranno gestite da DHL Express con tariffa fissa di 9,90€ a collo fino a 2kg. Il contratto con il precedente corriere (GLS) scade il 30/11. Le credenziali per il portale etichette vi saranno inviate entro il 25/11.",
+    "to": "davide"
+  },
+  {
+    "id": "em-brt-ritiri",
+    "type": "email",
+    "title": "Picco Black Friday: richiesta secondo ritiro",
+    "sender": "davide",
+    "date": "20/11 11:00",
+    "access": [
+      "spedizioni",
+      "magazzino"
+    ],
+    "body": "Buongiorno,\nper la settimana del Black Friday prevediamo circa 90 colli lunedì 24/11 e 160 colli venerdì 27/11. Possiamo avere un secondo ritiro alle 11:00?\nGrazie, Davide — Spedizioni Bottega Sabauda",
+    "to": "ritiri@brt.example"
+  },
+  {
+    "id": "em-brt-ritiri-r",
+    "type": "email",
+    "title": "Re: Picco Black Friday: richiesta secondo ritiro",
+    "sender": "ritiri@brt.example",
+    "date": "20/11 15:45",
+    "access": [
+      "spedizioni",
+      "magazzino"
+    ],
+    "body": "Il secondo ritiro può essere attivato solo dal 26/11. Capacità massima: 140 colli per ritiro.",
+    "to": "davide"
+  },
+  {
+    "id": "em-brt-ritardo",
+    "type": "email",
+    "title": "Avviso: ritardi di consegna Piemonte e Lombardia",
+    "sender": "servizioclienti@brt.example",
+    "date": "21/11 07:05",
+    "access": [
+      "spedizioni",
+      "clienti"
+    ],
+    "body": "A causa di uno sciopero e dei volumi del Black Friday, le consegne in Piemonte e Lombardia subiranno ritardi di 24/48 ore dal 21/11 al 28/11.",
+    "to": "davide"
+  },
+  {
+    "id": "em-brt-giacenza",
+    "type": "email",
+    "title": "Collo in giacenza — destinatario R. Gentile (ordine #10476)",
+    "sender": "giacenze@brt.example",
+    "date": "19/11 17:30",
+    "access": [
+      "spedizioni",
+      "clienti"
+    ],
+    "body": "Il collo è giacente presso la filiale di Milano: destinatario assente al primo tentativo. Secondo tentativo entro 48 ore, poi ritorno al mittente.",
+    "to": "davide"
+  },
+  {
+    "id": "em-gls-reclamo",
+    "type": "email",
+    "title": "Reclamo n. 77431 — destinatario P. Martin (ordine #10481)",
+    "sender": "reclami@gls-fr.example",
+    "date": "21/11 07:35",
+    "access": [
+      "spedizioni",
+      "clienti",
+      "shop"
+    ],
+    "body": "Abbiamo aperto il reclamo per danno da trasporto. Indennizzo massimo 100€ previa foto dell'imballo esterno e interno e del contenuto.",
+    "to": "davide"
+  },
+  {
+    "id": "em-conferma-ferrero",
+    "type": "email",
+    "title": "Il tuo ordine #10485 è in viaggio",
+    "sender": "noreply@bottegasabauda.example",
+    "date": "21/11 07:42",
+    "access": [
+      "clienti",
+      "spedizioni"
+    ],
+    "body": "Ciao Luca, il tuo ordine #10485 è stato affidato a BRT. Consegna stimata: 24-25/11. Tracking: BRT 0884412099.",
+    "to": "l.ferrero@mail.example"
+  },
+  {
+    "id": "em-conferma-russo",
+    "type": "email",
+    "title": "Il tuo ordine #10479 è in viaggio",
+    "sender": "noreply@bottegasabauda.example",
+    "date": "20/11 22:15",
+    "access": [
+      "clienti",
+      "spedizioni"
+    ],
+    "body": "Ciao Giovanni, il tuo ordine #10479 è stato affidato a BRT. Consegna stimata: 22-23/11. Tracking: BRT 0884411763.",
+    "to": "g.russo@mail.example"
+  },
+  {
+    "id": "em-cli-martin",
+    "type": "email",
+    "title": "Commande #10481 — colis abîmé",
+    "sender": "p.martin@mail.example",
+    "date": "20/11 19:31",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Bonjour, ma commande #10481 est arrivée avec la boîte écrasée et les chocolats cassés. Je joins des photos. Merci de me rembourser.",
+    "to": "giulia"
+  },
+  {
+    "id": "em-cli-latte",
+    "type": "email",
+    "title": "Allergia al latte — gianduiotti al caffè",
+    "sender": "elena.fabbri@mail.example",
+    "date": "21/11 08:02",
+    "access": [
+      "clienti"
+    ],
+    "body": "Buongiorno, ho acquistato i gianduiotti al caffè (ordine #10465). Ho un'allergia al latte e sull'etichetta non trovo l'indicazione degli allergeni. I gianduiotti al caffè contengono latte? Grazie.",
+    "to": "giulia"
+  },
+  {
+    "id": "em-cli-dubois",
+    "type": "email",
+    "title": "Commande #10484 — pas de confirmation",
+    "sender": "marie.dubois@mail.example",
+    "date": "21/11 07:30",
+    "access": [
+      "clienti",
+      "shop"
+    ],
+    "body": "Bonjour, j'ai payé la commande #10484 avec PayPal mais je n'ai reçu aucune confirmation. Pouvez-vous vérifier ?",
+    "to": "giulia"
+  },
+  {
+    "id": "em-cli-weber",
+    "type": "email",
+    "title": "Order #10486 — payment declined",
+    "sender": "k.weber@mail.example",
+    "date": "21/11 07:50",
+    "access": [
+      "clienti",
+      "shop"
+    ],
+    "body": "Hello, my card was declined twice for order #10486 although the card is fine. Could you send me another way to pay?",
+    "to": "giulia"
+  },
+  {
+    "id": "em-cli-russo",
+    "type": "email",
+    "title": "Indirizzo sbagliato ordine #10479",
+    "sender": "g.russo@mail.example",
+    "date": "20/11 12:30",
+    "access": [
+      "clienti",
+      "spedizioni"
+    ],
+    "body": "Buongiorno, ho sbagliato l'indirizzo: ho scritto via Po 12 ma è via Po 112, Torino. Si può correggere? Grazie.",
+    "to": "giulia"
+  },
+  {
+    "id": "em-cli-vittoria",
+    "type": "email",
+    "title": "Ordine #10469 — scatole mancanti",
+    "sender": "bar.vittoria@mail.example",
+    "date": "19/11 15:10",
+    "access": [
+      "clienti",
+      "spedizioni"
+    ],
+    "body": "Il corriere ha lasciato il collo senza farci controllare: nel nostro ordine mancano 2 scatole di tavolette gianduja. Potete rispedirle? Siamo un bar di Torino e a Natale ne vendiamo tantissime.",
+    "to": "giulia"
+  },
+  {
+    "id": "em-b2b-dolcevita",
+    "type": "email",
+    "title": "Richiesta fornitura gianduiotti sfusi per Natale",
+    "sender": "info@dolcevitatorino.example",
+    "date": "19/11 17:10",
+    "access": [
+      "shop",
+      "magazzino"
+    ],
+    "body": "Buonasera, vorremmo 20 kg di gianduiotti classici sfusi per le vetrine natalizie, consegna entro martedì 25/11 presso via Garibaldi 21, Torino. Fattura elettronica. Grazie, Dolce Vita Torino.",
+    "to": "marco"
+  },
+  {
+    "id": "em-newsletter",
+    "type": "email",
+    "title": "Campagna «Il Natale è dolce» programmata",
+    "sender": "campagne@mailer.example",
+    "date": "20/11 17:00",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "La campagna è programmata per il 21/11 alle 10:00 verso 8.400 iscritti. Contenuti: banner Box Natale (NATALE10) e banner Gianduiotti al caffè con codice CAFFE15 (-15%).",
+    "to": "marco"
+  },
+  {
+    "id": "dc-promo",
+    "type": "doc",
+    "title": "Calendario promozioni novembre–dicembre",
+    "sender": "marco",
+    "date": "18/11",
+    "access": [
+      "all"
+    ],
+    "body": "ATTIVE\n• NATALE10 — -10% solo sui Box Natale (BOX-NAT), fino al 30/11.\n• 2x1 Tavolette gianduja, fino al 23/11.\n• CAFFE15 — -15% sui Gianduiotti al caffè (smaltimento scorta), fino al 30/11.\n• BENVENUTO5 — -5€ sul primo ordine sopra 30€.\n• Spedizione gratuita in Italia sopra 49€ (estero sopra 79€).\nRegola: un solo codice sconto per ordine.\n\nPROGRAMMATE\n• Black Friday: -20% dal 27/11 al 30/11 su tutto il catalogo, esclusi Calendari dell'Avvento e ordini B2B. Da non comunicare ai clienti prima del 26/11.\n• Dal 1/12 spedizione UE a tariffa fissa DHL."
+  },
+  {
+    "id": "dc-sconti",
+    "type": "doc",
+    "title": "Regole sconti e codici",
+    "sender": "marco",
+    "date": "02/10",
+    "access": [
+      "all"
+    ],
+    "body": "Ogni ordine può avere al massimo il 20% di sconto complessivo (codici promo e sconti manuali compresi). Sconti oltre il 20% non sono consentiti; per casi eccezionali serve l'approvazione dello Shop prima di applicarli."
+  },
+  {
+    "id": "dc-resi",
+    "type": "doc",
+    "title": "Policy resi e rimborsi",
+    "sender": "sara",
+    "date": "02/09",
+    "access": [
+      "all"
+    ],
+    "body": "Prodotti danneggiati in transito: rimborso completo o rispedizione entro 14 giorni dalla consegna, con foto. I rimborsi fino a 100€ li approva il Servizio clienti; sopra 100€ serve l'approvazione dello Shop. Prodotti alimentari aperti: nessun reso per ripensamento."
+  },
+  {
+    "id": "dc-spedizioni",
+    "type": "doc",
+    "title": "Procedura spedizioni",
+    "sender": "davide",
+    "date": "05/10",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Cut-off ordini ore 14:00: ordini entro le 14:00 partono in giornata, dopo il giorno lavorativo successivo. Tempi di consegna: Italia 24-48h, UE 3-5 giorni lavorativi. Corrieri: BRT (Italia), GLS (estero, fino al 30/11), DHL Express (estero dal 1/12). Spedizioni a negozi: colli multipli con DDT, consegna su appuntamento; il collo va controllato alla consegna."
+  },
+  {
+    "id": "dc-faq",
+    "type": "doc",
+    "title": "FAQ clienti — allergeni e conservazione",
+    "sender": "giulia",
+    "date": "10/10",
+    "access": [
+      "all"
+    ],
+    "body": "Tutti i gianduiotti contengono nocciole e latte; i fondenti 70% possono contenere tracce di latte. Possibili tracce di altra frutta a guscio e soia. Conservare in luogo fresco e asciutto, 12 mesi dal confezionamento."
+  },
+  {
+    "id": "dc-b2b",
+    "type": "doc",
+    "title": "Listino B2B negozi",
+    "sender": "marco",
+    "date": "01/10",
+    "access": [
+      "shop",
+      "magazzino"
+    ],
+    "body": "Sconto 35% sul listino al pubblico, minimo ordine 10 kg o 100€. Spedizione gratuita sopra 300€. Pagamento a 30 giorni, fattura elettronica. Le promozioni al pubblico (NATALE10, Black Friday) non si applicano al B2B."
+  },
+  {
+    "id": "dc-margini",
+    "type": "doc",
+    "title": "Report margini — novembre (bozza)",
+    "sender": "marco",
+    "date": "20/11 16:40",
+    "access": [
+      "shop"
+    ],
+    "body": "Margine lordo novembre (al 20/11): 38,4%. Ricavi 41.200€, costo del venduto 25.380€. Margine più alto: tavolette (57%); più basso: Box Natale (31%, per il packaging). La spedizione gratuita sopra 49€ costa in media 4,80€ a ordine."
+  },
+  {
+    "id": "dc-contratto-lab",
+    "type": "doc",
+    "title": "Condizioni fornitore Laboratorio Sant'Anna",
+    "sender": "marco",
+    "date": "15/06",
+    "access": [
+      "shop",
+      "magazzino"
+    ],
+    "body": "Lead time 5 giorni lavorativi dalla conferma. Ordine minimo 200 pezzi per referenza. Pagamento a 30 giorni data fattura. Penale del 3% per ritardi di consegna oltre 3 giorni."
+  },
+  {
+    "id": "dc-magazzino",
+    "type": "doc",
+    "title": "Procedura magazzino",
+    "sender": "sara",
+    "date": "12/09",
+    "access": [
+      "magazzino",
+      "spedizioni"
+    ],
+    "body": "Gestione FIFO per lotto. Ogni arrivo viene registrato con numero di lotto; i lotti non conformi vanno spostati in quarantena (scaffale Q) e segnalati subito. Inventario ciclico settimanale a rotazione sugli scaffali A, B, C."
+  },
+  {
+    "id": "tk-cumulo",
+    "type": "task",
+    "title": "Bloccare cumulo codici sconto nel checkout",
+    "sender": "marco",
+    "date": "21/11",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "Task assegnato a Marco. Scadenza 22/11. Stato: in corso (80%).",
+    "due": "22/11"
+  },
+  {
+    "id": "tk-inventario",
+    "type": "task",
+    "title": "Inventario ciclico scaffali A–C",
+    "sender": "sara",
+    "date": "17/11",
+    "access": [
+      "magazzino",
+      "spedizioni"
+    ],
+    "body": "Task assegnato a Sara. Scadenza 24/11. Stato: 2 scaffali su 3 completati.",
+    "due": "24/11"
+  },
+  {
+    "id": "tk-dhl",
+    "type": "task",
+    "title": "Aggiornare etichette e tariffe per DHL Express (dal 1/12)",
+    "sender": "davide",
+    "date": "19/11",
+    "access": [
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Task assegnato a Davide. Scadenza 28/11. Stato: da iniziare, servono le credenziali DHL (attese entro il 25/11).",
+    "due": "28/11"
+  },
+  {
+    "id": "tk-bf",
+    "type": "task",
+    "title": "Pianificare picking Black Friday (160 colli)",
+    "sender": "davide",
+    "date": "20/11",
+    "access": [
+      "magazzino",
+      "spedizioni"
+    ],
+    "body": "Task assegnato a Davide con Sara. Scadenza 26/11. Stato: in pianificazione; dipende dall'arrivo dei cartoni esterni.",
+    "due": "26/11"
+  },
+  {
+    "id": "tk-faq",
+    "type": "task",
+    "title": "Aggiornare FAQ allergeni sul sito",
+    "sender": "giulia",
+    "date": "19/11",
+    "access": [
+      "clienti",
+      "shop"
+    ],
+    "body": "Task assegnato a Giulia. Scadenza 28/11. Stato: non iniziato.",
+    "due": "28/11"
+  },
+  {
+    "id": "ch-g1",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "giulia",
+    "date": "18/11 09:02",
+    "access": [
+      "all"
+    ],
+    "body": "Buongiorno team! Chi ha le foto nuove dei Box Natale? Il sito ha ancora quelle dell'anno scorso 🎄",
+    "channel": "generale"
+  },
+  {
+    "id": "ch-g2",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "marco",
+    "date": "18/11 09:10",
+    "access": [
+      "all"
+    ],
+    "body": "Le carico oggi pomeriggio, Sara me le ha passate ieri.",
+    "channel": "generale"
+  },
+  {
+    "id": "ch-g3",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "davide",
+    "date": "19/11 12:31",
+    "access": [
+      "all"
+    ],
+    "body": "Ricordo: venerdì 28 aperitivo di squadra dopo il Black Friday, se sopravviviamo 😅",
+    "channel": "generale"
+  },
+  {
+    "id": "ch-g4",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "marco",
+    "date": "20/11 18:03",
+    "access": [
+      "all"
+    ],
+    "body": "ahah per il Black Friday facciamo 50% su tutto così finiamo i gianduiotti 😂",
+    "channel": "generale",
+    "claim": {
+      "key": "blackfriday.discount",
+      "value": "50%",
+      "text": "Per il Black Friday lo sconto è del 50% su tutto il catalogo."
+    }
+  },
+  {
+    "id": "ch-g5",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "sara",
+    "date": "20/11 18:04",
+    "access": [
+      "all"
+    ],
+    "body": "Marco dimmi che scherzi, il laboratorio ci ammazza 😅",
+    "channel": "generale"
+  },
+  {
+    "id": "ch-g6",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "marco",
+    "date": "20/11 18:05",
+    "access": [
+      "all"
+    ],
+    "body": "Ovviamente scherzo!! Il Black Friday è -20% dal 27 al 30/11, ma non ditelo ai clienti prima del 26.",
+    "channel": "generale"
+  },
+  {
+    "id": "ch-g7",
+    "type": "chat",
+    "title": "#generale",
+    "sender": "sara",
+    "date": "21/11 08:00",
+    "access": [
+      "all"
+    ],
+    "body": "Buongiorno a tutti ☕",
+    "channel": "generale"
+  },
+  {
+    "id": "ch-p1",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "marco",
+    "date": "19/11 09:10",
+    "access": [
+      "all"
+    ],
+    "body": "Promo attive al momento: NATALE10 (-10% sui Box Natale fino al 30/11), 2x1 sulle tavolette di gianduja fino al 23/11, CAFFE15 (-15% sui gianduiotti al caffè, per smaltire la scorta), BENVENUTO5 (5€ sul primo ordine sopra 30€) e spedizione gratis sopra 49€ in Italia (79€ estero).",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p2",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "giulia",
+    "date": "19/11 09:25",
+    "access": [
+      "all"
+    ],
+    "body": "Un cliente mi chiede se NATALE10 vale anche sul Calendario dell'Avvento. Ho detto di no, giusto?",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p3",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "marco",
+    "date": "19/11 09:27",
+    "access": [
+      "all"
+    ],
+    "body": "Giusto, solo sui Box Natale. L'Avvento è già a prezzo lancio 29,90.",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p4",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "davide",
+    "date": "19/11 10:02",
+    "access": [
+      "all"
+    ],
+    "body": "Con spedizione gratis e Black Friday in arrivo ci aspettiamo il doppio dei colli. I corrieri sono già al limite.",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p5",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "sara",
+    "date": "20/11 11:40",
+    "access": [
+      "all"
+    ],
+    "body": "Per il 2x1 sulle tavolette ne abbiamo 300 a scaffale, la promo finisce domenica: poi le rimetto a prezzo pieno nel gestionale?",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p6",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "marco",
+    "date": "20/11 11:44",
+    "access": [
+      "all"
+    ],
+    "body": "Sì, dal 24 le riporto io a 4,50€. Tu non devi fare nulla.",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p7",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "giulia",
+    "date": "20/11 15:12",
+    "access": [
+      "all"
+    ],
+    "body": "Altra domanda dai clienti: il codice benvenuto si può usare insieme al Black Friday?",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p8",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "marco",
+    "date": "20/11 15:20",
+    "access": [
+      "all"
+    ],
+    "body": "Un solo codice per ordine, ma sto sistemando il checkout perché al momento non è bloccato.",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p9",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "marco",
+    "date": "20/11 17:30",
+    "access": [
+      "all"
+    ],
+    "body": "Black Friday confermato: -20% dal 27 al 30/11, esclusi Calendari dell'Avvento e ordini B2B. Banner pronto giovedì.",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p10",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "giulia",
+    "date": "21/11 07:55",
+    "access": [
+      "all"
+    ],
+    "body": "Mi stanno scrivendo in tanti per il Black Friday, posso già anticipare qualcosa?",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-p11",
+    "type": "chat",
+    "title": "#promo",
+    "sender": "marco",
+    "date": "21/11 07:58",
+    "access": [
+      "all"
+    ],
+    "body": "Niente date né percentuali fino al 26, per favore.",
+    "channel": "promo"
+  },
+  {
+    "id": "ch-m1",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "sara",
+    "date": "18/11 15:20",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Inventario scaffale C fatto: i fondenti 70% oggi sono 95 pz. Ne vendiamo circa 19 al giorno.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m2",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "davide",
+    "date": "18/11 15:24",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Occhio che dal 27 ne partiranno molti di più, i fondenti piacciono ai regali aziendali.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m3",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "marco",
+    "date": "19/11 17:25",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Sara, ordine B2B da Dolce Vita Torino: 20 kg di classici sfusi entro martedì 25/11, prezzo listino B2B. Ce la fai?",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m4",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "sara",
+    "date": "19/11 17:40",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Guardo lo sfuso: a gestionale vedo 15 kg. Dovrei chiedere un'integrazione al laboratorio.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m5",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "sara",
+    "date": "20/11 16:15",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Il laboratorio ha spostato i fondenti al 28/11 per ritardi sul cacao. Con 38 pz a scaffale finiamo in 2 giorni. Marco, che facciamo sul sito?",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m6",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "marco",
+    "date": "20/11 16:22",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Li segno «ultimi pezzi» e poi «disponibili dal 29/11». Se qualcuno li ordina in Black Friday non possiamo spedire prima.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m7",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "davide",
+    "date": "20/11 16:30",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Meglio avvisare subito i clienti B2B che li hanno richiesti.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m8",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "sara",
+    "date": "21/11 07:30",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Scatole Box Natale: i cartoni bastano per circa 90 box. Preventivo Ormea: minimo 2.000 pz a 0,62€, consegna in 10 giorni lavorativi. Ordiniamo oggi?",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m9",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "marco",
+    "date": "21/11 07:36",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Sì, ma prima guardo il budget. Lo confermo lunedì.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m10",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "davide",
+    "date": "21/11 07:48",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Mi servono anche 150 cartoni esterni 40x30 per le spedizioni del Black Friday, ne abbiamo solo 90.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-m11",
+    "type": "chat",
+    "title": "#magazzino",
+    "sender": "sara",
+    "date": "21/11 07:52",
+    "access": [
+      "magazzino",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Li aggiungo all'ordine Ormea.",
+    "channel": "magazzino"
+  },
+  {
+    "id": "ch-s1",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "19/11 14:05",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Confermo il cut-off: ordini entro le 14:00 partono in giornata, dopo le 14:00 il giorno lavorativo successivo. Con il Black Friday la regola non cambia.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s2",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "giulia",
+    "date": "19/11 14:10",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Perfetto. I clienti chiedono sempre entro quando ordinare per ricevere prima di Natale: dico Italia entro il 18/12 e UE entro il 12/12?",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s3",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "19/11 14:20",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Sì, ma sono date indicative: con i ritardi dei corrieri a dicembre non posso garantire. Scrivi «consigliamo di ordinare entro».",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s4",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "20/11 11:00",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Ho scritto a BRT per il picco Black Friday: previsti 90 colli lunedì 24 e 160 venerdì 27.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s5",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "giulia",
+    "date": "20/11 12:40",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Davide, il cliente G. Russo (#10479) ha sbagliato l'indirizzo: via Po 12 invece di via Po 112. Il pacco è già partito.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s6",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "20/11 12:55",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Chiedo a BRT di intercettarlo: costa 7€ e non è garantito. Se rientra lo rispediamo noi a nostre spese.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s7",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "20/11 15:50",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "BRT: secondo ritiro solo da giovedì 26/11 e massimo 140 colli a ritiro. Venerdì 27 con 160 colli rischiamo di non farcela.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s8",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "sara",
+    "date": "20/11 16:00",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Il 27 il magazzino riesce a preparare 160 colli solo se arrivano per tempo i cartoni. Dobbiamo anticipare il picking a giovedì sera.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s9",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "21/11 07:08",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "BRT avvisa ritardi di 24/48h in Piemonte e Lombardia per sciopero e volumi: toccati #10482, #10485 e gli altri in partenza oggi.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s10",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "giulia",
+    "date": "21/11 07:14",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Ok, preparo una mail ai clienti coinvolti. Davide, mandami i numeri d'ordine.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s11",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "davide",
+    "date": "21/11 07:40",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Dal 1° dicembre l'estero passa a DHL Express a 9,90€ a collo (fino a 2kg), GLS scade il 30/11. Dobbiamo aggiornare tariffe sul sito e le etichette.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-s12",
+    "type": "chat",
+    "title": "#spedizioni",
+    "sender": "sara",
+    "date": "21/11 07:44",
+    "access": [
+      "spedizioni",
+      "magazzino",
+      "clienti"
+    ],
+    "body": "Per le etichette DHL servono rotoli 100x150 per la termica: ne ordino 4.",
+    "channel": "spedizioni"
+  },
+  {
+    "id": "ch-c1",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "giulia",
+    "date": "19/11 09:00",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Ieri 23 ticket: 9 «dov'è il mio ordine?», 6 codici sconto che non funzionano, 4 domande sugli allergeni, 4 resi.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-c2",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "marco",
+    "date": "19/11 09:12",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Sui codici è normale, ne vale uno per ordine. Poi sistemo il messaggio d'errore al checkout.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-c3",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "giulia",
+    "date": "21/11 07:20",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Cliente P. Martin (ordine #10481) dice che il Box Natale e i gianduiotti sono arrivati con la scatola schiacciata e il cioccolato rotto, chiede rimborso. Ho le foto.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-c4",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "davide",
+    "date": "21/11 07:26",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "GLS ha aperto il reclamo 77431 e riconosce il danno, ma l'indennizzo è massimo 100€ e servono le foto dell'imballo.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-c5",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "marco",
+    "date": "21/11 07:31",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Sotto i 100€ lo approvi tu Giulia, come da policy: rimborso completo.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-c6",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "giulia",
+    "date": "21/11 08:03",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Mi ha scritto una cliente con allergia al latte: chiede se i gianduiotti al caffè contengono latte, perché sull'etichetta non lo trova. Io penso di sì ma non ne sono sicura.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-c7",
+    "type": "chat",
+    "title": "#clienti",
+    "sender": "marco",
+    "date": "21/11 08:06",
+    "access": [
+      "clienti",
+      "spedizioni",
+      "shop"
+    ],
+    "body": "Guarda la FAQ allergeni: tutti i gianduiotti contengono latte, nei fondenti solo tracce.",
+    "channel": "clienti"
+  },
+  {
+    "id": "ch-sh1",
+    "type": "chat",
+    "title": "#shop",
+    "sender": "marco",
+    "date": "20/11 10:15",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "Il laboratorio ci ha scritto: dal 1° gennaio il listino sale del 3,5% per il rincaro del cacao. Dobbiamo rivedere i prezzi di gennaio.",
+    "channel": "shop"
+  },
+  {
+    "id": "ch-sh2",
+    "type": "chat",
+    "title": "#shop",
+    "sender": "marco",
+    "date": "21/11 06:59",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "Il codice NATALE10 si cumula con BENVENUTO5: stanotte 14 ordini con doppio sconto, margine quasi azzerato sui Box Natale. Sto bloccando la cumulabilità nel checkout.",
+    "channel": "shop"
+  },
+  {
+    "id": "ch-sh3",
+    "type": "chat",
+    "title": "#shop",
+    "sender": "giulia",
+    "date": "21/11 07:05",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "Se qualcuno chiede rispondo che vale un solo codice per ordine. Ai 14 clienti lasciamo lo sconto già applicato?",
+    "channel": "shop"
+  },
+  {
+    "id": "ch-sh4",
+    "type": "chat",
+    "title": "#shop",
+    "sender": "marco",
+    "date": "21/11 07:10",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "Sì, ormai è un nostro errore: li evadiamo normalmente, ma da oggi blocco.",
+    "channel": "shop"
+  },
+  {
+    "id": "ch-sh5",
+    "type": "chat",
+    "title": "#shop",
+    "sender": "marco",
+    "date": "21/11 07:45",
+    "access": [
+      "shop",
+      "clienti"
+    ],
+    "body": "Newsletter «Il Natale è dolce» parte alle 10:00 a 8.400 iscritti, con il banner CAFFE15 sui gianduiotti al caffè.",
+    "channel": "shop"
+  }
+]
