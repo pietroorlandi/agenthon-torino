@@ -71,7 +71,7 @@ make deploy   # Cloud Run (scripts/deploy.sh)
 - Versioni fissate: google-adk 2.14.1, google-genai 2.34.0, FastAPI 0.165, Vite 8, React 19, Tailwind 4.3, TS 6.0.
 
 ## Struttura repo
-- `src/backend/app/` — FastAPI: `main.py` (API), `store.py` (stato in memoria + filtri per ruolo), `llm.py` (unico punto verso Gemini: cache, fallback, metriche), `telemetry.py` (OpenTelemetry + contatori), `pipeline/` (trust, regole, triage, estrazione, riconciliazione), `services/` (qa, gaps, brief, actions, curation, clock, tts), `agents/draft_agent.py` (ADK), `views.py` (stato per utente). Test in `src/backend/tests/`
+- `src/backend/app/` — FastAPI: `main.py` (API), `store.py` (stato in memoria + filtri per ruolo), `llm.py` (unico punto verso Gemini: cache, fallback, metriche), `telemetry.py` (OpenTelemetry + contatori), `pipeline/` (trust, regole, triage, estrazione, riconciliazione), `services/` (qa, probe, gaps, brief, actions, curation, clock, tts), `agents/draft_agent.py` (ADK), `views.py` (stato per utente). Test in `src/backend/tests/`
 - `src/frontend/` — Vite + React + TS + Tailwind: `src/App.tsx`, `src/ui.tsx` (componenti comuni), `src/views/*` (una vista per tab), `src/api.ts`, `src/types.ts` (contratto di `/api/state`)
 - `src/data/seed/*.json` — **dataset della demo, fonte di verità** (convertito da `data.js`): company, store, sources, memory, actions, brief, `timeline.json` (eventi di ▶ Avanti). `src/data/llm_cache/` — cache delle risposte Gemini
 - `src/web/` — UI statica dello step 1 (`data.js`, `app.js`): resta come fallback ma **non è più aggiornata**; i dati nuovi vanno nei JSON seed

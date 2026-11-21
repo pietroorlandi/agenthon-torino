@@ -11,7 +11,7 @@ I casi segnati 🤖 sono coperti anche da test automatici (`src/backend/tests/`)
 | Utente | **Chat** | Il Brain (risponde solo con informazioni approvate e mostra le fonti) e i canali del team simulati. Nei canali puoi scrivere: il Brain legge il messaggio come uno vero |
 | Utente | **Posta** | Il brief del mattino come email, le email ricevute e inviate, e quelle "inviate" dopo un'approvazione |
 | Utente | **Cosa sappiamo** | La memoria approvata del team, con ricerca |
-| Sviluppatore / demo | pulsante **Dev** | Barra scura con orologio, **Avanti** (eventi della mattina), **Reset**, e le viste Store, Fonti, Mettilo alla prova, Audit, Osservabilità |
+| Sviluppatore / demo | pulsante **Dev** | Barra scura con orologio, **Avanti** (eventi della mattina), **Reset**, e le viste Brain, Store, Fonti, Mettilo alla prova, Audit, Osservabilità |
 
 Il selettore in alto a destra simula il login: ogni persona vede solo ciò che il suo reparto può vedere.
 Persone: **Sara** (Magazzino), **Giulia** (Servizio clienti), **Marco** (Shop), **Davide** (Spedizioni).
@@ -93,6 +93,19 @@ Niente esce dalla demo: non partono email né pagamenti. Approvare:
 Rifiutare non cambia nulla.
 
 > **Da decidere in team:** A2 "Pagare fattura 889" contraddice l'architettura (pagamenti fuori dal catalogo azioni). Proposta: trasformarla in "Segnala all'amministrazione".
+
+---
+
+## B2. Stato del Brain (Dev → Brain)
+
+Serve a vedere la conoscenza dal punto 0 e a dimostrare che il «non lo so» è una regola, non un caso.
+- **Contatori**: fatti approvati, in attesa, in quarantena, buchi aperti e colmati, fonti bandite, con la variazione dall'ultimo ▶ Avanti.
+- **Cosa è cambiato dall'ultimo ▶ Avanti**: un elenco preciso, per esempio «+ Q2 in quarantena: lo sconto massimo è il 30%». Il frontend fa un'istantanea a ogni passo, per la persona selezionata.
+- **Evoluzione dal punto 0**: una riga di contatori per ogni passo della timeline.
+- **Banco di prova**: per ogni domanda mostra l'esito e il motivo, cioè quali fatti ha usato, a quale reparto chiederebbe e quale fonte in quarantena ha ignorato. Gli esiti sono *Risponde*, *Buco → reparto*, *Non lo so · in revisione*, *Riservato*, *Non lo so · fuori perimetro*. La prova gira su una copia del Brain (`POST /api/probe`): non scrive in chat, non apre buchi, non lascia righe nell'audit. «Chiedi davvero» fa partire il flusso reale in chat.
+- **Memoria completa**: tutti i fatti, quelli di altri reparti come 🔒. Il filtro resta lato server anche qui.
+
+Copione consigliato: Prova tutte al punto 0 → ▶ Avanti 1 → di nuovo «sconto massimo» (risponde 20% e dice che ha ignorato il 30% in quarantena) → «Quanti scaffali ha il magazzino?» → Chiedi davvero → rispondi come Magazzino in Oggi → riprova: ora risponde.
 
 ---
 

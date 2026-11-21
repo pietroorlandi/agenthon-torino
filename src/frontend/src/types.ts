@@ -62,4 +62,8 @@ export interface State {
 }
 
 export interface StepResult { source_id?: string; title: string; trust?: string | null; triage?: string | null; reason?: string | null; engine?: string | null; outcome?: string | null }
+export interface ProbeResult {
+  question: string; path: string; kind: string; text: string; engine?: string | null;
+  memory: { id: string; text: string }[]; gap_owner?: string | null; gap_existing?: boolean; notes: string[];
+}
 export interface NextResult { moment: { id: string; at: string; label: string }; results: StepResult[] }

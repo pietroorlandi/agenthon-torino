@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useState, type ReactNode } from
 import type { SourceView, State, User } from "./types";
 
 // ---------- app context: state + navigation + source panel ----------
-export type Tab = "today" | "chat" | "mail" | "knowledge" | "store" | "sources" | "redteam" | "audit" | "obs";
+export type Tab = "today" | "chat" | "mail" | "knowledge" | "brain" | "store" | "sources" | "redteam" | "audit" | "obs";
 interface AppCtx { state: State; openSource: (id: string) => void; goto: (tab: Tab) => void; dev: boolean }
 export const AppContext = createContext<AppCtx | null>(null);
 export const useApp = () => useContext(AppContext)!;
