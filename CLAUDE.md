@@ -9,22 +9,33 @@ Aggiornalo man mano: è la fonte di verità condivisa.
 - La sfida dettagliata viene svelata **solo all'apertura della giornata**. Fino ad allora tutto è provvisorio.
 - Traccia parziale in [docs/brief.md](docs/brief.md); criteri in [docs/evaluation.md](docs/evaluation.md).
 
-## Track (ne sceglieremo UNA all'apertura)
-1. **Agentic AI per le aziende** (Ariete Tech Solutions): workflow autonomi, gestione richieste in entrata, analisi documenti, integrazione di più strumenti.
-2. **Generative AI per il marketing** (Demetra): modelli generativi per testo, grafica e video.
+- Portale ufficiale: https://agenthon-portal.gdgtorino.it/app#today
+- Risorse, crediti e vincoli: [docs/resources.md](docs/resources.md)
+
+## Track: **Agentic AI per le aziende** (business) — Ariete Tech Solutions
+Workflow autonomi, gestione richieste in entrata, analisi documenti, integrazione di più strumenti.
+(L'altra track, Generative AI per il marketing / Demetra, non è la nostra.) La sfida dettagliata esce all'apertura.
+
+## Vincoli tecnici da ricordare
+- Crediti Google Cloud $30/persona, validi 12 ore dal claim (sabato mattina).
+- **Gemini solo via Vertex AI** (non AI Studio: i crediti non si applicano). Modelli GA: `gemini-3.8-flash`, `gemini-3.5-flash`, `gemini-3.1-flash-lite`.
+- **Non usare Claude/Llama come modelli del prodotto su Vertex**: probabilmente non coperti dai crediti.
+- Regione: NON `europe-west12` né `me-central1`. Deploy su Cloud Run (non GKE).
+- Evitare modelli Preview senza aver verificato che i crediti li coprano.
+- ElevenLabs gratis (coupon) per voce via API; premio speciale per il miglior uso.
 
 ## Criteri di valutazione (guidano ogni scelta)
 Innovazione · Coerenza con il brief · Fattibilità · Esecuzione · Pitch finale.
 → Il brief ufficiale va letto con attenzione e rispettato alla lettera; meglio una demo piccola e solida che un progetto ambizioso rotto.
 
 ## Stato attuale
-- [ ] Track scelta: _da decidere_
+- [x] Track scelta: Agentic AI per le aziende
 - [ ] Brief ufficiale incollato in docs/brief.md
 - [ ] Stack deciso: _da decidere_ (vedi sezione Stack)
 - [ ] Ruoli assegnati
 
 ## Stack
-_TBD dopo l'apertura._ Candidati ragionevoli: Python o TypeScript, API Claude/Gemini (GDG → probabile affinità con l'ecosistema Google), un frontend semplice per la demo.
+_Da confermare dopo l'apertura._ Indicazione di partenza (dai crediti): Gemini su Vertex AI, Cloud Run, Firestore/Cloud Storage, Python o TypeScript, un frontend semplice per la demo. ElevenLabs per la voce se utile.
 Quando lo stack è deciso, scrivi qui comandi di install/run/test.
 
 ## Struttura repo

@@ -1,6 +1,6 @@
 # AGENTHON — GDG Torino
 
-Progetto del nostro team per AGENTHON (track: _da definire_).
+Progetto del nostro team per AGENTHON (track: Agentic AI per le aziende).
 
 ## Cos'è
 _Descrizione in una frase, da compilare dopo l'apertura._
@@ -20,5 +20,6 @@ cp .env.example .env   # inserisci le tue chiavi
 ## Documentazione
 - [CLAUDE.md](CLAUDE.md) — contesto per Claude Code e il team
 - [docs/brief.md](docs/brief.md) — traccia
+- [docs/resources.md](docs/resources.md) — crediti Google Cloud, ElevenLabs, vincoli
 - [docs/evaluation.md](docs/evaluation.md) — criteri e checklist
 - [docs/decisions.md](docs/decisions.md) — decisioni
