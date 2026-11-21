@@ -28,7 +28,7 @@ export function RedTeamView() {
   const set = (k: string, v: string) => setEv((e) => ({ ...e, [k]: v }));
   return (
     <section className="mx-auto max-w-4xl px-4 py-6">
-      <h1 className="h1">🧪 Mettilo alla prova</h1>
+      <h1 className="h1">Mettilo alla prova</h1>
       <p className="muted">Manda al Brain un'email o un messaggio in chat, come farebbe un attaccante (o un collega distratto), e guarda dove finisce: ignorato, quarantena, proposta da approvare.
         In chat l'identità è quella della sessione (<b>{state.me.name}</b>), non quella scritta nel testo.</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -37,7 +37,7 @@ export function RedTeamView() {
       <div className="card mt-3 space-y-2">
         <div className="flex gap-2">
           <select className="rounded-md border border-stone-300 px-2 py-1" value={ev.type} onChange={(e) => set("type", e.target.value)}>
-            <option value="email">📧 Email in arrivo</option><option value="chat">💬 Messaggio in chat</option>
+            <option value="email">Email in arrivo</option><option value="chat">Messaggio in chat</option>
           </select>
           {ev.type === "chat" ? (
             <select className="rounded-md border border-stone-300 px-2 py-1" value={ev.channel} onChange={(e) => set("channel", e.target.value)}>

@@ -63,7 +63,7 @@
       "on_low_stock": {
         "sku": "GIA-250",
         "target": "magazzino",
-        "title": "⚠️ Gianduiotti classici 250g sotto scorta (24 pz)",
+        "title": "Gianduiotti classici 250g sotto scorta (24 pz)",
         "text": "Dopo il post di un'influencer ne sono stati venduti 118 in 60 minuti: al ritmo attuale finiscono entro 2 ore, a 6 giorni dal Black Friday. Il laboratorio ha un lead time di 5 giorni lavorativi: un riordino oggi arriva il 28/11, a Black Friday già iniziato (i 400 pz già ordinati arrivano il 25/11). Ti ho preparato una bozza di riordino da approvare.",
         "source_ids": ["STORE-GIA-250", "dc-contratto-lab"],
         "action": {

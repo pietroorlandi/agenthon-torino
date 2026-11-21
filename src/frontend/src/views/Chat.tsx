@@ -1,111 +1,144 @@
+import { Hash, Lock, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import type { Message } from "../types";
-import { Avatar, Cites, EngineBadge, RichText, Tag, TriageBadges, useAct, useApp, type Tone } from "../ui";
+import { Avatar, Cites, EngineBadge, OUTCOME_LABEL, RichText, TriageBadges, useAct, useApp, useToast } from "../ui";
 
-const KIND_TAG: Record<string, [string, Tone]> = {
-  brief: ["proattivo · nessuno l'ha chiesto", "blue"], alert: ["alert proattivo", "amber"], security: ["sicurezza", "red"],
-  denied: ["accesso negato", "red"], unknown: ["non lo so", "gray"], answer: ["dalla memoria approvata", "green"],
-  gap: ["buco di conoscenza · richiesta aperta", "purple"], done: ["eseguito dopo approvazione", "green"], info: ["proposta", "amber"],
+// Short, human label for each kind of Brain message (no badges soup)
+const KIND: Record<string, [string, string]> = {
+  answer: ["Dalla memoria approvata", "text-emerald-700"], unknown: ["Non lo so", "text-stone-500"],
+  denied: ["Riservato", "text-rose-700"], gap: ["Ho chiesto a chi lo sa", "text-violet-700"],
+  alert: ["Avviso", "text-amber-700"], security: ["Sicurezza", "text-rose-700"], done: ["Fatto", "text-emerald-700"],
+  info: ["Proposta", "text-amber-700"], brief: ["Brief del mattino", "text-stone-500"],
 };
-const BORDER: Record<string, string> = {
-  brief: "border-l-sky-600", alert: "border-l-amber-500", security: "border-l-rose-600", denied: "border-l-rose-600",
-  unknown: "border-l-stone-400", answer: "border-l-emerald-600", done: "border-l-emerald-600", gap: "border-l-violet-500", info: "border-l-amber-500",
-};
+
+// "dd/mm hh:mm" → sortable "mm/dd hh:mm"
+const key = (d?: string) => (d ? `${d.slice(3, 5)}/${d.slice(0, 2)}${d.slice(5)}` : "");
 
 function BrainMsg({ m }: { m: Message }) {
-  const { state, goto } = useApp();
-  const tag = KIND_TAG[m.kind];
-  const gap = m.gap_id ? state.gaps.find((g) => g.id === m.gap_id) : undefined;
+  const { state, goto, dev } = useApp();
+  const k = KIND[m.kind];
+  // the button only for whoever actually has to decide (the asker of a gap does not)
+  const needsDecision = state.actions.some((a) => a.id === m.action_id && a.can_decide)
+    || state.quarantine.some((q) => q.id === m.quarantine_id && q.can_decide)
+    || state.gaps.some((g) => g.id === m.gap_id && g.mine && g.status === "open");
   return (
-    <div className="flex gap-2.5">
-      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-800 text-lg">🧠</span>
-      <div className={`min-w-0 flex-1 rounded-lg border border-l-4 border-stone-200 bg-stone-50 px-3 py-2.5 ${BORDER[m.kind] ?? ""}`}>
-        <div className="mb-1 flex flex-wrap items-center gap-1.5">
-          <b>Brain</b><span className="rounded bg-stone-200 px-1 text-[10px]">APP</span><span className="muted text-xs">{m.time}</span>
-          {tag && <Tag tone={tag[1]}>{tag[0]}</Tag>}<EngineBadge engine={m.engine} />
+    <div className="flex gap-3">
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">B</span>
+      <div className="min-w-0 flex-1">
+        <div className="mb-0.5 flex items-center gap-2 text-xs">
+          <b className="text-sm font-semibold">Brain</b><span className="muted">{m.time}</span>
+          {k && <span className={k[1]}>{k[0]}</span>}
+          {dev && <EngineBadge engine={m.engine} />}
         </div>
-        <RichText text={m.text} />
-        {m.items && <ul className="mt-2 list-disc space-y-2 pl-5">{m.items.map((it, i) => <li key={i}><RichText text={it.text} /><Cites ids={it.sources} /></li>)}</ul>}
-        <Cites ids={m.sources} memoryIds={m.memory_ids} />
-        <div className="mt-2 flex gap-2">
-          {m.action_id && <button className="btn-primary btn-sm" onClick={() => goto("actions")}>Vedi azione in attesa →</button>}
-          {m.quarantine_id && <button className="btn-primary btn-sm" onClick={() => goto("memory")}>Decidi in Memoria →</button>}
-          {gap?.mine && gap.status === "open" && <button className="btn-primary btn-sm" onClick={() => goto("memory")}>Documenta ora →</button>}
-        </div>
+        <RichText text={m.text} className="leading-relaxed" />
+        {m.items && <ul className="mt-2 list-disc space-y-1.5 pl-5">{m.items.map((it, i) => <li key={i}><RichText text={it.text} /><Cites ids={it.sources} /></li>)}</ul>}
+        <Cites ids={m.sources} memoryIds={dev ? m.memory_ids : []} />
+        {needsDecision && <button className="btn btn-sm mt-2" onClick={() => goto("today")}>Decidi in Oggi</button>}
       </div>
     </div>
   );
 }
 
 export function ChatView() {
-  const { state } = useApp();
+  const { state, dev } = useApp();
   const { run, busy } = useAct();
+  const toast = useToast();
   const [channel, setChannel] = useState("brain");
   const [text, setText] = useState("");
   const box = useRef<HTMLDivElement>(null);
   const me = state.me;
   const users = Object.fromEntries(state.users.map((u) => [u.id, u]));
+  const isBrain = channel === "brain";
+  const asked = state.dm.some((m) => m.sender === "user");
+  const channelMsgs = state.sources.filter((s) => !s.locked && s.type === "chat" && s.channel === channel)
+    .sort((a, b) => key(a.date).localeCompare(key(b.date)));
 
-  useEffect(() => { box.current?.scrollTo(0, box.current.scrollHeight); }, [channel, state.dm.length]);
-  useEffect(() => { if (channel === "brain" && state.unread) api.read(); }, [channel, state.unread]);
+  useEffect(() => { box.current?.scrollTo(0, box.current.scrollHeight); }, [channel, state.dm.length, channelMsgs.length]);
+  useEffect(() => { if (isBrain && state.unread) api.read(); }, [isBrain, state.unread]);
 
-  const ask = async (q: string) => {
-    if (!q.trim()) return;
+  const send = async () => {
+    const t = text.trim();
+    if (!t) return;
     setText("");
-    await run(() => api.ask(q));
+    if (isBrain) { await run(() => api.ask(t)); return; }
+    // a message in a channel goes through the real pipeline, with the session identity (not what the text claims)
+    const r = await run(() => api.inject({ type: "chat", channel, body: t }));
+    if (r && dev) toast(`Il Brain ha letto il messaggio: ${r.outcome ? OUTCOME_LABEL[r.outcome]?.[0] ?? r.outcome : ""}${r.reason ? ` — ${r.reason}` : ""}`);
   };
 
-  const channelMsgs = state.sources.filter((s) => !s.locked && s.type === "chat" && s.channel === channel)
-    .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
+  const navBtn = (id: string, label: React.ReactNode, locked = false, badge = 0) => (
+    <button key={id} disabled={locked} onClick={() => setChannel(id)}
+      className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-left disabled:opacity-40 ${channel === id ? "bg-stone-200 font-medium text-stone-900" : "text-stone-600 hover:bg-stone-100"}`}>
+      {label}
+      {locked && <Lock size={12} className="ml-auto" />}
+      {!!badge && <span className="ml-auto rounded-full bg-brand px-1.5 text-[11px] text-white">{badge}</span>}
+    </button>
+  );
 
   return (
-    <section className="flex h-[calc(100vh-92px)]">
-      <aside className="w-56 shrink-0 overflow-y-auto bg-side p-2 text-side-ink">
-        <div className="px-2 pt-1 pb-3 text-[15px] font-bold text-white">Bottega Sabauda</div>
-        <div className="px-2 pt-2 pb-1 text-xs uppercase opacity-70">Canali</div>
-        {state.channels.map((c) => (
-          <button key={c.id} disabled={c.locked} onClick={() => setChannel(c.id)}
-            className={`block w-full rounded px-2 py-1 text-left disabled:opacity-40 ${channel === c.id ? "bg-brand text-white" : "hover:bg-white/10"}`}>
-            # {c.id}{c.locked && " 🔒"}
-          </button>
-        ))}
-        <div className="px-2 pt-4 pb-1 text-xs uppercase opacity-70">App</div>
-        <button onClick={() => setChannel("brain")} className={`block w-full rounded px-2 py-1 text-left ${channel === "brain" ? "bg-brand text-white" : "hover:bg-white/10"}`}>
-          🧠 Brain {!!state.unread && channel !== "brain" && <span className="ml-1 rounded-full bg-rose-600 px-1.5 text-[11px] text-white">{state.unread}</span>}
-        </button>
-      </aside>
+    <div className="mx-auto flex h-[calc(100vh-57px)] max-w-6xl">
+      <nav className="w-52 shrink-0 space-y-0.5 overflow-y-auto border-r border-stone-200 p-2">
+        <div className="px-2 pt-1 pb-1 text-xs text-stone-400">Messaggi diretti</div>
+        {navBtn("brain", <><span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[9px] font-semibold text-white">B</span> Brain</>, false, isBrain ? 0 : state.unread)}
+        <div className="px-2 pt-4 pb-1 text-xs text-stone-400">Canali</div>
+        {state.channels.map((c) => navBtn(c.id, <><Hash size={14} className="shrink-0" /> {c.id}</>, c.locked))}
+      </nav>
+
       <div className="flex min-w-0 flex-1 flex-col bg-white">
-        <div className="border-b border-stone-200 px-4 py-3">
-          {channel === "brain" ? <><b>🧠 Brain</b> <span className="muted">· messaggi diretti con {me.name} ({me.role_label})</span></>
-            : <><b># {channel}</b> <span className="muted">· il Brain osserva questo canale</span></>}
+        <div className="border-b border-stone-200 px-5 py-3">
+          {isBrain ? <><b className="font-semibold">Brain</b> <span className="muted">· chiedi qualcosa sull'azienda</span></>
+            : <><b className="font-semibold">#{channel}</b> <span className="muted">· il Brain legge questo canale</span></>}
         </div>
-        <div ref={box} className="flex flex-1 flex-col gap-3.5 overflow-y-auto p-4">
-          {channel === "brain" ? state.dm.map((m) => m.sender === "user" ? (
-            <div key={m.id} className="flex gap-2.5"><Avatar user={me} /><div><div className="mb-0.5"><b>{me.name}</b> <span className="muted text-xs">{m.time}</span></div>{m.text}</div></div>
-          ) : <BrainMsg key={m.id} m={m} />)
-            : channelMsgs.length ? channelMsgs.map((s) => {
-              const a = users[s.sender ?? ""];
-              return (
-                <div key={s.id} className="flex gap-2.5">
-                  {a ? <Avatar user={a} /> : <span className="h-9 w-9" />}
-                  <div><div className="mb-0.5 flex flex-wrap items-center gap-1.5"><b>{s.sender_label}</b> <span className="muted text-xs">{s.date}</span><TriageBadges s={s} /></div>{s.body}</div>
+
+        <div ref={box} className="flex flex-1 flex-col gap-5 overflow-y-auto px-5 py-5">
+          {isBrain ? (
+            <>
+              {state.dm.filter((m) => m.kind !== "brief").map((m) => m.sender === "user" ? (
+                <div key={m.id} className="flex gap-3">
+                  <Avatar user={me} />
+                  <div><div className="mb-0.5 text-xs"><b className="text-sm font-semibold">{me.name}</b> <span className="muted">{m.time}</span></div>{m.text}</div>
                 </div>
-              );
-            }) : <p className="muted p-5">Nessun messaggio recente.</p>}
+              ) : <BrainMsg key={m.id} m={m} />)}
+              {!asked && (
+                <div className="muted mt-auto text-center">
+                  <p className="text-base text-stone-700">Chiedimi qualcosa sull'azienda.</p>
+                  <p className="text-xs">Rispondo solo con informazioni approvate dal team e ti dico da dove vengono. Se non lo so, lo dico.</p>
+                </div>
+              )}
+            </>
+          ) : channelMsgs.length ? channelMsgs.map((s) => {
+            const a = users[s.sender ?? ""];
+            return (
+              <div key={s.id} className="flex gap-3">
+                {a ? <Avatar user={a} /> : <span className="h-8 w-8 shrink-0" />}
+                <div className="min-w-0">
+                  <div className="mb-0.5 flex flex-wrap items-center gap-1.5 text-xs">
+                    <b className="text-sm font-semibold">{s.sender_label}</b><span className="muted">{s.date}</span>
+                    {(dev || s.in_quarantine) && <TriageBadges s={s} />}
+                  </div>
+                  <p className="whitespace-pre-line">{s.body}</p>
+                </div>
+              </div>
+            );
+          }) : <p className="muted">Nessun messaggio in questo canale.</p>}
         </div>
-        {channel === "brain" ? (
-          <>
-            <div className="flex flex-wrap gap-1.5 border-t border-stone-200 px-4 pt-2">
-              {state.suggestions.map((q) => <button key={q} disabled={busy} onClick={() => ask(q)} className="rounded-full border border-sky-200 bg-white px-2 py-0.5 text-xs text-brand hover:bg-sky-50">{q}</button>)}
+
+        <div className="border-t border-stone-200 px-5 py-3">
+          {isBrain && !asked && (
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {state.suggestions.slice(0, 4).map((q) => (
+                <button key={q} disabled={busy} onClick={() => run(() => api.ask(q))} className="rounded-full border border-stone-300 bg-white px-2.5 py-1 text-xs hover:border-stone-500">{q}</button>
+              ))}
             </div>
-            <form className="flex gap-2 px-4 pt-2.5 pb-3.5" onSubmit={(e) => { e.preventDefault(); ask(text); }}>
-              <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder="Chiedi qualcosa al Brain…" autoComplete="off" />
-              <button className="btn-primary" disabled={busy}>{busy ? "…" : "Invia"}</button>
-            </form>
-          </>
-        ) : <div className="px-4 pb-3.5"><input className="input" disabled placeholder="Canale simulato (sola lettura): per scrivere usa 🧪 Mettilo alla prova" /></div>}
+          )}
+          <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); send(); }}>
+            <input className="input" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off"
+              placeholder={isBrain ? "Scrivi una domanda…" : `Scrivi in #${channel} come ${me.name}…`} />
+            <button className="btn-primary" disabled={busy || !text.trim()} aria-label="Invia">{busy ? "…" : <Send size={16} />}</button>
+          </form>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

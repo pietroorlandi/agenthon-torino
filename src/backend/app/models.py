@@ -209,6 +209,7 @@ class Action(BaseModel):
 class BriefItem(BaseModel):
     text: str
     sources: list[str] = []
+    derived: bool = False  # summary of pending decisions/counters: the UI shows those as the decision list instead
 
 
 class Message(BaseModel):

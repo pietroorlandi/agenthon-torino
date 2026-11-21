@@ -14,20 +14,20 @@ def build_brief(brain, user: User) -> dict:
         if q.status != "pending" or user.role not in q.authority:
             continue
         if q.kind == "contradiction":
-            text = f"🛡️ **Informazione in quarantena**: «{q.claim.text}» contraddice la memoria approvata. Non la uso finché non decidi in *Memoria*."
+            text = f"**Informazione in quarantena**: «{q.claim.text}» contraddice la memoria approvata. Non la uso finché non decidi in *Oggi*."
         else:
-            text = f"🛡️ **Messaggio sospetto in quarantena**: «{brain.sources[q.source_id].title}» — {q.reason}."
-        items.insert(0, BriefItem(text=text, sources=[q.source_id]))
+            text = f"**Messaggio sospetto in quarantena**: «{brain.sources[q.source_id].title}» — {q.reason}."
+        items.insert(0, BriefItem(text=text, sources=[q.source_id], derived=True))
     gaps = [g for g in brain.gaps if g.status == "open" and g.owner == user.role]
     if gaps:
-        items.append(BriefItem(text=f"📝 Hai **{len(gaps)} domande da documentare** che nessuno aveva mai scritto (es. «{gaps[0].question}»)."))
+        items.append(BriefItem(text=f"Hai **{len(gaps)} domande da documentare** che nessuno aveva mai scritto (es. «{gaps[0].question}»).", derived=True))
     pending = [m for m in brain.memory if m.status == "pending" and can_see(m.access, user.role) and brain.can_curate(m, user.role)]
     if pending:
-        items.append(BriefItem(text=f"Hai **{len(pending)} elementi di memoria** da revisionare."))
+        items.append(BriefItem(text=f"Hai **{len(pending)} elementi di memoria** da revisionare.", derived=True))
     c = brain.counters
     if c["observed"]:
         items.append(BriefItem(text=f"Da stamattina ho osservato **{c['observed']} nuovi eventi**: {c['ignored']} ignorati, "
-                                    f"{c['quarantined']} in quarantena, {c['proposed']} proposte di memoria, {c['corroborated']} conferme."))
+                                    f"{c['quarantined']} in quarantena, {c['proposed']} proposte di memoria, {c['corroborated']} conferme.", derived=True))
     return {"text": f"Buongiorno {user.name.split()[0]}, ecco cosa richiede la tua attenzione oggi:", "items": items, "time": "08:00"}
 
 

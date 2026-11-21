@@ -119,7 +119,7 @@ def reconcile(brain, src: Source, cands: list[Candidate], items: list[MemoryItem
         to = brain.user(src.to or "")
         if to and brain.can_curate(m, to.role):
             brain.push(to.id, kind="info", sources=[src.id], memory_ids=[m.id],
-                       text=f"**📥 Nuova proposta di memoria** da «{src.title}»: {m.text}\nLa userò per rispondere solo dopo che una persona l'avrà approvata in *Memoria*.")
+                       text=f"**Nuova proposta di memoria** da «{src.title}»: {m.text}\nLa userò per rispondere solo dopo che una persona l'avrà approvata in *Oggi*.")
         outcomes.append("proposed")
     return outcomes
 

@@ -6,7 +6,7 @@ export function AuditView() {
   const { state } = useApp();
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h1 className="h1">📜 Audit log</h1>
+      <h1 className="h1">Audit log</h1>
       <p className="muted">Tutto lascia traccia: chi (agente o persona), cosa, su quale input. Anche ciò che è stato ignorato, con il motivo. Vedi solo le righe del tuo reparto.</p>
       <div className="mt-3 max-h-[72vh] overflow-auto rounded-lg border border-stone-200 bg-white">
         <table className="w-full"><thead className="sticky top-0"><tr>{["Ora sim.", "Attore", "Operazione", "Dettaglio", "Trace"].map((h) => <th key={h} className="th">{h}</th>)}</tr></thead>
@@ -35,7 +35,7 @@ export function ObservabilityView() {
   );
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h1 className="h1">📊 Osservabilità</h1>
+      <h1 className="h1">Osservabilità</h1>
       <p className="muted">Calcolata dai contatori del backend: funziona anche offline. Modalità LLM <b>{data.mode}</b> · modelli {data.models.main} / {data.models.lite} · tracce: <b>{data.trace_exporter}</b>.</p>
       <h2 className="h2">LLM</h2>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

@@ -107,7 +107,7 @@ project=bottega-brain-1121-21996 location=global mode=live
 **Regione:** mai `europe-west12` (Torino) né `me-central1` (esclusi dai crediti). Vertex usa `global`, mentre Cloud Run resta su `europe-west4` (`REGION` nel Makefile). Dopo un'ora controlla in *Billing → Reports* che il costo sia scalato dai crediti.
 
 ### 3.4 Costi attesi
-Ogni evento della timeline fa 1–2 chiamate (triage su Flash-Lite, estrazione su 3.8 Flash); una domanda ne fa 1–2. Un giro completo del copione costa pochi centesimi. Il pannello **📊 Osservabilità** mostra il costo stimato in tempo reale contro il budget (`LLM_BUDGET_USD`), mentre il saldo Google arriva con un'ora di ritardo. I prezzi di Flash-Lite e 3.5 Flash in `app/config.py` sono stime: verificali sul listino Vertex.
+Ogni evento della timeline fa 1–2 chiamate (triage su Flash-Lite, estrazione su 3.8 Flash); una domanda ne fa 1–2. Un giro completo del copione costa pochi centesimi. Il pannello **Osservabilità** (pulsante **Dev**) mostra il costo stimato in tempo reale contro il budget (`LLM_BUDGET_USD`), mentre il saldo Google arriva con un'ora di ritardo. I prezzi di Flash-Lite e 3.5 Flash in `app/config.py` sono stime: verificali sul listino Vertex.
 
 ### 3.5 Modalità LLM e piano B
 | `LLM_MODE` | Comportamento | Quando |
@@ -129,7 +129,7 @@ Ogni evento della timeline fa 1–2 chiamate (triage su Flash-Lite, estrazione s
    ELEVENLABS_VOICE_ID=...
    ELEVENLABS_MODEL_ID=eleven_multilingual_v2   # oppure eleven_flash_v2_5: più veloce ed economico, parla italiano
    ```
-5. Verifica con `make check` (riga «✓ ElevenLabs»), poi *Email del mattino → 🔊 Ascolta il brief*.
+5. Verifica con `make check` (riga «✓ ElevenLabs»), poi *Oggi → Ascolta*.
 
 Usa sempre l'**API**, non l'app web, per far durare i crediti. L'mp3 è in cache per testo: riascoltare lo stesso brief non consuma caratteri. C'è un premio speciale per il miglior uso di ElevenLabs: vedi le idee in fondo.
 
@@ -139,7 +139,7 @@ Ogni chiamata a Gemini passa da un solo punto (`app/llm.py`), che registra token
 
 | Dove | Come si attiva | A cosa serve |
 |---|---|---|
-| **📊 Osservabilità** + **📜 Audit** nell'app | Sempre attivi | Pitch e giuria: costi, precisione dell'estrazione, % «non lo so», chi ha approvato cosa |
+| **Osservabilità** + **Audit** nell'app (pulsante **Dev**) | Sempre attivi | Pitch e giuria: costi, precisione dell'estrazione, % «non lo so», chi ha approvato cosa |
 | Console | `TRACE_EXPORTER=console` | Debug veloce in locale (gli span finiscono su stdout) |
 | **Cloud Trace** + Cloud Logging | `TRACE_EXPORTER=gcp` (già impostato da `make deploy`) | Su Cloud Run: *Trace Explorer*. I log JSON hanno il trace id, quindi dal log si salta alla traccia |
 | **Phoenix** (locale, open source) | `docker run -p 6006:6006 arizephoenix/phoenix` + `TRACE_EXPORTER=otlp` + `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:6006` | Vedere prompt e risposte in una UI dedicata agli LLM (con `LOG_PROMPTS=true`) |
@@ -184,7 +184,7 @@ make deploy                    # = ./scripts/deploy.sh company-brain europe-west
 | `429 RESOURCE_EXHAUSTED` | Quota al minuto | Riprova tra poco; il Brain intanto usa il fallback (vedi pannello) |
 | `DefaultCredentialsError` | Manca `gcloud auth application-default login` | Rilancia `gcp-join.sh` o `gcp-setup.sh` |
 | La UI dice `LLM: off` | `GOOGLE_CLOUD_PROJECT` vuoto o `LLM_MODE=off` | Controlla `.env` e riavvia il backend |
-| «Riscrivi con l'agente» disabilitato | L'agente ADK gira solo in `live` | `LLM_MODE=live` |
+| Manca il pulsante «Riscrivi» sulle azioni | L'agente ADK gira solo in `live` | `LLM_MODE=live` |
 | 🔊 usa la voce del browser | ElevenLabs non configurato o errore | §4; l'errore è nei log del backend |
 | Build Cloud Run fallisce per permessi | Service account senza ruoli di build | §6.1 |
 
