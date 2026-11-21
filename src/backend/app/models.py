@@ -26,6 +26,13 @@ class TopicOwner(BaseModel):
     keywords: list[str]
 
 
+class KnowledgeTopic(BaseModel):
+    """Kind of knowledge inside a department (promotions, policies, ...): used to browse 'Cosa sappiamo'."""
+    id: str
+    label: str
+    keywords: list[str] = []
+
+
 class Contact(BaseModel):
     domain: str
     org: str
@@ -40,6 +47,7 @@ class Company(BaseModel):
     roles: dict[str, str]
     channels: list[Channel]
     topic_owners: list[TopicOwner]
+    knowledge_topics: list[KnowledgeTopic] = []
     contacts: list[Contact] = []
     consumer_domains: list[str] = []
 
@@ -161,6 +169,8 @@ class MemoryItem(BaseModel):
     source_quote: Optional[str] = None
     attributed_to: Optional[str] = None
     created_at: Optional[str] = None
+    dept: Optional[str] = None   # owning department (role id); derived by services/taxonomy.py when missing
+    topic: Optional[str] = None  # KnowledgeTopic id; derived when missing
 
 
 class QuarantineItem(BaseModel):

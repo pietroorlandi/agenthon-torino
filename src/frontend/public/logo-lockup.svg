@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 128">
+  <!-- Bottega Sabauda lockup (mark + wordmark) for slides and documents. Text uses Bricolage Grotesque if installed. -->
+  <g>
+  <!-- Bottega Sabauda mark: the Mole Antonelliana whose dome is a gianduiotto seen end-on -->
+  <!-- spire + star -->
+  <path d="M64 9 L66.2 25 H61.8 Z" fill="#e3a948"/>
+  <path d="M64 2 L65.5 5.6 L69.3 5.8 L66.3 8.2 L67.3 11.9 L64 9.8 L60.7 11.9 L61.7 8.2 L58.7 5.8 L62.5 5.6 Z" fill="#e3a948"/>
+  <!-- tempietto, two orders -->
+  <rect x="58" y="24" width="12" height="8" rx="1.2" fill="#8a5233"/>
+  <path d="M61 26.2 V30 M64 26.2 V30 M67 26.2 V30" stroke="#fbf6ec" stroke-width="1.4" stroke-linecap="round"/>
+  <rect x="56" y="31.5" width="16" height="2.5" rx="1" fill="#5c321c"/>
+  <rect x="54" y="34" width="20" height="10" rx="1.2" fill="#8a5233"/>
+  <path d="M57.5 36.4 V41.6 M62 36.4 V41.6 M66 36.4 V41.6 M70.5 36.4 V41.6" stroke="#fbf6ec" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="51" y="43.5" width="26" height="4" rx="1.2" fill="#5c321c"/>
+  <!-- dome = gianduiotto end-on, with a light facet and a gold ridge -->
+  <path d="M33 98 C37 72 49 51 64 47.5 C79 51 91 72 95 98 Z" fill="#5c321c"/>
+  <path d="M33 98 C37 72 49 51 64 47.5 C56 58 51 77 50 98 Z" fill="#8a5233"/>
+  <path d="M64 47.5 C60 60 58 78 58 98" stroke="#e3a948" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- colonnade in Savoy blue -->
+  <rect x="26" y="98" width="76" height="20" rx="2.5" fill="#1f56a8"/>
+  <g fill="#fbf6ec">
+    <rect x="30.5" y="102" width="3" height="12" rx="1.5"/><rect x="38.5" y="102" width="3" height="12" rx="1.5"/><rect x="46.5" y="102" width="3" height="12" rx="1.5"/>
+    <rect x="54.5" y="102" width="3" height="12" rx="1.5"/><rect x="62.5" y="102" width="3" height="12" rx="1.5"/><rect x="70.5" y="102" width="3" height="12" rx="1.5"/>
+    <rect x="78.5" y="102" width="3" height="12" rx="1.5"/><rect x="86.5" y="102" width="3" height="12" rx="1.5"/><rect x="94.5" y="102" width="3" height="12" rx="1.5"/>
+  </g>
+  </g>
+  <g font-family="'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif">
+    <text x="122" y="62" font-size="40" font-weight="800" fill="#5c321c" letter-spacing="-0.5">Bottega</text>
+    <text x="122" y="100" font-size="40" font-weight="800" fill="#1f56a8" letter-spacing="-0.5">Sabauda</text>
+    <rect x="124" y="110" width="40" height="3" rx="1.5" fill="#e3a948"/>
+    <text x="172" y="114" font-size="11" font-weight="600" fill="#8a5233" letter-spacing="2.4">GIANDUIOTTI · TORINO</text>
+  </g>
+</svg>

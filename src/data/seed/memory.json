@@ -21,7 +21,9 @@
       "dicembre",
       "tariffa",
       "gls"
-    ]
+    ],
+    "dept": "spedizioni",
+    "topic": "avvisi"
   },
   {
     "id": "M3",
@@ -49,7 +51,9 @@
     "fact": {
       "key": "blackfriday.discount",
       "value": "20%"
-    }
+    },
+    "dept": "shop",
+    "topic": "promozioni"
   },
   {
     "id": "M15",
@@ -76,7 +80,9 @@
     "fact": {
       "key": "discount.max",
       "value": "20%"
-    }
+    },
+    "dept": "shop",
+    "topic": "policy"
   },
   {
     "id": "M4",
@@ -96,7 +102,9 @@
       "fatturato",
       "novembre"
     ],
-    "approved_by": "Marco Bianchi"
+    "approved_by": "Marco Bianchi",
+    "dept": "shop",
+    "topic": "base"
   },
   {
     "id": "M5",
@@ -117,7 +125,9 @@
       "rott",
       "schiacciat"
     ],
-    "approved_by": "Giulia Rossi"
+    "approved_by": "Giulia Rossi",
+    "dept": "clienti",
+    "topic": "policy"
   },
   {
     "id": "M6",
@@ -140,7 +150,9 @@
       "quanto ci mette",
       "arriva"
     ],
-    "approved_by": "Davide Greco"
+    "approved_by": "Davide Greco",
+    "dept": "spedizioni",
+    "topic": "base"
   },
   {
     "id": "M7",
@@ -163,7 +175,9 @@
       "scadenza",
       "prima di natale",
       "regalo"
-    ]
+    ],
+    "dept": "spedizioni",
+    "topic": "procedure"
   },
   {
     "id": "M8",
@@ -188,7 +202,9 @@
       "tavolette",
       "gratis"
     ],
-    "approved_by": "Marco Bianchi"
+    "approved_by": "Marco Bianchi",
+    "dept": "shop",
+    "topic": "promozioni"
   },
   {
     "id": "M9",
@@ -207,7 +223,9 @@
       "etichetta",
       "caffe",
       "richiamo"
-    ]
+    ],
+    "dept": "magazzino",
+    "topic": "avvisi"
   },
   {
     "id": "M10",
@@ -228,7 +246,9 @@
       "glutine",
       "soia"
     ],
-    "approved_by": "Giulia Rossi"
+    "approved_by": "Giulia Rossi",
+    "dept": "clienti",
+    "topic": "base"
   },
   {
     "id": "M11",
@@ -250,7 +270,9 @@
       "penale",
       "produzione"
     ],
-    "approved_by": "Sara Conti"
+    "approved_by": "Sara Conti",
+    "dept": "shop",
+    "topic": "base"
   },
   {
     "id": "M12",
@@ -271,7 +293,9 @@
       "cacao",
       "28/11",
       "classici"
-    ]
+    ],
+    "dept": "magazzino",
+    "topic": "avvisi"
   },
   {
     "id": "M13",
@@ -292,7 +316,9 @@
       "ingrosso",
       "listino"
     ],
-    "approved_by": "Marco Bianchi"
+    "approved_by": "Marco Bianchi",
+    "dept": "shop",
+    "topic": "policy"
   },
   {
     "id": "M14",
@@ -313,6 +339,8 @@
       "scaffale",
       "inventario"
     ],
-    "approved_by": "Sara Conti"
+    "approved_by": "Sara Conti",
+    "dept": "magazzino",
+    "topic": "procedure"
   }
 ]

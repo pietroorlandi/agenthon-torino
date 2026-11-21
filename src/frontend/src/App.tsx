@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Play, RotateCcw, Wrench } from "lucide-react";
 import { useState } from "react";
 import { api, getUser, setUser } from "./api";
+import { Brand } from "./brand";
 import { AppContext, OUTCOME_LABEL, SourceModal, useAct, useToast, type Tab } from "./ui";
 import { AuditView, ObservabilityView } from "./views/Audit";
 import { ChatView } from "./views/Chat";
@@ -62,29 +63,29 @@ export default function App() {
 
   const tabBtn = (t: { id: Tab; label: string }) => (
     <button key={t.id} onClick={() => setTab(t.id)}
-      className={`relative px-3 py-4 whitespace-nowrap ${tab === t.id ? "font-semibold text-stone-900 after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-brand" : "text-stone-500 hover:text-stone-900"}`}>
+      className={`relative px-3 py-[22px] whitespace-nowrap transition-colors ${tab === t.id ? "font-semibold text-white after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:rounded-t after:bg-hazel" : "text-cream/70 hover:text-white"}`}>
       {t.label}
-      {!!badge[t.id] && <span className="ml-1.5 rounded-full bg-brand px-1.5 py-px text-[11px] font-medium text-white">{badge[t.id]}</span>}
+      {!!badge[t.id] && <span className="ml-1.5 rounded-full bg-hazel px-1.5 py-px text-[11px] font-semibold text-cocoa-deep">{badge[t.id]}</span>}
     </button>
   );
 
   return (
     <AppContext.Provider value={{ state, openSource: setSourceId, goto: setTab, dev }}>
-      <header className="sticky top-0 z-30 border-b border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4">
-          <div className="font-semibold whitespace-nowrap">Company Brain <span className="font-normal text-stone-400">Bottega Sabauda</span></div>
+      <header className="sticky top-0 z-30 bg-cocoa-deep text-cream shadow-[0_1px_0_var(--color-hazel)]">
+        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4">
+          <Brand />
           <nav className="flex overflow-x-auto">{USER_TABS.map(tabBtn)}</nav>
           <div className="ml-auto flex items-center gap-2">
-            <select className="rounded-md border border-stone-300 bg-white px-2 py-1 text-sm" value={userId} aria-label="Persona"
+            <select className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-sm text-cream hover:bg-white/15 [&>option]:text-stone-900" value={userId} aria-label="Persona"
               onChange={(e) => { setUser(e.target.value); setUserId(e.target.value); }}>
               {state.users.map((u) => <option key={u.id} value={u.id}>{u.name} · {u.role_label}</option>)}
             </select>
-            <button className={`btn btn-sm ${dev ? "border-stone-800 bg-stone-800 text-white hover:bg-stone-700" : ""}`} onClick={() => setDev(!dev)}
+            <button className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors ${dev ? "border-hazel bg-hazel text-cocoa-deep" : "border-white/20 text-cream hover:bg-white/10"}`} onClick={() => setDev(!dev)}
               title="Strumenti per sviluppatori e demo" aria-pressed={dev}><Wrench size={14} /> Dev</button>
           </div>
         </div>
         {dev && (
-          <div className="border-t border-stone-700 bg-stone-900 text-stone-200">
+          <div className="border-t border-white/10 bg-stone-950 text-stone-200">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-1.5 text-xs">
               <span className="font-mono">{state.now}</span>
               <button className="inline-flex items-center gap-1 rounded bg-white px-2 py-1 font-medium text-stone-900 disabled:opacity-40" disabled={busy || !state.timeline.next} onClick={next}

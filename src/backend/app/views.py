@@ -5,6 +5,7 @@ from __future__ import annotations
 from .config import settings
 from .models import User
 from .services.brief import build_brief
+from .services.taxonomy import classify
 from .store import can_see
 
 SUGGESTIONS = [
@@ -25,13 +26,36 @@ def _source(brain, s, role: str) -> dict:
     return d
 
 
+def memory_scope(m, dept: str | None, role: str, can_curate: bool) -> str | None:
+    """Department policy for 'Cosa sappiamo' (on top of the `access` list):
+    mine    → fact of my own department
+    company → fact with no department, visible to me
+    shared  → another department's fact that its owner made visible to everyone
+    review  → another department's pending fact I am asked to verify (shown only in 'Oggi')
+    None    → not sent to this user (locked stub)"""
+    if not can_see(m.access, role):
+        return None
+    if dept == role:
+        return "mine"
+    if dept is None:
+        return "company"
+    if "all" in m.access:
+        return "shared"
+    if m.status == "pending" and can_curate:
+        return "review"
+    return None
+
+
 def state_for(brain, user: User) -> dict:
     role = user.role
     sources = list(brain.sources.values()) + [brain.source(f"STORE-{sku}") for sku in brain.products]
     memory = []
     for m in brain.memory:
-        if can_see(m.access, role):
-            memory.append({**m.model_dump(), "access_label": brain.roles_label(m.access), "can_curate": brain.can_curate(m, role)})
+        dept, topic = classify(brain, m) if can_see(m.access, role) else (None, None)
+        scope = memory_scope(m, dept, role, brain.can_curate(m, role))
+        if scope:
+            memory.append({**m.model_dump(), "dept": dept, "topic": topic, "scope": scope,
+                           "access_label": brain.roles_label(m.access), "can_curate": brain.can_curate(m, role)})
         else:
             memory.append({"id": m.id, "status": m.status, "locked": True, "access_label": brain.roles_label(m.access), "source_ids": []})
     quarantine = []
@@ -65,6 +89,7 @@ def state_for(brain, user: User) -> dict:
         "me": user.model_dump(),
         "users": [u.model_dump() for u in brain.company.users],
         "roles": brain.company.roles,
+        "knowledge_topics": [{"id": t.id, "label": t.label} for t in brain.company.knowledge_topics],
         "channels": [{"id": c.id, "locked": not can_see(c.access, role)} for c in brain.company.channels],
         "dm": [m.model_dump() for m in brain.dm[user.id]],
         "unread": brain.unread.get(user.id, 0),

@@ -1,8 +1,8 @@
-import { Check, Search, ShieldAlert, X } from "lucide-react";
+import { Building2, Check, ChevronDown, ChevronRight, Headset, Package, Search, ShieldAlert, Store, Truck, X, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { api } from "../api";
 import type { GapView, MemoryView as Mem, QuarantineView } from "../types";
-import { Cites, Section, useAct, useApp } from "../ui";
+import { Cites, useAct, useApp } from "../ui";
 
 // A fact the Brain proposes: nobody uses it to answer until the right person approves it.
 export function ProposalCard({ m }: { m: Mem }) {
@@ -81,9 +81,16 @@ export function GapCard({ g }: { g: GapView }) {
   );
 }
 
-function FactRow({ m }: { m: Mem }) {
+function FactRow({ m, from }: { m: Mem; from?: string }) {
+  const look = m.dept ? DEPT[m.dept] : undefined;
   return (
     <li className="border-b border-stone-100 py-3 last:border-0">
+      {(from || m.status === "pending") && (
+        <div className="mb-1 flex flex-wrap gap-1.5">
+          {from && <span className={`inline-block rounded px-1.5 py-px text-[11px] font-medium ${look?.tint ?? "bg-stone-200 text-stone-700"}`}>dal comparto {from}</span>}
+          {m.status === "pending" && <span className="inline-block rounded bg-amber-100 px-1.5 py-px text-[11px] font-medium text-amber-800">Da verificare · non usata per rispondere</span>}
+        </div>
+      )}
       {m.question && <div className="muted text-xs">{m.question}</div>}
       <p>{m.text}</p>
       <div className="muted mt-0.5 text-xs">
@@ -96,36 +103,107 @@ function FactRow({ m }: { m: Mem }) {
   );
 }
 
-// What the company knows: only approved facts are used to answer.
+// Department look: icon + tint, so the four comparti are recognisable at a glance
+const DEPT: Record<string, { icon: LucideIcon; tint: string }> = {
+  magazzino: { icon: Package, tint: "bg-amber-100 text-amber-800" },
+  clienti: { icon: Headset, tint: "bg-emerald-100 text-emerald-800" },
+  shop: { icon: Store, tint: "bg-sky-100 text-sky-800" },
+  spedizioni: { icon: Truck, tint: "bg-violet-100 text-violet-800" },
+  general: { icon: Building2, tint: "bg-stone-200 text-stone-700" },
+};
+const GENERAL = "general";
+
+function Counts({ facts }: { facts: Mem[] }) {
+  const pending = facts.filter((m) => m.status === "pending").length;
+  return (
+    <span className="ml-auto flex shrink-0 items-center gap-1.5 text-xs">
+      {pending > 0 && <span className="rounded-full bg-amber-100 px-1.5 py-px font-medium text-amber-800">{pending} da verificare</span>}
+      <span className="muted tabular-nums">{facts.length}</span>
+    </span>
+  );
+}
+
+// What the company knows, browsable as comparto → argomento → fatti. Only approved facts are used to answer.
 export function KnowledgeView() {
   const { state } = useApp();
   const [q, setQ] = useState("");
-  const match = (m: Mem) => !q || `${m.text} ${m.question ?? ""}`.toLowerCase().includes(q.toLowerCase());
-  const visible = state.memory.filter((m) => !m.locked);
-  const approved = visible.filter((m) => m.status === "approved" && match(m));
-  const pending = visible.filter((m) => m.status === "pending" && match(m));
+  // one section open per level: opening one closes the sibling
+  const [openDept, setOpenDept] = useState<string | null>(state.me.role);
+  const [openTopic, setOpenTopic] = useState<string | null>(null);
+  const searching = q.trim().length > 0;
+  const match = (m: Mem) => !searching || `${m.text} ${m.question ?? ""}`.toLowerCase().includes(q.trim().toLowerCase());
+  // Department policy (enforced server side, see views.memory_scope): my comparto + what other comparti shared with everyone.
+  // "review" items are other comparti's proposals I must verify: they live in 'Oggi', not here.
+  const visible = state.memory.filter((m) => !m.locked && m.scope !== "review");
+  const current = visible.filter((m) => (m.status === "approved" || m.status === "pending") && match(m));
   const past = visible.filter((m) => (m.status === "rejected" || m.status === "superseded") && match(m));
-  const locked = state.memory.filter((m) => m.locked && m.status === "approved").length;
+  const hidden = state.memory.filter((m) => (m.locked || m.scope === "review") && m.status === "approved").length;
+
+  const depts = [state.me.role, GENERAL];
+  const deptOf = (m: Mem) => (m.scope === "mine" ? state.me.role : GENERAL);
+  const deptLabel = (d: string) => (d === GENERAL ? "Condivise con tutta l'azienda" : state.roles[d as keyof typeof state.roles]);
+  const originOf = (m: Mem) => (m.scope === "shared" && m.dept ? state.roles[m.dept] : undefined);
+  const byStatus = (a: Mem, b: Mem) => (a.status === b.status ? 0 : a.status === "approved" ? -1 : 1);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="h1">Cosa sappiamo</h1>
-      <p className="muted">Il Brain risponde solo con queste informazioni, approvate da una persona del team.</p>
+      <p className="muted">Il Brain risponde solo con informazioni approvate da una persona del team. Qui trovi le nozioni del tuo comparto e quelle che gli altri comparti hanno condiviso con tutti.</p>
       <label className="relative mt-4 block">
         <Search size={16} className="absolute top-2.5 left-3 text-stone-400" />
         <input className="input pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca (es. corriere, sconto, allergeni)" />
       </label>
-      <Section title="Approvate" count={approved.length} hint={locked ? `Altre ${locked} sono riservate ad altri reparti.` : undefined}>
-        {approved.length ? <ul className="card py-0">{approved.map((m) => <FactRow key={m.id} m={m} />)}</ul> : <p className="muted">Nessun risultato.</p>}
-      </Section>
-      {pending.length > 0 && (
-        <Section title="In attesa di verifica" count={pending.length} hint="Non vengono usate per rispondere finché qualcuno non le approva.">
-          <ul className="card py-0">{pending.map((m) => <FactRow key={m.id} m={m} />)}</ul>
-        </Section>
-      )}
+      {searching && <p className="muted mt-2 text-xs">{current.length ? `${current.length} risultati: ho aperto le sezioni che li contengono.` : "Nessun risultato."}</p>}
+
+      <div className="mt-5 space-y-2.5">
+        {depts.map((d) => {
+          const facts = current.filter((m) => deptOf(m) === d);
+          if (!facts.length) return null;
+          const look = DEPT[d] ?? DEPT[GENERAL];
+          const Icon = look.icon;
+          const open = searching || openDept === d;
+          return (
+            <section key={d} className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+              <button className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50" aria-expanded={open}
+                onClick={() => { setOpenDept(open ? null : d); setOpenTopic(null); }}>
+                <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${look.tint}`}><Icon size={18} /></span>
+                <span className="min-w-0">
+                  <span className="block font-display text-[15px] font-semibold text-stone-900">{deptLabel(d)}</span>
+                  <span className="muted block text-xs">{d === GENERAL ? "Nozioni degli altri comparti, visibili a tutti" : "Il tuo comparto"}</span>
+                </span>
+                <Counts facts={facts} />
+                <ChevronDown size={18} className={`shrink-0 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`} />
+              </button>
+              {open && (
+                <div className="space-y-1.5 border-t border-stone-100 bg-stone-50/60 px-3 py-3">
+                  {state.knowledge_topics.map((t) => {
+                    const tf = facts.filter((m) => (m.topic ?? "base") === t.id).sort(byStatus);
+                    if (!tf.length) return null;
+                    const key = `${d}/${t.id}`;
+                    const topicOpen = searching || openTopic === key;
+                    return (
+                      <div key={key} className="rounded-md border border-stone-200 bg-white">
+                        <button className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-hazel-soft/50" aria-expanded={topicOpen}
+                          onClick={() => setOpenTopic(topicOpen ? null : key)}>
+                          <ChevronRight size={16} className={`shrink-0 text-stone-400 transition-transform ${topicOpen ? "rotate-90" : ""}`} />
+                          <span className="font-medium text-stone-800">{t.label}</span>
+                          <Counts facts={tf} />
+                        </button>
+                        {topicOpen && <ul className="border-t border-stone-100 px-4 py-0">{tf.map((m) => <FactRow key={m.id} m={m} from={originOf(m)} />)}</ul>}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
+      {hidden > 0 && <p className="muted mt-3 text-xs">{hidden === 1 ? "Un'altra nozione è riservata" : `Altre ${hidden} nozioni sono riservate`} agli altri comparti e non sono visibili.</p>}
       {past.length > 0 && (
         <details className="mt-6">
           <summary className="muted cursor-pointer text-xs">Rifiutate o sostituite ({past.length})</summary>
-          <ul className="card mt-2 py-0">{past.map((m) => <FactRow key={m.id} m={m} />)}</ul>
+          <ul className="card mt-2 py-0">{past.map((m) => <FactRow key={m.id} m={m} from={originOf(m)} />)}</ul>
         </details>
       )}
     </div>

@@ -47,7 +47,8 @@ def answer_gap(brain, user: User, gap: Gap, fact: str, question: str, access: li
     brain.sources[src.id] = src
     n = len([m for m in brain.memory if m.id.startswith("K")]) + 1
     mem = MemoryItem(id=f"K{n}", text=fact, question=question, source_ids=[src.id], access=access, status="approved",
-                     proposed_by=user.name, approved_by=user.name, keywords=derive_keywords(question), min_score=2, created_at=brain.now)
+                     proposed_by=user.name, approved_by=user.name, keywords=derive_keywords(question), min_score=2, created_at=brain.now,
+                     dept=gap.owner)
     brain.memory.append(mem)
     gap.status, gap.answer, gap.decided_by = "answered", fact, user.name
     brain.log(f"user:{user.id}", "gap.answered", f"{user.name} ha documentato «{question}» ({mem.id})", access=access, refs=[gap.id, mem.id])

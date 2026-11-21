@@ -133,6 +133,29 @@ def test_gap_is_routed_documented_and_then_answered():
     assert a["kind"] == "answer" and "100 kg" in a["text"]
 
 
+def test_knowledge_is_grouped_by_department_and_topic():
+    st = call("GET", "/api/state", user="marco").json()
+    topics = {t["id"] for t in st["knowledge_topics"]}
+    visible = [m for m in st["memory"] if not m.get("locked")]
+    assert visible and all(m["topic"] in topics for m in visible)
+    assert next(m for m in visible if m["id"] == "M3")["dept"] == "shop"
+    # a fact documented to fill a gap belongs to the department that answered it
+    q = "Qual è l'ordine minimo per le nocciole?"
+    ask(q, "sara")
+    call("POST", f"/api/gaps/{brain.gaps[0].id}/answer", user="marco", json={"fact": "Ordine minimo nocciole: 100 kg.", "question": q, "access": ["all"]})
+    st = call("GET", "/api/state", user="sara").json()
+    assert next(m for m in st["memory"] if m.get("question") == q)["dept"] == "shop"
+
+
+def test_knowledge_respects_department_policy():
+    mem = {m["id"]: m for m in call("GET", "/api/state", user="davide").json()["memory"]}  # Spedizioni
+    assert mem["M6"]["scope"] == "mine"
+    assert mem["M9"]["scope"] == "shared"                 # Magazzino fact made visible to everyone
+    assert mem["M14"].get("locked") and "text" not in mem["M14"]  # Magazzino fact shared only with some roles: not sent
+    shop = {m["id"]: m for m in call("GET", "/api/state", user="marco").json()["memory"]}
+    assert shop["M12"]["scope"] == "review" and shop["M12"]["can_curate"]  # still reaches 'Oggi' to be verified
+
+
 def test_same_question_twice_opens_one_gap():
     q = "Qual è l'ordine minimo per le nocciole?"
     ask(q, "sara")

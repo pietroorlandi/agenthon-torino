@@ -35,7 +35,7 @@ Programmata: Black Friday **-20%** dal 27 al 30/11 (esclusi Calendari e B2B), da
 | Chat | 54 (1 live) | 6 canali: `#generale`, `#promo`, `#magazzino`, `#spedizioni`, `#clienti`, `#shop` (alcuni bloccati per ruolo) |
 | Documenti | 9 | calendario promo, regole sconti, policy resi, procedura spedizioni/magazzino, FAQ allergeni, listino B2B, margini, condizioni fornitore |
 | Task | 5 | cumulo codici, inventario, DHL, picking Black Friday, FAQ |
-| Memoria | 14 | 10 approvati, 4 in attesa di revisione |
+| Memoria | 14 | 10 approvati, 4 in attesa di revisione. Ogni voce ha un comparto (`dept`, uno dei 4 ruoli) e un argomento (`topic`: promozioni, policy, procedure, avvisi, base; elenco in `company.json → knowledge_topics`). In «Cosa sappiamo» ognuno vede il proprio comparto + le nozioni che gli altri comparti hanno reso visibili a tutti (`access: all`); le altre non arrivano al browser (`views.memory_scope`). La chat segue solo `access` |
 | Azioni proposte | 7 + 1 da evento | rimborso, pagamento fattura, blocco vendita, quarantena, avvisi clienti, intercettazione collo, riordino |
 
 I dati sono in un unico file; le fonti hanno id mnemonici (`em-` email, `ch-` chat, `dc-` doc, `tk-` task) usati da memoria, azioni e brief per citare le fonti.

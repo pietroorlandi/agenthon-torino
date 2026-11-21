@@ -1,6 +1,7 @@
 import { Hash, Loader2, Lock, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
+import { Lockup } from "../brand";
 import type { Message } from "../types";
 import { Avatar, Cites, EngineBadge, OUTCOME_LABEL, RichText, TriageBadges, useAct, useApp, useToast } from "../ui";
 
@@ -24,7 +25,7 @@ function BrainMsg({ m }: { m: Message }) {
     || state.gaps.some((g) => g.id === m.gap_id && g.mine && g.status === "open");
   return (
     <div className="flex gap-3">
-      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">B</span>
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-savoia text-xs font-semibold text-white">B</span>
       <div className="min-w-0 flex-1">
         <div className="mb-0.5 flex items-center gap-2 text-xs">
           <b className="text-sm font-semibold">Brain</b><span className="muted">{m.time}</span>
@@ -51,7 +52,7 @@ function ThinkingMsg() {
   }, []);
   return (
     <div className="flex gap-3" role="status" aria-live="polite">
-      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">B</span>
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-savoia text-xs font-semibold text-white">B</span>
       <div className="min-w-0 flex-1">
         <div className="mb-0.5 text-xs"><b className="text-sm font-semibold">Brain</b> <span className="muted">sta pensando…</span></div>
         <div className="flex items-center gap-2 text-stone-500">
@@ -108,7 +109,7 @@ export function ChatView() {
 
   const navBtn = (id: string, label: React.ReactNode, locked = false, badge = 0) => (
     <button key={id} disabled={locked} onClick={() => setChannel(id)}
-      className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-left disabled:opacity-40 ${channel === id ? "bg-stone-200 font-medium text-stone-900" : "text-stone-600 hover:bg-stone-100"}`}>
+      className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-left disabled:opacity-40 ${channel === id ? "bg-hazel-soft font-medium text-cocoa" : "text-stone-600 hover:bg-stone-100"}`}>
       {label}
       {locked && <Lock size={12} className="ml-auto" />}
       {!!badge && <span className="ml-auto rounded-full bg-brand px-1.5 text-[11px] text-white">{badge}</span>}
@@ -116,10 +117,10 @@ export function ChatView() {
   );
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-57px)] max-w-6xl">
+    <div className="mx-auto flex h-[calc(100vh-64px)] max-w-6xl">
       <nav className="w-52 shrink-0 space-y-0.5 overflow-y-auto border-r border-stone-200 p-2">
         <div className="px-2 pt-1 pb-1 text-xs text-stone-400">Messaggi diretti</div>
-        {navBtn("brain", <><span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[9px] font-semibold text-white">B</span> Brain</>, false, isBrain ? 0 : state.unread)}
+        {navBtn("brain", <><span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-savoia text-[9px] font-semibold text-white">B</span> Brain</>, false, isBrain ? 0 : state.unread)}
         <div className="px-2 pt-4 pb-1 text-xs text-stone-400">Canali</div>
         {state.channels.map((c) => navBtn(c.id, <><Hash size={14} className="shrink-0" /> {c.id}</>, c.locked))}
       </nav>
@@ -149,8 +150,9 @@ export function ChatView() {
                 </>
               )}
               {!asked && (
-                <div className="muted mt-auto text-center">
-                  <p className="text-base text-stone-700">Chiedimi qualcosa sull'azienda.</p>
+                <div className="muted mt-auto flex flex-col items-center text-center">
+                  <div className="mb-5"><Lockup size={96} /></div>
+                  <p className="font-display text-lg font-semibold text-cocoa">Chiedimi qualcosa sull'azienda.</p>
                   <p className="text-xs">Rispondo solo con informazioni approvate dal team e ti dico da dove vengono. Se non lo so, lo dico.</p>
                 </div>
               )}
