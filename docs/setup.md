@@ -133,6 +133,26 @@ Ogni evento della timeline fa 1–2 chiamate (triage su Flash-Lite, estrazione s
 
 Usa sempre l'**API**, non l'app web, per far durare i crediti. L'mp3 è in cache per testo: riascoltare lo stesso brief non consuma caratteri. C'è un premio speciale per il miglior uso di ElevenLabs: vedi le idee in fondo.
 
+## 4b. Email reale (opzionale, effetto wow)
+
+Quando una persona approva un'azione, la bozza parte **davvero** come email. Per sicurezza l'unico destinatario possibile è `MAIL_TO`: anche "avvisa 17 clienti" arriva solo lì, mai ai destinatari veri (garanzia nel codice, `app/services/mailer.py`). Senza configurazione le email restano simulate e tutto il resto funziona uguale.
+
+**Con Gmail** (5 minuti):
+1. Account Google → *Sicurezza* → attiva la **Verifica in due passaggi** (se non è già attiva).
+2. Vai su **myaccount.google.com/apppasswords**, crea una password per l'app "Company Brain" e copia le 16 lettere.
+3. In `.env` (mai nel repo):
+   ```dotenv
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=<il tuo gmail>
+   SMTP_PASSWORD=<password per le app>
+   MAIL_TO=<la casella dove vuoi ricevere le email, anche lo stesso gmail>
+   ```
+4. Verifica con `win.ps1 check` / `make check` (riga «✓ Email reale»: fa solo il login, non invia nulla), poi riavvia il backend.
+5. Prova: Giulia approva il rimborso in **Oggi** → in **Posta → Inviate** compare «inviata davvero» e l'email arriva nella casella.
+
+Consiglio per la demo: usa un Gmail creato apposta come mittente, così nella casella arriva da "Company Brain · Bottega Sabauda" e non da te stesso. Se la password per le app va revocata: stessa pagina, *Elimina*.
+
 ## 5. Osservabilità (GenAI)
 
 Ogni chiamata a Gemini passa da un solo punto (`app/llm.py`), che registra token, costo, latenza, uso della cache e fallback. Lo fa due volte: nei **contatori** del pannello e negli **span OpenTelemetry**, con gli attributi standard `gen_ai.*` e gli equivalenti OpenInference per Phoenix. Anche l'agente ADK produce i suoi span (agente, chiamata LLM, tool).

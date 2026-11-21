@@ -33,7 +33,10 @@ export default function App() {
   const [dev, setDevState] = useState(() => readDev() || DEV_TABS.some((t) => t.id === hashTab()));
   const setTab = (t: Tab) => { setTabState(t); history.replaceState(null, "", `#${t}`); };
   const [sourceId, setSourceId] = useState<string | null>(null);
-  const { data: state, error } = useQuery({ queryKey: ["state", userId], queryFn: api.state });
+  const { data: state, error } = useQuery({
+    queryKey: ["state", userId], queryFn: api.state,
+    refetchInterval: (q) => (q.state.data?.outbox.some((o) => o.delivery === "sending") ? 1500 : false), // real email in flight
+  });
   const { run, busy } = useAct();
   const toast = useToast();
 
