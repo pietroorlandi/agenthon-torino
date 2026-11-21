@@ -32,13 +32,20 @@ Innovazione · Coerenza con il brief · Fattibilità · Esecuzione · Pitch fina
 ## Stato attuale
 - [x] Track scelta: Agentic AI per le aziende
 - [x] Brief ufficiale incollato in docs/brief.md (Challenge A Company Brain / B Back Office Autopilot)
-- [ ] Challenge scelta: _A o B_
-- [ ] Stack deciso: _da decidere_ (vedi sezione Stack)
+- [x] Challenge scelta: **A · Company Brain** — dominio: cioccolateria torinese fittizia (Mole Cacao). Architettura: [docs/architecture.md](docs/architecture.md)
+- [x] Stack deciso: vedi sezione Stack e docs/architecture.md §13
 - [ ] Ruoli assegnati
 
 ## Stack
-_Da confermare dopo l'apertura._ Indicazione di partenza (dai crediti): Gemini su Vertex AI, Cloud Run, Firestore/Cloud Storage, Python o TypeScript, un frontend semplice per la demo. ElevenLabs per la voce se utile.
-Quando lo stack è deciso, scrivi qui comandi di install/run/test.
+Deciso (dettagli e motivazioni in [docs/architecture.md](docs/architecture.md) §13–14):
+- **Backend:** Python 3.12 + FastAPI + Pydantic. LLM via `google-genai` su **Vertex** (`gemini-3.8-flash`, `gemini-3.1-flash-lite` per il triage).
+- **Agenti:** Google ADK **solo** per il draft agent (tool in sola lettura + `propose_action`). Le approvazioni stanno nel nostro store, non in ADK.
+- **Frontend:** Vite + React + TypeScript + Tailwind CSS v4 (+ TanStack Query, lucide-react).
+- **Voce:** ElevenLabs TTS (brief audio).
+- **Osservabilità:** OpenTelemetry → Cloud Trace, log JSON → Cloud Logging, pannello in app con costi e qualità dell'agente.
+- **Deploy:** un solo servizio Cloud Run (Dockerfile multi-stage), stato in memoria + seed + reset.
+
+Comandi di install/run/test: _da scrivere qui dopo lo scaffold._
 
 ## Struttura repo
 - `src/` — codice del progetto
