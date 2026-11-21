@@ -28,5 +28,6 @@ Configurazione di Vertex AI, ElevenLabs, osservabilità e deploy su Cloud Run: [
 - [docs/setup.md](docs/setup.md) — guida setup (API, servizi, deploy)
 - [docs/architecture.md](docs/architecture.md) — architettura
 - [docs/scenario.md](docs/scenario.md) — contesto aziendale e dataset sintetico della demo
+- [docs/casi-uso.md](docs/casi-uso.md) — casi d'uso da provare per familiarizzare e verificare la demo
 - [docs/evaluation.md](docs/evaluation.md) — criteri e checklist
 - [docs/decisions.md](docs/decisions.md) — decisioni

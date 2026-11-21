@@ -183,8 +183,8 @@ class Brain:
             order = f" e l'ha applicata all'ordine {src.effects['order_id']}" if src.effects and src.effects.get("order_id") else ""
             self.notify_roles(
                 q.authority, kind="alert", sources=[src.id], memory_ids=[mem.id], quarantine_id=q.id,
-                text=f"**🛡️ Informazione in contrasto con la memoria**\nIn {where} {self.who(src.sender)} scrive che «{claim_text}»{order}. "
-                     f"In memoria ({mem.id}) risulta **{mem.fact.value if mem.fact else mem.text}**. Non l'ho usata: è in quarantena, decidi in *Memoria* se scartarla o accettarla.",
+                text=f"**Informazione in contrasto con la memoria**\nIn {where} {self.who(src.sender)} scrive che «{claim_text}»{order}. "
+                     f"In memoria ({mem.id}) risulta **{mem.fact.value if mem.fact else mem.text}**. Non l'ho usata: è in quarantena, decidi in *Oggi* se scartarla o accettarla.",
             )
         return q
 
@@ -196,8 +196,8 @@ class Brain:
         self.log("agent:triage", "event.quarantined", f"Fonte sospetta in quarantena: {src.title} — {reason}", access=roles, refs=[src.id])
         self.notify_roles(
             roles, kind="security", sources=[src.id], quarantine_id=q.id,
-            text=f"**🛡️ Messaggio sospetto messo in quarantena**\n«{src.title}» da {src.sender}: {reason}. "
-                 "Non ne ho estratto nulla e non ho proposto azioni. Puoi confermare lo scarto o rilasciarlo in *Memoria → Quarantena*.",
+            text=f"**Messaggio sospetto messo in quarantena**\n«{src.title}» da {src.sender}: {reason}. "
+                 "Non ne ho estratto nulla e non ho proposto azioni. Puoi confermare lo scarto o rilasciarlo in *Oggi*.",
         )
         return q
 

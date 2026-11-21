@@ -1,7 +1,7 @@
 {
   "magazzino": [
     {
-      "text": "**Lotto L26-1108 (Gianduiotti al caffè) da isolare**: il laboratorio segnala un'etichetta senza l'allergene latte. A scaffale ci sono circa 202 pz: la quarantena è in *Azioni*.",
+      "text": "**Lotto L26-1108 (Gianduiotti al caffè) da isolare**: il laboratorio segnala un'etichetta senza l'allergene latte. A scaffale ci sono circa 202 pz: la quarantena è in *Oggi*.",
       "sources": [
         "em-lotto",
         "STORE-GIA-CAF"
@@ -24,7 +24,7 @@
   ],
   "clienti": [
     {
-      "text": "**Rimborso ordine #10481** (P. Martin, 69,80€): Box Natale arrivato schiacciato, GLS ha riconosciuto il danno. Sotto i 100€: la bozza è in *Azioni*.",
+      "text": "**Rimborso ordine #10481** (P. Martin, 69,80€): Box Natale arrivato schiacciato, GLS ha riconosciuto il danno. Sotto i 100€: la bozza è in *Oggi*.",
       "sources": [
         "em-cli-martin",
         "dc-resi",
@@ -40,7 +40,7 @@
       ]
     },
     {
-      "text": "**Ritardi BRT** di 24/48h in Piemonte e Lombardia fino al 28/11 (toccati #10482 e #10485): bozza di avviso in *Azioni*.",
+      "text": "**Ritardi BRT** di 24/48h in Piemonte e Lombardia fino al 28/11 (toccati #10482 e #10485): bozza di avviso in *Oggi*.",
       "sources": [
         "em-brt-ritardo"
       ]
@@ -55,7 +55,7 @@
   ],
   "shop": [
     {
-      "text": "**Promo CAFFE15 attiva su un prodotto bloccato** (lotto L26-1108) e la newsletter delle 10:00 la promuove a 8.400 iscritti: la sospensione è in *Azioni*.",
+      "text": "**Promo CAFFE15 attiva su un prodotto bloccato** (lotto L26-1108) e la newsletter delle 10:00 la promuove a 8.400 iscritti: la sospensione è in *Oggi*.",
       "sources": [
         "em-newsletter",
         "em-lotto",
@@ -63,7 +63,7 @@
       ]
     },
     {
-      "text": "**Fattura n. 889 scaduta** (3.450€) al Laboratorio Sant'Anna: è il fornitore dei gianduiotti e ha accennato a rivedere le priorità di produzione. Pagamento in *Azioni*.",
+      "text": "**Fattura n. 889 scaduta** (3.450€) al Laboratorio Sant'Anna: è il fornitore dei gianduiotti e ha accennato a rivedere le priorità di produzione. Pagamento in *Oggi*.",
       "sources": [
         "em-fattura",
         "em-lab-conferma"
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "text": "**Ordine #10479 con indirizzo errato** (via Po 12 → 112): proposta di intercettazione BRT (7€) in *Azioni*. Inoltre il collo #10476 è in giacenza a Milano.",
+      "text": "**Ordine #10479 con indirizzo errato** (via Po 12 → 112): proposta di intercettazione BRT (7€) in *Oggi*. Inoltre il collo #10476 è in giacenza a Milano.",
       "sources": [
         "em-cli-russo",
         "em-brt-giacenza"

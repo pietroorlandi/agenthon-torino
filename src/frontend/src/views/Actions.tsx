@@ -1,67 +1,73 @@
-import { Sparkles } from "lucide-react";
+import { Check, Pencil, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import { api } from "../api";
 import type { ActionView } from "../types";
 import { Cites, Tag, useAct, useApp } from "../ui";
 
-function ActionCard({ a }: { a: ActionView }) {
+// What approving really does (see backend services/actions.py). Nothing leaves the demo: it is all simulated.
+const EFFECT: Record<string, string> = {
+  refund: "registra il rimborso sull'ordine e invia la risposta al cliente",
+  intercept: "segna il collo come intercettato e invia la richiesta al corriere",
+  reorder: "registra il riordino (i pezzi risultano in arrivo) e invia l'ordine al fornitore",
+  block: "sospende la vendita del prodotto nello shop e invia la comunicazione",
+  payment: "invia il messaggio; il pagamento vero resta fuori dal sistema",
+  quarantine: "invia la comunicazione al magazzino",
+  notify: "invia l'avviso ai clienti",
+};
+
+export function ActionCard({ a }: { a: ActionView }) {
   const { state } = useApp();
   const { run, busy } = useAct();
   const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(a.draft ?? "");
-  if (a.locked) {
-    const s = { pending: "in attesa", executed: "eseguita", rejected: "rifiutata" }[a.status];
-    return <div className="card muted border-dashed py-2.5">🔒 Azione di competenza {a.owner_label} — {s}</div>;
-  }
-  const status = {
-    pending: <Tag tone="amber">in attesa di approvazione</Tag>,
-    executed: <Tag tone="green">eseguita · approvata da {a.decided_by}</Tag>,
-    rejected: <Tag tone="red">rifiutata da {a.decided_by}</Tag>,
-  }[a.status];
+  const pending = a.status === "pending";
   return (
-    <div className={`card border-l-4 ${a.status === "pending" ? "border-l-amber-500" : a.status === "executed" ? "border-l-emerald-600" : "border-l-stone-400"}`}>
-      <div className="flex flex-wrap items-center justify-between gap-2"><b>{a.title}</b>{status}</div>
-      <p className="mt-1"><span className="muted">Perché:</span> {a.why}</p>
-      {editing ? (
-        <textarea className="input mt-2 font-mono text-xs" rows={8} value={draft} onChange={(e) => setDraft(e.target.value)} />
-      ) : (
-        <pre className="mt-2 rounded-md bg-stone-50 p-3 font-mono text-xs whitespace-pre-wrap">{a.draft}</pre>
-      )}
-      <div className="muted mt-1 text-xs">Bozza: {a.draft_by}{a.edited_by && ` · modificata da ${a.edited_by}`}</div>
-      <Cites ids={a.source_ids} />
-      {a.can_decide && (
-        <div className="mt-2 flex flex-wrap gap-2">
-          <button className="btn-primary btn-sm" disabled={busy || editing} onClick={() => run(() => api.action(a.id, "approve"))}>✓ Approva ed esegui</button>
-          <button className="btn-danger btn-sm" disabled={busy || editing} onClick={() => run(() => api.action(a.id, "reject"))}>✕ Rifiuta</button>
-          {editing ? (
-            <button className="btn btn-sm" disabled={busy} onClick={async () => { await run(() => api.editDraft(a.id, draft), "Bozza salvata"); setEditing(false); }}>💾 Salva bozza</button>
-          ) : (
-            <button className="btn btn-sm" disabled={busy} onClick={() => { setDraft(a.draft ?? ""); setEditing(true); }}>✏️ Modifica</button>
-          )}
-          <button className="btn btn-sm" disabled={busy || editing || state.llm.mode !== "live"} title={state.llm.mode !== "live" ? "Serve LLM_MODE=live" : "L'agente ADK rilegge le fonti e riscrive la bozza"}
-            onClick={() => run(() => api.agentDraft(a.id), "Bozza riscritta dall'agente: controllala prima di approvare")}>
-            <Sparkles size={14} /> {busy ? "L'agente sta scrivendo…" : "Riscrivi con l'agente"}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+    <article className="card">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <h3 className="font-semibold">{a.title}</h3>
+        {!pending && <Tag tone={a.status === "executed" ? "green" : "gray"}>{a.status === "executed" ? `approvata da ${a.decided_by}` : `rifiutata da ${a.decided_by}`}</Tag>}
+      </div>
+      <p className="mt-1 text-stone-700">{a.why}</p>
 
-export function ActionsView() {
-  const { state } = useApp();
-  return (
-    <section className="mx-auto max-w-4xl space-y-2.5 px-4 py-6">
-      <h1 className="h1">✅ Azioni proposte</h1>
-      <p className="muted">Il Brain <b>propone soltanto</b>: prepara bozze, ma nulla viene inviato o modificato finché una persona del reparto giusto non approva.</p>
-      {state.actions.map((a) => <ActionCard key={`${a.id}-${a.draft?.length}`} a={a} />)}
-      <h2 className="h2">📤 Outbox del tuo reparto <span className="muted font-normal">(eseguito solo dopo approvazione)</span></h2>
-      {state.outbox.length ? state.outbox.map((o) => (
-        <div key={o.action_id} className="card border-l-4 border-l-sky-600">
-          <div className="flex flex-wrap items-center justify-between gap-2"><b>{o.title}</b><Tag tone="blue">inviata {o.sent_at} · approvata da {o.approved_by}</Tag></div>
-          <pre className="mt-2 font-mono text-xs whitespace-pre-wrap">{o.body}</pre>
+      {editing ? (
+        <textarea className="input mt-3 font-mono text-xs" rows={9} value={draft} onChange={(e) => setDraft(e.target.value)} />
+      ) : (
+        <div className="mt-3 rounded-md border border-stone-200 bg-stone-50">
+          <button className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-stone-600" onClick={() => setOpen(!open)}>
+            <span>Bozza preparata{a.draft_by ? ` da ${a.draft_by}` : ""}{a.edited_by ? `, modificata da ${a.edited_by}` : ""}</span>
+            <span>{open ? "Nascondi" : "Leggi"}</span>
+          </button>
+          {open && <pre className="border-t border-stone-200 px-3 py-2 font-sans text-xs whitespace-pre-wrap">{a.draft}</pre>}
         </div>
-      )) : <p className="muted">Vuota: nessuna azione approvata finora.</p>}
-    </section>
+      )}
+      <Cites ids={a.source_ids} />
+
+      {a.can_decide && (
+        <>
+          {a.effect && EFFECT[a.effect] && <p className="muted mt-3 text-xs">Se approvi, il sistema {EFFECT[a.effect]}.</p>}
+          <div className="mt-2 flex flex-wrap gap-2">
+            {editing ? (
+              <>
+                <button className="btn-primary btn-sm" disabled={busy} onClick={async () => { await run(() => api.editDraft(a.id, draft), "Bozza salvata"); setEditing(false); setOpen(true); }}>Salva bozza</button>
+                <button className="btn btn-sm" disabled={busy} onClick={() => setEditing(false)}>Annulla</button>
+              </>
+            ) : (
+              <>
+                <button className="btn-primary btn-sm" disabled={busy} onClick={() => run(() => api.action(a.id, "approve"))}><Check size={14} /> Approva</button>
+                <button className="btn btn-sm" disabled={busy} onClick={() => { setDraft(a.draft ?? ""); setEditing(true); }}><Pencil size={14} /> Modifica</button>
+                <button className="btn-danger btn-sm" disabled={busy} onClick={() => run(() => api.action(a.id, "reject"))}><X size={14} /> Rifiuta</button>
+                {state.llm.mode === "live" && (
+                  <button className="btn btn-sm" disabled={busy} title="L'agente rilegge le fonti e riscrive la bozza"
+                    onClick={() => run(() => api.agentDraft(a.id), "Bozza riscritta: controllala prima di approvare")}>
+                    <Sparkles size={14} /> {busy ? "Sto scrivendo…" : "Riscrivi"}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </>
+      )}
+    </article>
   );
 }

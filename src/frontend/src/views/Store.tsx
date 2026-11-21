@@ -1,4 +1,4 @@
-import { Tag, TriageBadges, TYPE_ICON, useApp } from "../ui";
+import { SourceIcon, Tag, TriageBadges, useApp } from "../ui";
 
 const PROBLEM = ["In attesa approvazione sconto", "Pagamento fallito", "In attesa pagamento", "Rimborso richiesto", "In giacenza", "Indirizzo errato"];
 const eur = (n: number) => n.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
@@ -14,7 +14,7 @@ export function StoreView() {
   );
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h1 className="h1">🛒 Store admin — Bottega Sabauda</h1>
+      <h1 className="h1">Store (simulato)</h1>
       <p className="muted">I dati cambiano solo quando una persona approva un'azione o quando arriva un evento (▶ Avanti).</p>
       <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
         {kpi("Ordini oggi", state.orders.filter((o) => o.date.startsWith("21/11")).length)}
@@ -35,7 +35,7 @@ export function StoreView() {
                 <td className="td">
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-20 rounded bg-stone-200"><div className={`h-1.5 rounded ${isLow ? "bg-amber-500" : "bg-emerald-500"}`} style={{ width: `${Math.min(100, (p.stock / (p.threshold * 3)) * 100)}%` }} /></div>
-                    {p.stock} pz {isLow && "⚠️"} {p.incoming > 0 && <Tag tone="green">+{p.incoming} in arrivo</Tag>}
+                    {p.stock} pz {p.incoming > 0 && <Tag tone="green">+{p.incoming} in arrivo</Tag>}
                   </div>
                 </td>
                 <td className="td">{p.sold7d}</td>
@@ -70,14 +70,14 @@ export function SourcesView() {
     .sort((a, b) => (b.observed_at ? 1 : 0) - (a.observed_at ? 1 : 0) || (b.date ?? "").localeCompare(a.date ?? ""));
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h1 className="h1">📁 Fonti osservate</h1>
+      <h1 className="h1">Fonti osservate</h1>
       <p className="muted">Email, chat, task e documenti che il Brain legge. Vedi solo quelle accessibili al ruolo <b>{state.me.role_label}</b>
         {state.hidden_sources > 0 && ` (${state.hidden_sources} riservate ad altri reparti)`}. Le fonti arrivate durante la demo mostrano come le ha trattate (fiducia, triage, esito).</p>
       <div className="mt-3 max-h-[70vh] overflow-auto rounded-lg border border-stone-200 bg-white">
         <table className="w-full"><thead className="sticky top-0"><tr>{["Tipo", "Titolo", "Da", "Data", "Accesso", "Brain"].map((h) => <th key={h} className="th">{h}</th>)}</tr></thead>
           <tbody>{visible.map((s) => (
             <tr key={s.id} className="cursor-pointer hover:bg-sky-50" onClick={() => openSource(s.id)}>
-              <td className="td whitespace-nowrap">{TYPE_ICON[s.type]} {s.type}</td>
+              <td className="td whitespace-nowrap"><span className="inline-flex items-center gap-1.5"><SourceIcon type={s.type} /> {s.type}</span></td>
               <td className="td">{s.title} {s.in_quarantine && <Tag tone="red">in quarantena</Tag>}</td>
               <td className="td">{s.sender_label}</td><td className="td whitespace-nowrap">{s.date}</td>
               <td className="td text-xs">{s.access_label}</td><td className="td"><TriageBadges s={s} /></td>

@@ -2,7 +2,7 @@
 export type Role = "magazzino" | "clienti" | "shop" | "spedizioni";
 
 export interface User { id: string; name: string; role: Role; role_label: string; avatar: string; color: string }
-export interface BriefItem { text: string; sources: string[] }
+export interface BriefItem { text: string; sources: string[]; derived?: boolean }
 
 export interface Message {
   id: string; sender: "brain" | "user"; user_id?: string | null; kind: string; text: string; time: string;
@@ -12,7 +12,7 @@ export interface Message {
 
 export interface SourceView {
   id: string; type: string; locked?: boolean; access_label: string;
-  title?: string; sender?: string; sender_label?: string; to_label?: string | null; date?: string; body?: string;
+  title?: string; sender?: string; sender_label?: string; to?: string | null; to_label?: string | null; date?: string; body?: string;
   channel?: string | null; observed_at?: string | null; trust?: string | null; trust_reason?: string | null;
   triage?: string | null; triage_reason?: string | null; triage_engine?: string | null; outcome?: string | null;
   banned?: boolean; in_quarantine?: boolean; injected_by?: string | null;

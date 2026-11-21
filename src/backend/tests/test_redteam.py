@@ -142,3 +142,18 @@ def test_restricted_question_is_denied_even_if_the_llm_classifier_misses_it(monk
     res = qa._miss(brain, brain.user("sara"), "Qual è il margine di novembre?", [], use_llm=True)
     assert res["kind"] == "denied" and "38,4%" not in res["text"]
     assert len(brain.gaps) == gaps_before  # no request opened for something that already exists
+
+
+def test_pending_answer_is_not_turned_into_a_gap_if_the_llm_classifier_misses_it(monkeypatch):
+    """The answer exists but is pending (M1, visible to Clienti): say so instead of opening a gap."""
+    from types import SimpleNamespace
+
+    from app.models import QAMiss
+    from app.services import qa
+
+    monkeypatch.setattr(qa, "brain_llm_miss", lambda prompt: SimpleNamespace(
+        data=QAMiss(restricted_memory_id=None, pending_memory_id=None, topic_owner="spedizioni"), engine="gemini"))
+    gaps_before = len(brain.gaps)
+    res = qa._miss(brain, brain.user("giulia"), "Quale corriere usiamo per l'estero da dicembre?", [], use_llm=True)
+    assert res["kind"] == "unknown" and "in attesa di revisione" in res["text"]
+    assert len(brain.gaps) == gaps_before

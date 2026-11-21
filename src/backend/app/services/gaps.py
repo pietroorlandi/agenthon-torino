@@ -26,15 +26,15 @@ def open_gap(brain, asker: User, question: str, topic: TopicOwner, text: str, en
     owner = next(iter(brain.users_with_role(topic.role)), None)
     if is_new and owner and owner.id != asker.id:
         brain.push(owner.id, kind="alert", gap_id=gap.id,
-                   text=f"**📝 Buco di conoscenza da colmare**\n{asker.name} ({asker.role_label}) ha chiesto: «{question}». Non è nella memoria e sembra "
-                        f"di tua competenza ({topic.label}). Puoi scrivere la risposta in *Memoria → Da documentare*?")
+                   text=f"**Buco di conoscenza da colmare**\n{asker.name} ({asker.role_label}) ha chiesto: «{question}». Non è nella memoria e sembra "
+                        f"di tua competenza ({topic.label}). Puoi scrivere la risposta in *Oggi*?")
     if owner and owner.id == asker.id:
-        tail = "Sembra di **tua** competenza: puoi documentarla tu in *Memoria → Da documentare*."
+        tail = "Sembra di **tua** competenza: puoi documentarla tu in *Oggi*."
     elif is_new:
         tail = f"Sembra di competenza **{brain.role_label(topic.role)}** ({topic.label}): ho chiesto a **{owner.name if owner else 'il reparto'}** di documentarla, quando risponde te lo scrivo qui."
     else:
         tail = f"C'è già una richiesta aperta a **{owner.name if owner else brain.role_label(topic.role)}** su questa domanda."
-    return {"kind": "gap", "text": f"{text}\n📝 È un'informazione aziendale che qualcuno conosce ma che non è mai stata scritta. {tail}",
+    return {"kind": "gap", "text": f"{text}\nÈ un'informazione aziendale che qualcuno conosce ma che non è mai stata scritta. {tail}",
             "gap_id": gap.id, "engine": engine}
 
 
@@ -54,7 +54,7 @@ def answer_gap(brain, user: User, gap: Gap, fact: str, question: str, access: li
     asker = brain.user(gap.asked_by)
     if asker and can_see(access, asker.role):
         brain.push(asker.id, kind="answer", sources=[src.id], memory_ids=[mem.id],
-                   text=f"📝 **{user.name}** ha risposto alla tua domanda «{gap.question}»:\n{fact}\nL'ho aggiunto alla memoria: da ora lo so anche io.")
+                   text=f"**{user.name}** ha risposto alla tua domanda «{gap.question}»:\n{fact}\nL'ho aggiunto alla memoria: da ora lo so anche io.")
     elif asker:
         brain.push(asker.id, kind="denied", text=f"{user.name} ha documentato la risposta a «{gap.question}», ma l'ha resa visibile solo a {brain.roles_label(access)}.")
     if asker and asker.id != user.id:

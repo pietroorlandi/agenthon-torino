@@ -63,7 +63,7 @@ I dati sono in un unico file; le fonti hanno id mnemonici (`em-` email, `ch-` ch
 ## Fiducia nelle fonti: quarantena ("coda di scarto")
 Il Brain **non considera vero ciò che legge**. Per ogni fonte estrae le affermazioni (`claim` in `data.js`) e le confronta con la memoria **approvata** che ha lo stesso `fact.key`:
 - stesso valore o nessun confronto possibile → segue il flusso normale (proposta in memoria, da approvare);
-- valore diverso → **non viene usata né proposta come memoria**: finisce in *Memoria → Quarantena* per i ruoli in `authority` della voce contraddetta (qui lo Shop), che avvisa con un messaggio proattivo;
+- valore diverso → **non viene usata né proposta come memoria**: finisce in *Oggi → Da verificare* per i ruoli in `authority` della voce contraddetta (qui lo Shop), che avvisa con un messaggio proattivo;
 - l'autorità sceglie **Scarta e dimentica** (fonte bandita, mai più usata; se serve si corregge l'ordine coinvolto) oppure **Accetta e aggiorna la memoria**.
 Gli altri reparti vedono solo che esiste un elemento in quarantena, non il contenuto.
 Nella demo l'estrazione dei `claim` è pre-annotata nei dati; con Gemini diventerà un passo del Brain (stesso formato).
@@ -71,7 +71,7 @@ Nella demo l'estrazione dei `claim` è pre-annotata nei dati; con Gemini divente
 ## Buchi di conoscenza ("da documentare")
 Quando il Brain non trova nulla nella memoria (né approvata né in revisione):
 1. **Capisce se la domanda riguarda l'azienda** confrontandola con le competenze dei reparti (`TOPIC_OWNERS` in `data.js`). Se non riguarda l'azienda (es. «quanti dipendenti ha il concorrente?») dice solo «non lo so» e non apre nulla.
-2. Se riguarda l'azienda, **apre una richiesta al reparto competente** (es. nocciole → Shop, che gestisce fornitori e acquisti). La persona riceve un messaggio proattivo e la richiesta compare in *Memoria → Da documentare*. Una domanda uguale già aperta non viene duplicata.
+2. Se riguarda l'azienda, **apre una richiesta al reparto competente** (es. nocciole → Shop, che gestisce fornitori e acquisti). La persona riceve un messaggio proattivo e la richiesta compare in *Oggi → Domande dei colleghi*. Una domanda uguale già aperta non viene duplicata.
 3. La persona competente scrive **il fatto** e **la domanda a cui risponde** (precompilata, modificabile) e sceglie chi può vederlo. Il fatto entra in memoria **già approvato**, perché lo firma chi ha l'autorità, ed è citato come fonte «📝 Risposta di …». Le parole chiave vengono ricavate dalla domanda e ne servono almeno 2 per far scattare la risposta.
 4. Chi aveva chiesto riceve la risposta in chat. Da lì in poi il Brain la sa.
 5. In alternativa la persona chiude la richiesta con «Non esiste / non è di mia competenza», e chi aveva chiesto viene avvisato.

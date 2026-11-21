@@ -90,17 +90,17 @@ def _miss(brain, user: User, question: str, visible: list[MemoryItem], use_llm: 
         miss = QAMiss(restricted_memory_id=r_hit.id if r_hit else None, pending_memory_id=p_hit.id if p_hit else None,
                       topic_owner=topic.role if topic else "none")
     r_ids, p_ids = {m.id: m for m in restricted}, {m.id for m in pending}
-    if miss.restricted_memory_id not in r_ids:
-        # deterministic safety net: the LLM classifier sometimes misses a restricted match and would open a useless gap.
-        # Only yields "denied" (no content), so it can never leak.
-        hit = _best(restricted, norm(question))
-        if hit:
-            miss.restricted_memory_id = hit.id
+    # deterministic safety net: the LLM classifier sometimes misses a restricted or pending match and would open a
+    # useless gap. It only yields "denied" / "pending review" (no content), so it can never leak.
+    if miss.restricted_memory_id not in r_ids and (hit := _best(restricted, norm(question))):
+        miss.restricted_memory_id = hit.id
+    if miss.pending_memory_id not in p_ids and (hit := _best(pending, norm(question))):
+        miss.pending_memory_id = hit.id
     if miss.restricted_memory_id in r_ids:
         return _denied(brain, user, r_ids[miss.restricted_memory_id], engine)
-    text = "🤷 **Non lo so.** Non c'è nulla nella memoria approvata che risponda a questa domanda, e non voglio inventare."
+    text = "**Non lo so.** Non c'è nulla nella memoria approvata che risponda a questa domanda, e non voglio inventare."
     if miss.pending_memory_id in p_ids:
-        text += "\nC'è un elemento **in attesa di revisione** che potrebbe essere rilevante: lo userò solo dopo che qualcuno lo avrà approvato in *Memoria*."
+        text += "\nC'è un elemento **in attesa di revisione** che potrebbe essere rilevante: lo userò solo dopo che qualcuno lo avrà approvato in *Oggi*."
         return {"kind": "unknown", "text": text, "engine": engine}
     topic = next((t for t in brain.company.topic_owners if t.role == miss.topic_owner), None)
     if not topic:
@@ -117,7 +117,7 @@ def _denied(brain, user: User, m: MemoryItem, engine: str) -> dict:
     contact = next((u for r in m.access for u in brain.users_with_role(r)), None)
     hint = f" Puoi chiedere a {contact.name}." if contact else ""
     return {"kind": "denied", "engine": engine,
-            "text": f"🔒 L'informazione esiste, ma è riservata al team **{owners}**: non posso condividerla con il ruolo {user.role_label}.{hint}"}
+            "text": f"L'informazione esiste, ma è riservata al team **{owners}**: non posso condividerla con il ruolo {user.role_label}.{hint}"}
 
 
 # ---------- deterministic engine (offline fallback, same guarantees) ----------
