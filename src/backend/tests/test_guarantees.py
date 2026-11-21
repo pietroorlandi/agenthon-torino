@@ -100,3 +100,18 @@ def test_quote_must_be_literal():
     before = len(brain.memory)
     reconcile(brain, src, [Candidate(text="Il prezzo è 5€", type="price", quote="il prezzo è 5€")], [], "test")
     assert len(brain.memory) == before
+
+
+# ---------- Dev "Brain" view: dry-run probe ----------
+def test_probe_has_no_side_effects_and_matches_ask():
+    q = "Quanti scaffali ha il magazzino?"
+    before = (len(brain.gaps), len(brain.audit), sum(map(len, brain.dm.values())))
+    p = call("POST", "/api/probe", user="giulia", json={"question": q}).json()
+    assert p["path"] == "gap" and p["gap_owner"]
+    assert before == (len(brain.gaps), len(brain.audit), sum(map(len, brain.dm.values())))
+    assert ask(q, "giulia")["kind"] == "gap"  # the real ask takes the same path
+
+
+def test_probe_respects_role_filter():
+    p = call("POST", "/api/probe", user="sara", json={"question": "Qual è il margine di novembre?"}).json()
+    assert p["path"] == "restricted" and p["memory"] == []
