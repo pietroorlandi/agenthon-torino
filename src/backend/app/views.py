@@ -6,6 +6,7 @@ from .config import settings
 from .models import User
 from .services.brief import build_brief
 from .services import orders
+from .services.tasks import done_for, tasks_for
 from .services.mailer import mask
 from .services.taxonomy import classify
 from .store import can_see
@@ -98,6 +99,9 @@ def state_for(brain, user: User) -> dict:
         "dm": [m.model_dump() for m in brain.dm[user.id]],
         "unread": brain.unread.get(user.id, 0),
         "brief": {**build_brief(brain, user), "items": [i.model_dump() for i in build_brief(brain, user)["items"]]},
+        "day": brain.day,
+        "tasks": {"open": tasks_for(brain, user), "done": done_for(brain, user, brain.date)},
+        "mails": list(reversed(brain.mails.get(user.id, []))),  # morning brief emails, newest first
         "memory": memory,
         "quarantine": quarantine,
         "gaps": gaps,

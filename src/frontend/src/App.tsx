@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Play, RotateCcw, Wrench } from "lucide-react";
+import { Play, RotateCcw, Sunrise, Wrench } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api, getUser, setUser } from "./api";
 import { Brand } from "./brand";
@@ -59,6 +59,11 @@ export default function App() {
     + state.memory.filter((m) => m.status === "pending" && m.can_curate).length;
   const badge: Partial<Record<Tab, number>> = { today: todo, chat: state.unread };
 
+  const newDay = async () => {
+    const r = await run(api.newDay);
+    if (r) toast(`È il ${r.date}: tutti hanno ricevuto il nuovo brief del mattino in Posta.${r.delivered ? ` Nella notte consegnati ${r.delivered} ordini.` : ""}`);
+  };
+
   const next = async () => {
     const r = await run(api.next);
     if (r) {
@@ -99,6 +104,8 @@ export default function App() {
                 <Play size={12} /> {state.timeline.next ? `Avanti ${state.timeline.done + 1}/${state.timeline.total}` : "Fine timeline"}
               </button>
               <button className="inline-flex items-center gap-1 rounded px-2 py-1 hover:bg-white/10" disabled={busy} onClick={() => run(api.reset, "Demo ripristinata")}><RotateCcw size={12} /> Reset</button>
+              <button className="inline-flex items-center gap-1 rounded px-2 py-1 hover:bg-white/10" disabled={busy} onClick={newDay}
+                title="Passa la notte: ordini spediti consegnati, nuovi ordini, e a tutti un nuovo brief del mattino"><Sunrise size={12} /> Nuovo giorno</button>
               <span className="text-stone-500">|</span>
               {DEV_TABS.map((t) => (
                 <button key={t.id} onClick={() => setTab(t.id)} className={`rounded px-2 py-1 ${tab === t.id ? "bg-white/15 text-white" : "hover:bg-white/10"}`}>{t.label}</button>

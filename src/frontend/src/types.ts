@@ -3,6 +3,9 @@ export type Role = "magazzino" | "clienti" | "shop" | "spedizioni";
 
 export interface User { id: string; name: string; role: Role; role_label: string; avatar: string; color: string }
 export interface BriefItem { text: string; sources: string[]; derived?: boolean }
+export interface Task { id: string; kind: "gap" | "approve" | "verify" | "review" | "ship" | "task"; title: string; detail?: string | null;
+  due?: string | null; days_left?: number | null; is_new?: boolean; tab?: string }
+export interface MorningMail { date: string; subject: string; text: string; items: BriefItem[] }
 
 export interface Message {
   id: string; sender: "brain" | "user"; user_id?: string | null; kind: string; text: string; time: string;
@@ -54,6 +57,7 @@ export interface State {
   channels: { id: string; locked: boolean }[];
   dm: Message[]; unread: number;
   brief: { text: string; time: string; items: BriefItem[] };
+  day: number; tasks: { open: Task[]; done: { text: string; op: string }[] }; mails: MorningMail[];
   memory: MemoryView[]; quarantine: QuarantineView[]; gaps: GapView[]; actions: ActionView[]; outbox: OutboxItem[];
   sources: SourceView[]; hidden_sources: number;
   products: Product[]; orders: Order[]; audit: AuditEntry[];

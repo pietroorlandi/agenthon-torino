@@ -185,6 +185,27 @@ def test_order_fact_is_visible_to_both_sides_and_archived_when_shipped():
     assert call("POST", "/api/orders/10489/ship", user="davide").status_code == 403  # already closed
 
 
+def test_new_day_sends_a_different_morning_brief():
+    q = "Il pacco dell'ordine #10487 è pronto per la spedizione?"
+    ask(q, "davide")
+    sara_tasks = call("GET", "/api/state", user="sara").json()["tasks"]["open"]
+    assert any(t["kind"] == "gap" for t in sara_tasks)  # the colleague's question is on Sara's to-do list
+    call("POST", f"/api/gaps/{brain.gaps[0].id}/answer", user="sara", json={"fact": "#10487 pronto.", "question": q, "access": ["all"]})
+    assert any(t["id"] == "ship-#10487" for t in call("GET", "/api/state", user="davide").json()["tasks"]["open"])
+    call("POST", "/api/orders/10487/ship", user="davide")
+    assert call("POST", "/api/tasks/tk-dhl/done", user="sara").status_code == 403  # not her task
+    assert call("POST", "/api/tasks/tk-dhl/done", user="davide").status_code == 200
+    assert call("POST", "/api/clock/day", user="davide").json()["date"] == "22/11"
+    st = call("GET", "/api/state", user="davide").json()
+    assert [m["subject"] for m in st["mails"]] == ["Il tuo brief del 22 novembre", "Il tuo brief del 21 novembre"]
+    today = " ".join(i["text"] for i in st["mails"][0]["items"])
+    assert "Ieri hai chiuso 2 attività" in today and "#10487" in today and "consegnato" in today
+    assert brain.order_by_id("#10487").status == "Consegnato"  # delivered overnight
+    assert not any(t["id"] in ("ship-#10487", "tk-dhl") for t in st["tasks"]["open"])
+    sara = call("GET", "/api/state", user="sara").json()["mails"][0]["items"]
+    assert any("nuovi ordini da preparare" in i["text"] for i in sara)
+
+
 def test_same_question_twice_opens_one_gap():
     q = "Qual è l'ordine minimo per le nocciole?"
     ask(q, "sara")

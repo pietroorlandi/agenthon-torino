@@ -1,18 +1,19 @@
 import { Volume2 } from "lucide-react";
 import { useState } from "react";
 import { api, fetchBriefAudio } from "../api";
-import type { OutboxItem, SourceView } from "../types";
+import type { MorningMail, OutboxItem, SourceView } from "../types";
 import { Cites, RichText, Tag, TriageBadges, useApp, useToast } from "../ui";
 
 // Simulated mailbox: the Brain's morning brief, the emails of the department and what was sent after approval.
 type Folder = "inbox" | "sent" | "team";
-type Sel = { kind: "brief" } | { kind: "source"; id: string } | { kind: "outbox"; id: string };
+type Sel = { kind: "brief"; date: string } | { kind: "source"; id: string } | { kind: "outbox"; id: string };
 
 // "dd/mm hh:mm" → sortable "mm/dd hh:mm"
 const key = (d?: string) => (d ? `${d.slice(3, 5)}/${d.slice(0, 2)}${d.slice(5)}` : "");
 
-function BriefMail() {
+function BriefMail({ mail }: { mail: MorningMail }) {
   const { state, goto } = useApp();
+  const isToday = mail.date === state.mails[0]?.date;
   const toast = useToast();
   const [audio, setAudio] = useState<string | null>(null);
   const listen = async () => {
@@ -27,14 +28,14 @@ function BriefMail() {
   };
   return (
     <>
-      <Header from="Brain <brain@bottegasabauda.example>" to={`${state.me.name} (${state.me.role_label})`} subject="Il tuo brief del 21 novembre" date="21/11 08:00" />
+      <Header from="Brain <brain@bottegasabauda.example>" to={`${state.me.name} (${state.me.role_label})`} subject={mail.subject} date={`${mail.date} 08:00`} />
       <div className="mt-3 flex items-center gap-2">
-        <button className="btn btn-sm" onClick={listen}><Volume2 size={14} /> Ascolta</button>
+        {isToday && <button className="btn btn-sm" onClick={listen}><Volume2 size={14} /> Ascolta</button>}
         {audio && <audio src={audio} controls autoPlay className="h-8" />}
       </div>
-      <p className="mt-4">{state.brief.text}</p>
+      <p className="mt-4">{mail.text}</p>
       <ol className="mt-2 list-decimal space-y-3 pl-5">
-        {state.brief.items.map((it, i) => <li key={i}><RichText text={it.text} /><Cites ids={it.sources} /></li>)}
+        {mail.items.map((it, i) => <li key={i}><RichText text={it.text} /><Cites ids={it.sources} /></li>)}
       </ol>
       <p className="mt-5">Per decidere apri <button className="font-medium text-brand underline" onClick={() => goto("today")}>Oggi</button>. Non eseguo nulla senza la tua approvazione.</p>
     </>
@@ -61,7 +62,7 @@ function Header({ from, to, subject, date, extra }: { from: string; to: string; 
 export function MailView() {
   const { state } = useApp();
   const [folder, setFolder] = useState<Folder>("inbox");
-  const [sel, setSel] = useState<Sel>({ kind: "brief" });
+  const [sel, setSel] = useState<Sel>({ kind: "brief", date: "" });
   const me = state.me;
   const emails = state.sources.filter((s) => !s.locked && s.type === "email").sort((a, b) => key(b.date).localeCompare(key(a.date)));
   const lists: Record<Folder, SourceView[]> = {
@@ -70,7 +71,7 @@ export function MailView() {
     team: emails.filter((s) => s.to !== me.id && s.sender !== me.id),
   };
   const folders: [Folder, string, number][] = [
-    ["inbox", "In arrivo", lists.inbox.length + 1], ["sent", "Inviate", lists.sent.length + state.outbox.length], ["team", "Del reparto", lists.team.length],
+    ["inbox", "In arrivo", lists.inbox.length + state.mails.length], ["sent", "Inviate", lists.sent.length + state.outbox.length], ["team", "Del reparto", lists.team.length],
   ];
   const current = sel.kind === "source" ? state.sources.find((s) => s.id === sel.id) : undefined;
   const sentByBrain = sel.kind === "outbox" ? state.outbox.find((o) => o.action_id === sel.id) : undefined;
@@ -93,7 +94,8 @@ export function MailView() {
         ))}
       </nav>
       <div className="w-80 shrink-0 overflow-y-auto border-r border-stone-200 bg-white">
-        {folder === "inbox" && row(sel.kind === "brief", () => setSel({ kind: "brief" }), "Il tuo brief del 21 novembre", "Brain", "08:00", <Tag tone="blue">dal Brain</Tag>)}
+        {folder === "inbox" && state.mails.map((m, i) => row(sel.kind === "brief" && (sel.date || state.mails[0]?.date) === m.date, () => setSel({ kind: "brief", date: m.date }),
+          m.subject, "Brain", `${m.date} 08:00`, <Tag tone={i === 0 ? "blue" : "gray"}>{i === 0 ? "brief di oggi" : "brief"}</Tag>))}
         {folder === "sent" && state.outbox.map((o) => row(sel.kind === "outbox" && sel.id === o.action_id, () => setSel({ kind: "outbox", id: o.action_id }),
           o.title, `Approvata da ${o.approved_by}`, o.sent_at.split(" ")[1] ?? o.sent_at, <DeliveryTag o={o} />))}
         {lists[folder].map((s) => row(sel.kind === "source" && sel.id === s.id, () => setSel({ kind: "source", id: s.id }),
@@ -102,7 +104,10 @@ export function MailView() {
         {!lists[folder].length && folder === "team" && <p className="muted p-4">Nessuna email.</p>}
       </div>
       <article className="min-w-0 flex-1 overflow-y-auto bg-white p-6">
-        {sel.kind === "brief" && <BriefMail />}
+        {sel.kind === "brief" && (() => {
+          const mail = state.mails.find((m) => m.date === sel.date) ?? state.mails[0];
+          return mail ? <BriefMail key={mail.date} mail={mail} /> : null;
+        })()}
         {current && !current.locked && (
           <>
             <Header from={current.sender_label ?? ""} to={current.to_label ?? ""} subject={current.title ?? ""} date={current.date ?? ""}

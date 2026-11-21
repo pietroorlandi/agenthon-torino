@@ -1,7 +1,8 @@
-import { Volume2 } from "lucide-react";
+import { Check, ListChecks, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { api, fetchBriefAudio } from "../api";
-import { Cites, RichText, Section, Tag, useApp, useToast } from "../ui";
+import type { Task } from "../types";
+import { Cites, RichText, Section, Tag, useAct, useApp, useToast } from "../ui";
 import { ActionCard } from "./Actions";
 import { GapCard, ProposalCard, QuarantineCard } from "./Memory";
 
@@ -29,6 +30,59 @@ function ListenButton() {
   );
 }
 
+const KIND_LABEL: Record<Task["kind"], string> = {
+  gap: "Domanda di un collega", approve: "Da approvare", verify: "Da verificare", review: "Da confermare", ship: "Da spedire", task: "Task",
+};
+
+function dueTag(days?: number | null) {
+  if (days === null || days === undefined) return null;
+  if (days < 0) return <Tag tone="red">scaduto</Tag>;
+  if (days === 0) return <Tag tone="red">scade oggi</Tag>;
+  if (days === 1) return <Tag tone="amber">scade domani</Tag>;
+  return <span className="muted text-xs">entro {days} giorni</span>;
+}
+
+// Everything this person has to do today, in one checklist (derived server side from gaps, actions, orders, tasks)
+function TasksSection() {
+  const { state, goto } = useApp();
+  const { run, busy } = useAct();
+  const { open, done } = state.tasks;
+  return (
+    <Section title="I tuoi compiti di oggi" count={open.length} hint={state.day > 0 ? "Aggiornati con quello che è successo ieri e stanotte." : undefined}>
+      {open.length ? (
+        <ul className="card divide-y divide-stone-100 py-1">
+          {open.map((t) => (
+            <li key={t.id} className="flex items-start gap-3 py-2.5">
+              {t.kind === "task" ? (
+                <button className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border border-stone-300 hover:border-savoia hover:bg-savoia-soft"
+                  disabled={busy} title="Segna come fatto" aria-label={`Segna come fatto: ${t.title}`}
+                  onClick={() => run(() => api.taskDone(t.id), "Fatto: lo ritroverai nel brief di domani")} />
+              ) : <ListChecks size={18} className="mt-0.5 shrink-0 text-savoia" />}
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="font-medium">{t.title}</span>
+                  {t.is_new && <Tag tone="blue">nuovo</Tag>}
+                  {dueTag(t.days_left)}
+                </div>
+                <div className="muted text-xs">{KIND_LABEL[t.kind]}{t.detail ? ` · ${t.detail}` : ""}</div>
+              </div>
+              {t.tab === "knowledge" && <button className="btn btn-sm shrink-0" onClick={() => goto("knowledge")}>Apri</button>}
+            </li>
+          ))}
+        </ul>
+      ) : <p className="muted">Niente in sospeso per oggi.</p>}
+      {done.length > 0 && (
+        <details className="mt-1">
+          <summary className="muted cursor-pointer text-xs">Fatto oggi ({done.length})</summary>
+          <ul className="mt-1 space-y-1 pl-1">
+            {done.map((d, i) => <li key={i} className="flex items-center gap-2 text-stone-500"><Check size={14} className="text-emerald-600" /><span className="line-through decoration-stone-300">{d.text}</span></li>)}
+          </ul>
+        </details>
+      )}
+    </Section>
+  );
+}
+
 export function TodayView() {
   const { state } = useApp();
   const quarantine = state.quarantine.filter((q) => q.can_decide);
@@ -48,6 +102,8 @@ export function TodayView() {
         </div>
         <ListenButton />
       </div>
+
+      <TasksSection />
 
       {news.length > 0 && (
         <Section title="Cosa devi sapere">

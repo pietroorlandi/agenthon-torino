@@ -22,7 +22,8 @@ from .services import gaps as gap_svc  # noqa: E402
 from .services import orders  # noqa: E402
 from .services.actions import Forbidden  # noqa: E402
 from .services.brief import brief_plaintext  # noqa: E402
-from .services.clock import next_moment  # noqa: E402
+from .services.clock import new_day, next_moment  # noqa: E402
+from .services import tasks as task_svc  # noqa: E402
 from .services.curation import decide_memory, decide_quarantine  # noqa: E402
 from .services.probe import probe as qa_probe  # noqa: E402
 from .services.qa import ask as qa_ask  # noqa: E402
@@ -101,6 +102,20 @@ def clock_next(user: User = Depends(current_user)):
         if res is None:
             raise HTTPException(409, "La timeline della demo è finita: usa Reset")
         return res
+
+
+@app.post("/api/clock/day")
+def clock_day(user: User = Depends(current_user)):
+    """Demo: the night passes and everyone gets a new morning brief."""
+    with brain.lock:
+        return new_day(brain)
+
+
+@app.post("/api/tasks/{tid}/done")
+def task_done(tid: str, user: User = Depends(current_user)):
+    with brain.lock, op_span("task.done"):
+        guard(lambda: task_svc.complete_task(brain, user, tid))
+        return _ok(user)
 
 
 class InjectIn(BaseModel):

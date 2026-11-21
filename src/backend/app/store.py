@@ -66,13 +66,30 @@ class Brain:
             self._seq = itertools.count(1)
             self._audit_seq = itertools.count(1)
             self.users: dict[str, User] = {u.id: u for u in self.company.users}
+            # simulated days: the morning brief changes every day (▶ Nuovo giorno)
+            self.day = 0
+            self.prev_date: Optional[str] = None
+            self.tasks_done: dict[str, str] = {}          # seed task id → date it was closed
+            self.prev_open: dict[str, set[str]] = {}      # user id → task ids open at the end of yesterday ("nuovo" badge)
+            self.overnight: dict[str, list[str]] = {}     # role → what happened during the night
+            self.mails: dict[str, list[dict]] = {u.id: [] for u in self.company.users}  # morning brief emails, one per day
             self._seed_conflicts()
-            from .services.brief import build_brief  # local import: avoids a cycle
-
-            for u in self.company.users:
-                b = build_brief(self, u)
-                self.push(u.id, kind="brief", text=b["text"], items=b["items"], time="08:00")
+            self.send_morning_briefs()
             self.log("system", "demo.reset", "Demo riportata allo stato iniziale (21/11 08:10)")
+
+    @property
+    def date(self) -> str:
+        return self.now.split(" ")[0]
+
+    def send_morning_briefs(self) -> None:
+        """Snapshot of today's brief per person: in the chat (DM) and as the morning email in Posta."""
+        from .services.brief import build_brief, email_subject  # local import: avoids a cycle
+
+        for u in self.company.users:
+            b = build_brief(self, u)
+            self.push(u.id, kind="brief", text=b["text"], items=b["items"], time="08:00")
+            self.mails[u.id].append({"date": self.date, "subject": email_subject(self.date), "text": b["text"],
+                                     "items": [i.model_dump() for i in b["items"]]})
 
     def _seed_conflicts(self) -> None:
         """Seed claims (pre-annotated extraction) that contradict approved memory go to quarantine, never to memory."""
