@@ -22,6 +22,7 @@ export interface MemoryView {
   id: string; status: "pending" | "approved" | "rejected" | "superseded"; locked?: boolean; access_label: string; source_ids: string[];
   text?: string; question?: string | null; proposed_by?: string; approved_by?: string | null; rejected_by?: string | null;
   can_curate?: boolean; attributed_to?: string | null; source_quote?: string | null; type?: string; created_at?: string | null;
+  dept?: Role | null; topic?: string; scope?: "mine" | "company" | "shared" | "review";
 }
 
 export interface QuarantineView {
@@ -48,7 +49,7 @@ export interface AuditEntry { id: number; real_ts: string; sim_ts: string; actor
 export interface OutboxItem { action_id: string; title: string; body: string; approved_by: string; sent_at: string; delivery?: "simulated" | "sending" | "sent" | "failed"; delivery_error?: string | null }
 
 export interface State {
-  now: string; me: User; users: User[]; roles: Record<Role, string>;
+  now: string; me: User; users: User[]; roles: Record<Role, string>; knowledge_topics: { id: string; label: string }[];
   channels: { id: string; locked: boolean }[];
   dm: Message[]; unread: number;
   brief: { text: string; time: string; items: BriefItem[] };

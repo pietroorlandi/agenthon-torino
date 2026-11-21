@@ -84,10 +84,10 @@ export function MailView() {
   );
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-57px)] max-w-6xl">
+    <div className="mx-auto flex h-[calc(100vh-64px)] max-w-6xl">
       <nav className="w-40 shrink-0 border-r border-stone-200 p-2">
         {folders.map(([f, label, n]) => (
-          <button key={f} onClick={() => setFolder(f)} className={`flex w-full justify-between rounded px-2 py-1.5 ${folder === f ? "bg-stone-200 font-medium" : "hover:bg-stone-100"}`}>
+          <button key={f} onClick={() => setFolder(f)} className={`flex w-full justify-between rounded px-2 py-1.5 ${folder === f ? "bg-hazel-soft font-medium text-cocoa" : "hover:bg-stone-100"}`}>
             {label}<span className="text-stone-400">{n}</span>
           </button>
         ))}

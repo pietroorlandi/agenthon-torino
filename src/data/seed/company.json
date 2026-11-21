@@ -160,6 +160,78 @@
       ]
     }
   ],
+  "knowledge_topics": [
+    {
+      "id": "promozioni",
+      "label": "Promozioni e prezzi",
+      "keywords": [
+        "promo",
+        "sconto",
+        "sconti",
+        "codice",
+        "black friday",
+        "2x1",
+        "offerta",
+        "coupon",
+        "listino",
+        "prezz"
+      ]
+    },
+    {
+      "id": "policy",
+      "label": "Policy e regole",
+      "keywords": [
+        "massimo",
+        "rimbors",
+        "reso",
+        "resi",
+        "non si",
+        "vietat",
+        "obbligator",
+        "regola",
+        "policy",
+        "condizion",
+        "minimo",
+        "penale"
+      ]
+    },
+    {
+      "id": "procedure",
+      "label": "Best practice e procedure",
+      "keywords": [
+        "fifo",
+        "procedura",
+        "si consiglia",
+        "consigli",
+        "prima di",
+        "scaffale",
+        "gestione",
+        "controll",
+        "checklist"
+      ]
+    },
+    {
+      "id": "avvisi",
+      "label": "Avvisi e novità",
+      "keywords": [
+        "dal 1",
+        "slitt",
+        "ritard",
+        "nuovo",
+        "nuova",
+        "lotto",
+        "richiamo",
+        "da oggi",
+        "cambia",
+        "passano a"
+      ]
+    },
+    {
+      "id": "base",
+      "label": "Nozioni di base",
+      "keywords": []
+    }
+  ],
   "contacts": [
     {
       "domain": "laboratorio-santanna.example",
