@@ -1,4 +1,4 @@
-import type { Message, NextResult, State, StepResult } from "./types";
+import type { Message, NextResult, ProbeResult, State, StepResult } from "./types";
 
 // Demo identity: the user switcher sets X-User; the server applies every filter.
 let currentUser = (() => {
@@ -30,6 +30,7 @@ export const api = {
   reset: () => req<State>("POST", "/api/reset"),
   next: () => req<NextResult>("POST", "/api/clock/next"),
   ask: (question: string) => req<Message>("POST", "/api/ask", { question }),
+  probe: (question: string) => req<ProbeResult>("POST", "/api/probe", { question }),
   read: () => req("POST", "/api/dm/read"),
   memory: (id: string, decision: "approve" | "reject") => req<State>("POST", `/api/memory/${id}/${decision}`),
   quarantine: (id: string, decision: "ban" | "accept" | "release" | "confirm-bad") => req<State>("POST", `/api/quarantine/${id}/${decision}`),

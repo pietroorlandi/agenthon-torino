@@ -23,6 +23,7 @@ from .services.actions import Forbidden  # noqa: E402
 from .services.brief import brief_plaintext  # noqa: E402
 from .services.clock import next_moment  # noqa: E402
 from .services.curation import decide_memory, decide_quarantine  # noqa: E402
+from .services.probe import probe as qa_probe  # noqa: E402
 from .services.qa import ask as qa_ask  # noqa: E402
 from .services.tts import synthesize  # noqa: E402
 from .store import brain, can_see  # noqa: E402
@@ -150,6 +151,16 @@ def ask(body: AskIn, user: User = Depends(current_user)):
         brain.log(f"user:{user.id}", "qa.answer", f"{user.name} ha chiesto «{q[:80]}» → {res['kind']} ({res.get('engine')})",
                   access=[user.role], refs=msg.memory_ids)
         return msg.model_dump()
+
+
+@app.post("/api/probe")
+def probe(body: AskIn, user: User = Depends(current_user)):
+    """Dev "Brain" view: what the Brain would answer to this user, with no side effects."""
+    q = body.question.strip()[:500]
+    if not q:
+        raise HTTPException(400, "Domanda vuota")
+    with op_span("qa.probe", **{"brain.role": user.role}):
+        return qa_probe(brain, user, q)
 
 
 @app.post("/api/dm/read")

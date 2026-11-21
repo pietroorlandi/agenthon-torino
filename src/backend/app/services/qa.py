@@ -68,7 +68,7 @@ def ask(brain, user: User, question: str) -> dict:
 
 def _answer(cited: list[MemoryItem], text: str, engine: str) -> dict:
     sources = list(dict.fromkeys(s for m in cited for s in m.source_ids))
-    return {"kind": "answer", "text": text, "sources": sources, "memory_ids": [m.id for m in cited], "engine": engine}
+    return {"kind": "answer", "path": "answer", "text": text, "sources": sources, "memory_ids": [m.id for m in cited], "engine": engine}
 
 
 def _miss(brain, user: User, question: str, visible: list[MemoryItem], use_llm: bool) -> dict:
@@ -101,11 +101,11 @@ def _miss(brain, user: User, question: str, visible: list[MemoryItem], use_llm: 
     text = "**Non lo so.** Non c'è nulla nella memoria approvata che risponda a questa domanda, e non voglio inventare."
     if miss.pending_memory_id in p_ids:
         text += "\nC'è un elemento **in attesa di revisione** che potrebbe essere rilevante: lo userò solo dopo che qualcuno lo avrà approvato in *Oggi*."
-        return {"kind": "unknown", "text": text, "engine": engine}
+        return {"kind": "unknown", "path": "pending", "text": text, "engine": engine}
     topic = next((t for t in brain.company.topic_owners if t.role == miss.topic_owner), None)
     if not topic:
-        return {"kind": "unknown", "text": text + "\nÈ fuori dal perimetro di Bottega Sabauda: non c'è nessuno a cui chiederlo internamente.", "engine": engine}
-    return gaps.open_gap(brain, user, question, topic, text, engine)
+        return {"kind": "unknown", "path": "out_of_scope", "text": text + "\nÈ fuori dal perimetro di Bottega Sabauda: non c'è nessuno a cui chiederlo internamente.", "engine": engine}
+    return {**gaps.open_gap(brain, user, question, topic, text, engine), "path": "gap"}
 
 
 def brain_llm_miss(prompt: str):
@@ -116,7 +116,7 @@ def _denied(brain, user: User, m: MemoryItem, engine: str) -> dict:
     owners = brain.roles_label(m.access)
     contact = next((u for r in m.access for u in brain.users_with_role(r)), None)
     hint = f" Puoi chiedere a {contact.name}." if contact else ""
-    return {"kind": "denied", "engine": engine,
+    return {"kind": "denied", "path": "restricted", "engine": engine,
             "text": f"L'informazione esiste, ma è riservata al team **{owners}**: non posso condividerla con il ruolo {user.role_label}.{hint}"}
 
 
