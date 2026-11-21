@@ -1,5 +1,7 @@
 # Architettura — Company Brain per Mole Cacao
 
+> ⚠️ **Scenario aggiornato (21/11):** l'azienda della demo è **Bottega Sabauda**, negozio online di gianduiotti con 4 comparti (magazzino, servizio clienti, shop, spedizioni). Scenario e persone del §3 ("Mole Cacao", finance/tech/ops) sono superati da [scenario.md](scenario.md); il resto dell'architettura resta valido. Vedi [decisions.md](decisions.md).
+>
 > Documento di lavoro del team. Le parti segnate **[DA DECIDERE]** sono aperte: discutiamole prima di scrivere codice.
 > I diagrammi sono in Mermaid (si vedono su GitHub o con un'estensione Mermaid in VS Code).
 

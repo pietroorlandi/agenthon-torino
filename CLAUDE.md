@@ -17,6 +17,15 @@ Workflow autonomi, gestione richieste in entrata, analisi documenti, integrazion
 **Tema ufficiale: "Build an AI your team would trust"** — lavora in background, chiede prima di agire, ammette ciò che non sa, mai azioni senza approvazione umana. Verrà attaccata live da giuria e team rivali (robustezza > effetti speciali). Dettagli in docs/brief.md.
 (L'altra track, Generative AI per il marketing / Demetra, non è la nostra.) La sfida dettagliata esce all'apertura.
 
+## Scenario demo (contesto aziendale del dataset)
+Il dataset sintetico della demo (`src/web/data.js`) simula **Bottega Sabauda**, negozio online torinese **specializzato nella vendita di gianduiotti**.
+- **4 comparti** = i 4 ruoli dell'app: **magazzino**, **servizio clienti**, **shop** (include amministrazione/fornitori) e **spedizioni** (verso utenti finali e negozi).
+- Il dataset contiene ordini (privati e negozi), email a/da fornitori, corrieri e clienti, chat tra colleghi su promozioni attive e problemi, documenti, task, memoria e azioni.
+- Dettagli, storie pre-piantate e permessi: [docs/scenario.md](docs/scenario.md). **Se cambi i dati o il contesto, aggiorna quel file.**
+- **Regola di prodotto — le fonti non sono verità**: il Brain confronta le nuove informazioni con la memoria approvata; se contraddicono (es. «sconto massimo 30%» vs 20% approvato) vanno in **quarantena** e le decide chi ha l'autorità (scarta e dimentica / accetta e aggiorna). Non vanno mai usate per rispondere prima. Meccanismo: `claim` sulle fonti, `fact` + `authority` sulla memoria in `data.js`; `detectConflicts()` in `app.js`.
+- **Regola di prodotto — i buchi di conoscenza si colmano**: se il Brain non sa rispondere a una domanda aziendale, non inventa. Apre una richiesta al reparto competente (`TOPIC_OWNERS` in `data.js`), che scrive il fatto e la domanda a cui risponde. Il fatto entra in memoria approvato e chi aveva chiesto viene avvisato. Le domande fuori perimetro ricevono solo «non lo so». Codice: `routeQuestion()`, `openGap()`, `saveGap()` in `app.js`.
+- Data "di oggi" nella demo: 21/11 ~08:10 (Black Friday il 27/11).
+
 ## Vincoli tecnici da ricordare
 - Crediti Google Cloud $30/persona, validi 12 ore dal claim (sabato mattina).
 - **Gemini solo via Vertex AI** (non AI Studio: i crediti non si applicano). Modelli GA: `gemini-3.8-flash`, `gemini-3.5-flash`, `gemini-3.1-flash-lite`.
@@ -32,7 +41,7 @@ Innovazione · Coerenza con il brief · Fattibilità · Esecuzione · Pitch fina
 ## Stato attuale
 - [x] Track scelta: Agentic AI per le aziende
 - [x] Brief ufficiale incollato in docs/brief.md (Challenge A Company Brain / B Back Office Autopilot)
-- [x] Challenge scelta: **A · Company Brain** — dominio: cioccolateria torinese fittizia (Mole Cacao). Architettura: [docs/architecture.md](docs/architecture.md)
+- [x] Challenge scelta: **A · Company Brain** — dominio: **Bottega Sabauda**, negozio online torinese di gianduiotti con 4 comparti (scenario e ruoli in [docs/scenario.md](docs/scenario.md)). Architettura: [docs/architecture.md](docs/architecture.md) (lo scenario "Mole Cacao" e le persone finance/tech/ops del suo §3 sono superati da scenario.md)
 - [x] Stack deciso: vedi sezione Stack e docs/architecture.md §13
 - [ ] Ruoli assegnati
 
@@ -49,7 +58,8 @@ Comandi di install/run/test: _da scrivere qui dopo lo scaffold._
 
 ## Struttura repo
 - `src/` — codice del progetto
-- `docs/` — brief, criteri, decisioni, script del pitch
+- `src/web/` — UI demo statica (`index.html`, `app.js`, `styles.css`) e dataset sintetico (`data.js`); si apre direttamente nel browser
+- `docs/` — brief, criteri, scenario demo, decisioni, script del pitch
 - `docs/decisions.md` — log delle decisioni (data, cosa, perché)
 - `.env.example` — variabili richieste; i segreti reali vanno in `.env` (mai committato)
 
