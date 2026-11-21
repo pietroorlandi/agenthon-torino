@@ -80,7 +80,7 @@ class LLM:
             path = self._cache_path(key)
             if path.exists():
                 try:
-                    data = schema.model_validate(json.loads(path.read_text()))
+                    data = schema.model_validate(json.loads(path.read_text(encoding="utf-8")))
                     metrics.record(component, model, 0, 0, 0, cache_hit=True)
                     span.set_attribute("brain.cache_hit", True)
                     return LLMResult(data, "cache")
@@ -133,7 +133,7 @@ class LLM:
             if settings.log_prompts:
                 span.set_attribute("output.value", json.dumps(out, ensure_ascii=False))
                 log.info("llm call", extra={"extra": {"component": component, "prompt": prompt, "response": out}})
-            path.write_text(json.dumps(out, ensure_ascii=False, indent=1))
+            path.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
             return LLMResult(parsed, "gemini")
 
 

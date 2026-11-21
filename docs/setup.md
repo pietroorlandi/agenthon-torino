@@ -21,20 +21,25 @@ Ogni livello funziona da solo: se Vertex o ElevenLabs non rispondono, la demo co
   ```
 - Docker: opzionale (solo per provare l'immagine in locale con `make docker`).
 
-### Windows: usa WSL
-Makefile e script sono bash, quindi su Windows si lavora **dentro WSL (Ubuntu)**. Una volta sola:
-1. PowerShell **come amministratore**: `wsl --install -d Ubuntu-24.04`, poi riavvia il PC. Al primo avvio Ubuntu chiede utente e password Linux.
-2. Da qui in poi **tutti i comandi vanno nel terminale Ubuntu**, non in PowerShell:
-   ```bash
-   sudo apt update && sudo apt install -y make git python3-venv python3-pip curl
-   curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt install -y nodejs
-   curl -sSL https://sdk.cloud.google.com | bash && exec -l $SHELL      # gcloud (solo per Gemini)
-   cd ~ && git clone https://github.com/pietroorlandi/agenthon-torino.git && cd agenthon-torino
-   ```
-   Clona il repo **nella home di Ubuntu (`~`)**, non in `/mnt/c/...`: lì npm e il reload sono lentissimi.
-3. VS Code: installa l'estensione **WSL**, poi `code .` dal terminale Ubuntu.
-4. `http://localhost:5173` si apre normalmente dal browser di Windows.
-5. Login `gcloud`: se il browser non si apre da solo, copia il link stampato nel terminale e incollalo nel browser di Windows.
+### Windows (senza WSL)
+Il Makefile è bash: su Windows lo sostituisce **`scripts\win.ps1`**, che fa le stesse cose. Installa una volta:
+1. **Python 3.12** da python.org (spunta *Add python.exe to PATH*).
+2. **Node.js 22 LTS** da nodejs.org.
+3. **Git** da git-scm.com.
+4. **Google Cloud CLI** (solo per Gemini): installer da https://cloud.google.com/sdk/docs/install. Poi **riapri PowerShell**.
+
+Poi, in PowerShell dalla cartella del repo:
+
+| Linux/macOS | Windows (PowerShell) |
+|---|---|
+| `make setup` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 setup` |
+| `make dev` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 dev` (il backend si apre in una seconda finestra) |
+| `make check` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 check` |
+| `make test` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 test` |
+| `make demo` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 demo` |
+| `bash scripts/gcp-join.sh <id>` | `powershell -ExecutionPolicy Bypass -File scripts\win.ps1 join <id>` |
+
+`gcp-setup.sh`, `gcp-add-member.sh` e il deploy restano su Linux: li lancia l'owner del progetto. In alternativa a tutto questo funziona anche WSL (Ubuntu) con i comandi Linux.
 
 ## 2. Livello A — avvio offline (2 minuti)
 
