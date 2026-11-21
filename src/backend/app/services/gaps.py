@@ -6,11 +6,17 @@ import re
 
 from ..models import Gap, MemoryItem, Source, TopicOwner, User
 from ..store import can_see, norm
+from . import orders
 
 
-def route_question(brain, q: str):
+def route_question(brain, q: str, asker_role: str | None = None):
+    """Department that knows the answer. Nobody asks their own department: if another department is also
+    relevant, it wins (e.g. Spedizioni asking «il pacco #10487 è pronto?» → Magazzino, who prepares it)."""
     scored = [(t, sum(1 for k in t.keywords if norm(k) in q)) for t in brain.company.topic_owners]
     scored = [x for x in scored if x[1] > 0]
+    if asker_role:
+        others = [x for x in scored if x[0].role != asker_role]
+        scored = others or scored
     return max(scored, key=lambda x: x[1])[0] if scored else None
 
 
@@ -46,9 +52,13 @@ def answer_gap(brain, user: User, gap: Gap, fact: str, question: str, access: li
                  date=brain.now, access=access, body=fact, observed_at=brain.now, trust="internal")
     brain.sources[src.id] = src
     n = len([m for m in brain.memory if m.id.startswith("K")]) + 1
+    asker = brain.user(gap.asked_by)
+    # a fact about one order is operational: it lives in Spedizioni → 'Stato degli ordini' until the order is fulfilled
+    order_id = orders.find_order_id(brain, question, fact, gap.question)
     mem = MemoryItem(id=f"K{n}", text=fact, question=question, source_ids=[src.id], access=access, status="approved",
                      proposed_by=user.name, approved_by=user.name, keywords=derive_keywords(question), min_score=2, created_at=brain.now,
-                     dept=gap.owner)
+                     dept=orders.SHIP_ROLE if order_id else gap.owner, topic="ordini" if order_id else None, order_id=order_id,
+                     involves=list(dict.fromkeys([user.role] + ([asker.role] if asker else []))))
     brain.memory.append(mem)
     gap.status, gap.answer, gap.decided_by = "answered", fact, user.name
     brain.log(f"user:{user.id}", "gap.answered", f"{user.name} ha documentato «{question}» ({mem.id})", access=access, refs=[gap.id, mem.id])

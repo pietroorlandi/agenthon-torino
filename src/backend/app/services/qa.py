@@ -25,9 +25,10 @@ Regole:
 MISS_SYSTEM = """Classifichi una domanda a cui la memoria visibile all'utente NON risponde. Restituisci solo id ed etichette, mai testo.
 - restricted_memory_id: id di un elemento in <riservati> che risponde alla domanda, altrimenti null.
 - pending_memory_id: id di un elemento in <in_revisione> che risponde alla domanda, altrimenti null.
-- topic_owner: il reparto di Bottega Sabauda competente sul tema (vedi <reparti>), oppure "none" se la domanda non riguarda l'azienda (concorrenti, cultura generale, richieste estranee)."""
+- topic_owner: il reparto di Bottega Sabauda che CONOSCE la risposta (vedi <reparti>), mai quello di chi chiede se un altro reparto è pertinente. Lo stato di un ordine o di un pacco da preparare (pronto, preparato, imballato, picking) lo sa il magazzino; corrieri, ritiri e consegne già partite le spedizioni. "none" solo se la domanda non riguarda l'azienda (concorrenti, cultura generale, richieste estranee)."""
 
 NUM = re.compile(r"\d+(?:[.,]\d+)?")
+PENDING_MIN_HITS = 2
 
 
 def _item_json(m: MemoryItem) -> str:
@@ -82,19 +83,24 @@ def _miss(brain, user: User, question: str, visible: list[MemoryItem], use_llm: 
                   + f"\n</in_revisione>\n<domanda>{question}</domanda>")
         r = brain_llm_miss(prompt)
         miss, engine = r.data, r.engine
+    q = norm(question)
     if miss is None:  # deterministic routing
-        q = norm(question)
         r_hit = _best(restricted, q)
-        p_hit = _best(pending, q)
-        topic = gaps.route_question(brain, q)
+        p_hit = _best(pending, q, min_hits=PENDING_MIN_HITS)
+        topic = gaps.route_question(brain, q, user.role)
         miss = QAMiss(restricted_memory_id=r_hit.id if r_hit else None, pending_memory_id=p_hit.id if p_hit else None,
                       topic_owner=topic.role if topic else "none")
+    elif miss.topic_owner == user.role:
+        # nobody asks their own department, if another one is relevant
+        if (t := gaps.route_question(brain, q, user.role)) and t.role != user.role:
+            miss.topic_owner = t.role
     r_ids, p_ids = {m.id: m for m in restricted}, {m.id for m in pending}
     # deterministic safety net: the LLM classifier sometimes misses a restricted or pending match and would open a
     # useless gap. It only yields "denied" / "pending review" (no content), so it can never leak.
-    if miss.restricted_memory_id not in r_ids and (hit := _best(restricted, norm(question))):
+    # Pending needs 2+ keyword hits: one shared generic word («spedizione») is not "this item answers the question".
+    if miss.restricted_memory_id not in r_ids and (hit := _best(restricted, q)):
         miss.restricted_memory_id = hit.id
-    if miss.pending_memory_id not in p_ids and (hit := _best(pending, norm(question))):
+    if miss.pending_memory_id not in p_ids and (hit := _best(pending, q, min_hits=PENDING_MIN_HITS)):
         miss.pending_memory_id = hit.id
     if miss.restricted_memory_id in r_ids:
         return _denied(brain, user, r_ids[miss.restricted_memory_id], engine)
@@ -125,9 +131,9 @@ def _score(m: MemoryItem, q: str) -> int:
     return sum(1 for k in m.keywords if norm(k) in q)
 
 
-def _best(items: list[MemoryItem], q: str):
+def _best(items: list[MemoryItem], q: str, min_hits: int = 1):
     scored = [(m, _score(m, q)) for m in items]
-    scored = [x for x in scored if x[1] >= max(1, x[0].min_score)]
+    scored = [x for x in scored if x[1] >= max(min_hits, x[0].min_score)]
     return max(scored, key=lambda x: x[1])[0] if scored else None
 
 

@@ -23,6 +23,7 @@ export interface MemoryView {
   text?: string; question?: string | null; proposed_by?: string; approved_by?: string | null; rejected_by?: string | null;
   can_curate?: boolean; attributed_to?: string | null; source_quote?: string | null; type?: string; created_at?: string | null;
   dept?: Role | null; topic?: string; scope?: "mine" | "company" | "shared" | "review";
+  order_id?: string | null; order_status?: string | null; completed?: boolean; involves?: Role[];
 }
 
 export interface QuarantineView {

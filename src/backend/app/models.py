@@ -171,6 +171,8 @@ class MemoryItem(BaseModel):
     created_at: Optional[str] = None
     dept: Optional[str] = None   # owning department (role id); derived by services/taxonomy.py when missing
     topic: Optional[str] = None  # KnowledgeTopic id; derived when missing
+    order_id: Optional[str] = None  # operational fact about one order: archived once the order is fulfilled
+    involves: list[str] = []        # roles that asked/answered it: they always see it in 'Cosa sappiamo'
 
 
 class QuarantineItem(BaseModel):

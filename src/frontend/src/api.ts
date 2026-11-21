@@ -33,6 +33,7 @@ export const api = {
   probe: (question: string) => req<ProbeResult>("POST", "/api/probe", { question }),
   read: () => req("POST", "/api/dm/read"),
   memory: (id: string, decision: "approve" | "reject") => req<State>("POST", `/api/memory/${id}/${decision}`),
+  shipOrder: (orderId: string) => req<State>("POST", `/api/orders/${orderId.replace("#", "")}/ship`),
   quarantine: (id: string, decision: "ban" | "accept" | "release" | "confirm-bad") => req<State>("POST", `/api/quarantine/${id}/${decision}`),
   gapAnswer: (id: string, fact: string, question: string, access: string[]) => req<State>("POST", `/api/gaps/${id}/answer`, { fact, question, access }),
   gapDismiss: (id: string) => req<State>("POST", `/api/gaps/${id}/dismiss`),

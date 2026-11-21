@@ -156,6 +156,35 @@ def test_knowledge_respects_department_policy():
     assert shop["M12"]["scope"] == "review" and shop["M12"]["can_curate"]  # still reaches 'Oggi' to be verified
 
 
+def test_operational_question_goes_to_the_department_that_knows():
+    # Spedizioni asks about a package: Magazzino prepares it, so Magazzino is asked to document it
+    q = "Il pacco dell'ordine #10487 è pronto per la spedizione?"
+    a = ask(q, "davide")
+    assert a["kind"] == "gap" and brain.gaps[0].owner == "magazzino"
+    assert brain.dm["sara"][-1].gap_id == brain.gaps[0].id  # Sara gets the request
+    fact = "Ordine #10487 imballato e pronto alla spedizione, sullo scaffale uscite."
+    call("POST", f"/api/gaps/{brain.gaps[0].id}/answer", user="sara", json={"fact": fact, "question": q, "access": ["all"]})
+    assert fact in brain.dm["davide"][-1].text  # Davide notified
+    assert ask(q, "davide")["kind"] == "answer"
+
+
+def test_order_fact_is_visible_to_both_sides_and_archived_when_shipped():
+    q = "Il pacco dell'ordine #10489 è pronto?"
+    ask(q, "davide")
+    gid = brain.gaps[0].id
+    # Sara shares it only with Magazzino + Spedizioni (not with everyone): the asker must still see it
+    call("POST", f"/api/gaps/{gid}/answer", user="sara", json={"fact": "Sì, #10489 imballato.", "question": q, "access": ["magazzino", "spedizioni"]})
+    fact = lambda u: next(m for m in call("GET", "/api/state", user=u).json()["memory"] if m.get("order_id") == "#10489")
+    d = fact("davide")
+    assert (d["scope"], d["dept"], d["topic"], d["completed"]) == ("mine", "spedizioni", "ordini", False)
+    assert fact("sara")["scope"] == "shared"
+    assert call("POST", "/api/orders/10489/ship", user="sara").status_code == 403  # only Spedizioni ships
+    assert call("POST", "/api/orders/10489/ship", user="davide").status_code == 200
+    assert brain.order_by_id("#10489").status == "Spedito"
+    assert fact("davide")["completed"] is True  # → 'Visualizza storico'
+    assert call("POST", "/api/orders/10489/ship", user="davide").status_code == 403  # already closed
+
+
 def test_same_question_twice_opens_one_gap():
     q = "Qual è l'ordine minimo per le nocciole?"
     ask(q, "sara")

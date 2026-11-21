@@ -5,6 +5,7 @@ from __future__ import annotations
 from .config import settings
 from .models import User
 from .services.brief import build_brief
+from .services import orders
 from .services.taxonomy import classify
 from .store import can_see
 
@@ -39,7 +40,7 @@ def memory_scope(m, dept: str | None, role: str, can_curate: bool) -> str | None
         return "mine"
     if dept is None:
         return "company"
-    if "all" in m.access:
+    if "all" in m.access or role in m.involves:  # shared with everyone, or I asked / answered it
         return "shared"
     if m.status == "pending" and can_curate:
         return "review"
@@ -54,7 +55,9 @@ def state_for(brain, user: User) -> dict:
         dept, topic = classify(brain, m) if can_see(m.access, role) else (None, None)
         scope = memory_scope(m, dept, role, brain.can_curate(m, role))
         if scope:
+            order = brain.order_by_id(m.order_id) if m.order_id else None
             memory.append({**m.model_dump(), "dept": dept, "topic": topic, "scope": scope,
+                           "order_status": order.status if order else None, "completed": orders.order_done(brain, m.order_id),
                            "access_label": brain.roles_label(m.access), "can_curate": brain.can_curate(m, role)})
         else:
             memory.append({"id": m.id, "status": m.status, "locked": True, "access_label": brain.roles_label(m.access), "source_ids": []})

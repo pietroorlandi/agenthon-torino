@@ -19,6 +19,7 @@ from .models import Source, User  # noqa: E402
 from .pipeline.observe import observe  # noqa: E402
 from .services import actions as act_svc  # noqa: E402
 from .services import gaps as gap_svc  # noqa: E402
+from .services import orders  # noqa: E402
 from .services.actions import Forbidden  # noqa: E402
 from .services.brief import brief_plaintext  # noqa: E402
 from .services.clock import next_moment  # noqa: E402
@@ -175,6 +176,14 @@ def _mem(mid: str):
     if not m:
         raise HTTPException(404, "Elemento non trovato")
     return m
+
+
+@app.post("/api/orders/{num}/ship")
+def order_ship(num: str, user: User = Depends(current_user)):
+    """Spedizioni confirms an order left: store updated, its operational facts move to the history."""
+    with brain.lock, op_span("order.ship"):
+        guard(lambda: orders.mark_shipped(brain, user, f"#{num.lstrip('#')}"))
+        return _ok(user)
 
 
 @app.post("/api/memory/{mid}/{decision}")

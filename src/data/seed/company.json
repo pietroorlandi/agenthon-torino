@@ -112,7 +112,7 @@
     },
     {
       "role": "magazzino",
-      "label": "scorte, lotti, scaffali e imballaggi",
+      "label": "scorte, lotti, scaffali, imballaggi e preparazione degli ordini",
       "keywords": [
         "scort",
         "magazzin",
@@ -124,7 +124,11 @@
         "cartoni",
         "scaden",
         "conserv",
-        "stagionalit"
+        "stagionalit",
+        "prepar",
+        "pront",
+        "picking",
+        "evas"
       ]
     },
     {
@@ -161,6 +165,11 @@
     }
   ],
   "knowledge_topics": [
+    {
+      "id": "ordini",
+      "label": "Stato degli ordini",
+      "keywords": []
+    },
     {
       "id": "promozioni",
       "label": "Promozioni e prezzi",

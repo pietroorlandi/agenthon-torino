@@ -1,4 +1,4 @@
-import { Building2, Check, ChevronDown, ChevronRight, Headset, Package, Search, ShieldAlert, Store, Truck, X, type LucideIcon } from "lucide-react";
+import { Building2, Check, ChevronDown, ChevronRight, Headset, History, Package, PackageCheck, Search, ShieldAlert, Store, Truck, X, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { api } from "../api";
 import type { GapView, MemoryView as Mem, QuarantineView } from "../types";
@@ -82,11 +82,19 @@ export function GapCard({ g }: { g: GapView }) {
 }
 
 function FactRow({ m, from }: { m: Mem; from?: string }) {
+  const { state } = useApp();
+  const { run, busy } = useAct();
   const look = m.dept ? DEPT[m.dept] : undefined;
+  const canShip = !!m.order_id && !m.completed && state.me.role === "spedizioni";
   return (
     <li className="border-b border-stone-100 py-3 last:border-0">
-      {(from || m.status === "pending") && (
+      {(from || m.order_id || m.status === "pending") && (
         <div className="mb-1 flex flex-wrap gap-1.5">
+          {m.order_id && (
+            <span className={`inline-flex items-center gap-1 rounded px-1.5 py-px text-[11px] font-medium ${m.completed ? "bg-emerald-100 text-emerald-800" : "bg-savoia-soft text-savoia"}`}>
+              Ordine {m.order_id}{m.order_status && ` · ${m.order_status}`}
+            </span>
+          )}
           {from && <span className={`inline-block rounded px-1.5 py-px text-[11px] font-medium ${look?.tint ?? "bg-stone-200 text-stone-700"}`}>dal comparto {from}</span>}
           {m.status === "pending" && <span className="inline-block rounded bg-amber-100 px-1.5 py-px text-[11px] font-medium text-amber-800">Da verificare · non usata per rispondere</span>}
         </div>
@@ -99,6 +107,12 @@ function FactRow({ m, from }: { m: Mem; from?: string }) {
         {m.source_ids.length > 1 && ` · confermato da ${m.source_ids.length} fonti`}
       </div>
       <Cites ids={m.source_ids} />
+      {canShip && (
+        <button className="btn btn-sm mt-2" disabled={busy}
+          onClick={() => run(() => api.shipOrder(m.order_id!), `Ordine ${m.order_id} evaso: la nozione è passata nello storico`)}>
+          <PackageCheck size={14} /> Segna come evaso
+        </button>
+      )}
     </li>
   );
 }
@@ -130,18 +144,22 @@ export function KnowledgeView() {
   // one section open per level: opening one closes the sibling
   const [openDept, setOpenDept] = useState<string | null>(state.me.role);
   const [openTopic, setOpenTopic] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState<string | null>(null);
   const searching = q.trim().length > 0;
   const match = (m: Mem) => !searching || `${m.text} ${m.question ?? ""}`.toLowerCase().includes(q.trim().toLowerCase());
   // Department policy (enforced server side, see views.memory_scope): my comparto + what other comparti shared with everyone.
   // "review" items are other comparti's proposals I must verify: they live in 'Oggi', not here.
   const visible = state.memory.filter((m) => !m.locked && m.scope !== "review");
-  const current = visible.filter((m) => (m.status === "approved" || m.status === "pending") && match(m));
+  const live = visible.filter((m) => (m.status === "approved" || m.status === "pending") && match(m));
+  // facts about orders already fulfilled: only behind "Visualizza storico"
+  const current = live.filter((m) => !m.completed);
+  const history = live.filter((m) => m.completed);
   const past = visible.filter((m) => (m.status === "rejected" || m.status === "superseded") && match(m));
   const hidden = state.memory.filter((m) => (m.locked || m.scope === "review") && m.status === "approved").length;
 
   const depts = [state.me.role, GENERAL];
   const deptOf = (m: Mem) => (m.scope === "mine" ? state.me.role : GENERAL);
-  const deptLabel = (d: string) => (d === GENERAL ? "Condivise con tutta l'azienda" : state.roles[d as keyof typeof state.roles]);
+  const deptLabel = (d: string) => (d === GENERAL ? "Condivise con te" : state.roles[d as keyof typeof state.roles]);
   const originOf = (m: Mem) => (m.scope === "shared" && m.dept ? state.roles[m.dept] : undefined);
   const byStatus = (a: Mem, b: Mem) => (a.status === b.status ? 0 : a.status === "approved" ? -1 : 1);
 
@@ -158,7 +176,9 @@ export function KnowledgeView() {
       <div className="mt-5 space-y-2.5">
         {depts.map((d) => {
           const facts = current.filter((m) => deptOf(m) === d);
-          if (!facts.length) return null;
+          const done = history.filter((m) => deptOf(m) === d);
+          if (!facts.length && !done.length) return null;
+          const showHistory = searching || historyOpen === d;
           const look = DEPT[d] ?? DEPT[GENERAL];
           const Icon = look.icon;
           const open = searching || openDept === d;
@@ -169,7 +189,7 @@ export function KnowledgeView() {
                 <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${look.tint}`}><Icon size={18} /></span>
                 <span className="min-w-0">
                   <span className="block font-display text-[15px] font-semibold text-stone-900">{deptLabel(d)}</span>
-                  <span className="muted block text-xs">{d === GENERAL ? "Nozioni degli altri comparti, visibili a tutti" : "Il tuo comparto"}</span>
+                  <span className="muted block text-xs">{d === GENERAL ? "Nozioni di altri comparti condivise con tutti o con te" : "Il tuo comparto"}</span>
                 </span>
                 <Counts facts={facts} />
                 <ChevronDown size={18} className={`shrink-0 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`} />
@@ -193,6 +213,20 @@ export function KnowledgeView() {
                       </div>
                     );
                   })}
+                  {done.length > 0 && (
+                    <div className="pt-1">
+                      <button className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-savoia hover:bg-savoia-soft" aria-expanded={showHistory}
+                        onClick={() => setHistoryOpen(showHistory ? null : d)}>
+                        <History size={14} /> {showHistory ? "Nascondi storico" : `Visualizza storico (${done.length})`}
+                      </button>
+                      {showHistory && (
+                        <div className="mt-1.5 rounded-md border border-dashed border-stone-300 bg-white">
+                          <p className="muted border-b border-stone-100 px-4 py-1.5 text-xs">Ordini evasi: queste nozioni non servono più per il lavoro di oggi.</p>
+                          <ul className="px-4 py-0 opacity-80">{done.map((m) => <FactRow key={m.id} m={m} from={originOf(m)} />)}</ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </section>
