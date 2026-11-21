@@ -7,7 +7,7 @@ Portale ufficiale: https://agenthon-portal.gdgtorino.it/app#today (brief, progra
 - Usare l'account **Gmail personale** (i crediti restano all'account che li riscatta).
 - Il saldo si aggiorna dopo circa 1 ora.
 - **Usare Gemini via Vertex AI**, NON via Google AI Studio (lì i crediti non vengono usati).
-- Scegliere una regione diversa da Torino (`europe-west12`) e Doha (`me-central1`): sono escluse. Es. `europe-west4` o `europe-west1`.
+- Scegliere una regione diversa da Torino (`europe-west12`) e Doha (`me-central1`): sono escluse. Per Vertex (Gemini 3.x) usare l'endpoint `global`; Cloud Run su `europe-west4`.
 
 ### Coperto dai crediti
 - Vertex AI: Gemini, Veo, Nano Banana, Lyria, embeddings, Speech-to-Text, Text-to-Speech, Translation, Vision

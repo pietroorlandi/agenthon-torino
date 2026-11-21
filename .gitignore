@@ -24,3 +24,4 @@ build/
 
 # Python tooling
 .pytest_cache/
+.gcp-project

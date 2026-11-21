@@ -36,54 +36,55 @@ Con `GOOGLE_CLOUD_PROJECT` vuoto il backend va da solo in `LLM_MODE=off`. In alt
 
 > ⚠️ **Solo Vertex AI, mai AI Studio**: i crediti valgono solo su Vertex. Niente chiave `GOOGLE_API_KEY`: ci si autentica con il proprio account Google (ADC).
 
-### 3.1 Crediti
-1. Il sabato mattina, con il **Gmail personale**, riscatta i crediti su **g.dev/credits/devfest-alps-2026** ($30, durano **12 ore** dal claim).
-2. Il riscatto crea (o ti fa scegliere) un **billing account** con i crediti. Il saldo si aggiorna con circa 1 ora di ritardo.
+**Progetto del team:** `bottega-brain-1121-21996` (owner: Pietro, fatturazione «GDP Event Credit: DevFest Alps 2026», crediti fino al 22/11 ore 2:05). Endpoint Vertex: **`GOOGLE_CLOUD_LOCATION=global`**, perché su `europe-west4` i modelli Gemini 3.x rispondono `404 NOT_FOUND`.
 
-### 3.2 Progetto
-```bash
-gcloud auth login
-gcloud projects create bottega-brain-<suffisso> --name="Company Brain"     # o usa un progetto esistente
-gcloud config set project bottega-brain-<suffisso>
-gcloud billing accounts list                                                # trova l'ID del billing account con i crediti
-gcloud billing projects link bottega-brain-<suffisso> --billing-account=XXXXXX-XXXXXX-XXXXXX
-gcloud services enable aiplatform.googleapis.com run.googleapis.com cloudbuild.googleapis.com \
-  artifactregistry.googleapis.com cloudtrace.googleapis.com logging.googleapis.com
+### 3.1 Sei un collega: usa il progetto del team (2 minuti)
+1. Installa `gcloud` (§1) e manda a Pietro il Gmail con cui farai il login.
+2. Pietro ti dà l'accesso:
+   ```bash
+   bash scripts/gcp-add-member.sh <gmail-collega>
+   ```
+3. Tu lanci:
+   ```bash
+   bash scripts/gcp-join.sh bottega-brain-1121-21996
+   make check
+   ```
+   Lo script fa il login, imposta le credenziali locali (ADC) e scrive `GOOGLE_CLOUD_PROJECT` e `GOOGLE_CLOUD_LOCATION=global` nella `.env`.
+
+Le chiamate dei colleghi usano i crediti di Pietro. I tuoi $30 restano liberi: riscattali solo se servono, ad esempio quando i crediti di Pietro finiscono o per un secondo progetto di deploy. In quel caso segui il §3.2.
+
+### 3.2 Creare un progetto nuovo da zero (solo l'owner)
+1. **Crediti:** con il Gmail personale, iscriviti al **Google Developer Program** (developers.google.com/profile → *Join the program*). Poi riscatta su **g.dev/credits/devfest-alps-2026** ($30, durano **12 ore** dal claim). Il riscatto crea un billing account «GDP Event Credit», **senza carta**. Se una pagina ti chiede la carta, sei nel flusso sbagliato: la prova da $300 o *Aggiungi account di fatturazione* non sono i crediti dell'evento.
+2. Il billing account compare in console entro ~5 minuti. Verifica con `gcloud billing accounts list`.
+3. Lancia:
+   ```bash
+   bash scripts/gcp-setup.sh      # crea il progetto, collega la fatturazione, abilita le API, ADC, .env
+   make check
+   ```
+   Lo script si può rilanciare: se i crediti non ci sono ancora si ferma, e alla volta dopo riparte dallo stesso progetto (l'ID è salvato in `.gcp-project`, ignorato da git).
+
+### 3.3 Problemi frequenti
+| Errore | Soluzione |
+|---|---|
+| `bash: suffisso: No such file or directory` | Hai copiato un placeholder `<...>`: usa gli script, che non ne hanno |
+| `Listed 0 items` / `No billing account found` | Crediti non riscattati, o riscattati con un altro account, o manca *Join the program*. Aspetta 5 minuti e rilancia |
+| `cloud-platform scope is required but not consented` | Nel browser, al login, spunta **tutte** le caselle dei permessi (anche Google Cloud) e rilancia lo script |
+| `404 NOT_FOUND ... publishers/google/models/gemini-...` | `GOOGLE_CLOUD_LOCATION=global` nella `.env` |
+| `403 PERMISSION_DENIED` (collega) | L'owner non ha ancora lanciato `gcp-add-member.sh` con il tuo Gmail |
+
+Esempio di `make check` riuscito:
+```
+project=bottega-brain-1121-21996 location=global mode=live
+✓ gemini-3.8-flash: {"ok":true,"word":"meraviglia"} · 78 in / 11 out · 5028 ms
+✓ gemini-3.1-flash-lite: {"ok": true, "word": "melodia"} · 78 in / 12 out · 826 ms
 ```
 
-### 3.3 Credenziali locali (ADC)
-```bash
-gcloud auth application-default login
-gcloud auth application-default set-quota-project bottega-brain-<suffisso>
-```
+**Regione:** mai `europe-west12` (Torino) né `me-central1` (esclusi dai crediti). Vertex usa `global`, mentre Cloud Run resta su `europe-west4` (`REGION` nel Makefile). Dopo un'ora controlla in *Billing → Reports* che il costo sia scalato dai crediti.
 
-### 3.4 `.env`
-```dotenv
-GOOGLE_CLOUD_PROJECT=bottega-brain-<suffisso>
-GOOGLE_CLOUD_LOCATION=europe-west4
-LLM_MODE=live
-```
-
-### 3.5 Verifica
-```bash
-make check
-# ✓ gemini-3.8-flash: {"ok": true, "word": "..."} · 12 in / 8 out · 900 ms
-# ✓ gemini-3.1-flash-lite: ...
-```
-
-**Regione:** mai `europe-west12` (Torino) né `me-central1` (esclusi dai crediti). Se un modello risponde `404 NOT_FOUND`, prova `GOOGLE_CLOUD_LOCATION=global` (spesso i Gemini nuovi escono prima sull'endpoint globale) oppure `europe-west1`. Dopo un'ora controlla in *Billing → Reports* che il costo sia scalato dai crediti.
-
-### 3.6 Lavorare in tre sullo stesso progetto
-Il proprietario del progetto aggiunge gli altri due:
-```bash
-gcloud projects add-iam-policy-binding bottega-brain-<suffisso> --member=user:<gmail-collega> --role=roles/aiplatform.user
-```
-Il collega fa i passi 3.3 e 3.4 con lo stesso `GOOGLE_CLOUD_PROJECT`. In alternativa ognuno sviluppa sul proprio progetto con i propri crediti (i costi si dividono) e si usa un solo progetto per il deploy.
-
-### 3.7 Costi attesi
+### 3.4 Costi attesi
 Ogni evento della timeline fa 1–2 chiamate (triage su Flash-Lite, estrazione su 3.8 Flash); una domanda ne fa 1–2. Un giro completo del copione costa pochi centesimi. Il pannello **📊 Osservabilità** mostra il costo stimato in tempo reale contro il budget (`LLM_BUDGET_USD`), mentre il saldo Google arriva con un'ora di ritardo. I prezzi di Flash-Lite e 3.5 Flash in `app/config.py` sono stime: verificali sul listino Vertex.
 
-### 3.8 Modalità LLM e piano B
+### 3.5 Modalità LLM e piano B
 | `LLM_MODE` | Comportamento | Quando |
 |---|---|---|
 | `live` | Chiama Vertex e salva ogni risposta in `src/data/llm_cache/` | Sviluppo e demo |
@@ -128,7 +129,7 @@ Un solo servizio: il Dockerfile multi-stage compila il frontend e lo serve da Fa
 ### 6.1 Permessi del service account (una volta)
 Cloud Run usa il service account di default di Compute Engine:
 ```bash
-PROJECT=bottega-brain-<suffisso>
+PROJECT=bottega-brain-1121-21996
 SA=$(gcloud projects describe $PROJECT --format='value(projectNumber)')-compute@developer.gserviceaccount.com
 for r in roles/aiplatform.user roles/cloudtrace.agent roles/logging.logWriter roles/cloudbuild.builds.builder roles/artifactregistry.writer; do
   gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$SA --role=$r --condition=None
@@ -147,16 +148,16 @@ make deploy                    # = ./scripts/deploy.sh company-brain europe-west
 
 ### 6.3 Prima del pitch
 1. Apri l'URL, fai **Reset** e un giro completo del copione: la cache si scalda e verifichi i tempi.
-2. Tieni pronto il piano B: cache committata + `LLM_MODE=replay` (§3.8), e un video registrato.
+2. Tieni pronto il piano B: cache committata + `LLM_MODE=replay` (§3.5), e un video registrato.
 
 ## 7. Problemi frequenti
 
 | Sintomo | Causa probabile | Soluzione |
 |---|---|---|
-| `403 PERMISSION_DENIED … aiplatform` | API non abilitata o ADC senza quota project | §3.2 `services enable`, §3.3 `set-quota-project` |
-| `404 NOT_FOUND Publisher model` | Modello non disponibile nella regione | `GOOGLE_CLOUD_LOCATION=global` o `europe-west1` |
+| `403 PERMISSION_DENIED … aiplatform` | API non abilitata o ADC senza quota project | Collega: §3.1 (`gcp-add-member.sh`). Owner: rilancia `scripts/gcp-setup.sh` |
+| `404 NOT_FOUND Publisher model` | Modello non disponibile nella regione | `GOOGLE_CLOUD_LOCATION=global` (default) |
 | `429 RESOURCE_EXHAUSTED` | Quota al minuto | Riprova tra poco; il Brain intanto usa il fallback (vedi pannello) |
-| `DefaultCredentialsError` | Manca `gcloud auth application-default login` | §3.3 |
+| `DefaultCredentialsError` | Manca `gcloud auth application-default login` | Rilancia `gcp-join.sh` o `gcp-setup.sh` |
 | La UI dice `LLM: off` | `GOOGLE_CLOUD_PROJECT` vuoto o `LLM_MODE=off` | Controlla `.env` e riavvia il backend |
 | «Riscrivi con l'agente» disabilitato | L'agente ADK gira solo in `live` | `LLM_MODE=live` |
 | 🔊 usa la voce del browser | ElevenLabs non configurato o errore | §4; l'errore è nei log del backend |

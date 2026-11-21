@@ -61,7 +61,7 @@ def load_settings() -> Settings:
         mode = "off"
     if mode == "live" and not project:
         mode = "off"  # cannot call Vertex without a project: fail safe (P8)
-    location = _env("GOOGLE_CLOUD_LOCATION", "europe-west4")
+    location = _env("GOOGLE_CLOUD_LOCATION", "global")
     # ADK and google-genai read these from the environment.
     if project:
         os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "TRUE"  # always Vertex (credits); also cleans inline comments
