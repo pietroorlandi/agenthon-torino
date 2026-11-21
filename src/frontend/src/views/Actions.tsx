@@ -45,7 +45,12 @@ export function ActionCard({ a }: { a: ActionView }) {
 
       {a.can_decide && (
         <>
-          {a.effect && EFFECT[a.effect] && <p className="muted mt-3 text-xs">Se approvi, il sistema {EFFECT[a.effect]}.</p>}
+          {a.effect && EFFECT[a.effect] && (
+            <p className="muted mt-3 text-xs">
+              Se approvi, il sistema {EFFECT[a.effect]}.
+              {state.mail.enabled && <> L'email parte davvero, ma solo verso la casella demo ({state.mail.to}).</>}
+            </p>
+          )}
           <div className="mt-2 flex flex-wrap gap-2">
             {editing ? (
               <>

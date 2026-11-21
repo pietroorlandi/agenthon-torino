@@ -1,7 +1,7 @@
 import { Volume2 } from "lucide-react";
 import { useState } from "react";
 import { api, fetchBriefAudio } from "../api";
-import type { SourceView } from "../types";
+import type { OutboxItem, SourceView } from "../types";
 import { Cites, RichText, Tag, TriageBadges, useApp, useToast } from "../ui";
 
 // Simulated mailbox: the Brain's morning brief, the emails of the department and what was sent after approval.
@@ -39,6 +39,13 @@ function BriefMail() {
       <p className="mt-5">Per decidere apri <button className="font-medium text-brand underline" onClick={() => goto("today")}>Oggi</button>. Non eseguo nulla senza la tua approvazione.</p>
     </>
   );
+}
+
+export function DeliveryTag({ o }: { o: OutboxItem }) {
+  if (o.delivery === "sent") return <Tag tone="blue">inviata davvero</Tag>;
+  if (o.delivery === "sending") return <Tag tone="amber">invio in corso…</Tag>;
+  if (o.delivery === "failed") return <Tag tone="red">invio reale non riuscito</Tag>;
+  return <Tag tone="gray">invio simulato</Tag>;
 }
 
 function Header({ from, to, subject, date, extra }: { from: string; to: string; subject: string; date: string; extra?: React.ReactNode }) {
@@ -88,7 +95,7 @@ export function MailView() {
       <div className="w-80 shrink-0 overflow-y-auto border-r border-stone-200 bg-white">
         {folder === "inbox" && row(sel.kind === "brief", () => setSel({ kind: "brief" }), "Il tuo brief del 21 novembre", "Brain", "08:00", <Tag tone="blue">dal Brain</Tag>)}
         {folder === "sent" && state.outbox.map((o) => row(sel.kind === "outbox" && sel.id === o.action_id, () => setSel({ kind: "outbox", id: o.action_id }),
-          o.title, `Inviata dopo l'approvazione di ${o.approved_by}`, o.sent_at.split(" ")[1] ?? o.sent_at, <Tag tone="green">approvata</Tag>))}
+          o.title, `Approvata da ${o.approved_by}`, o.sent_at.split(" ")[1] ?? o.sent_at, <DeliveryTag o={o} />))}
         {lists[folder].map((s) => row(sel.kind === "source" && sel.id === s.id, () => setSel({ kind: "source", id: s.id }),
           s.title ?? "", folder === "sent" ? `a ${s.to_label}` : s.sender_label ?? "", s.date ?? "",
           s.observed_at ? <TriageBadges s={s} /> : undefined))}
@@ -106,10 +113,14 @@ export function MailView() {
         )}
         {sentByBrain && (
           <>
-            <Header from={`${me.role_label} (preparata dal Brain)`} to="destinatari dell'azione" subject={sentByBrain.title} date={sentByBrain.sent_at}
-              extra={<Tag tone="green">inviata dopo l'approvazione di {sentByBrain.approved_by}</Tag>} />
+            <Header from={`${me.role_label} (preparata dal Brain)`} to={sentByBrain.delivery === "simulated" ? "destinatari dell'azione" : state.mail.to ?? ""}
+              subject={sentByBrain.title} date={sentByBrain.sent_at}
+              extra={<div className="flex flex-wrap gap-1.5"><Tag tone="green">approvata da {sentByBrain.approved_by}</Tag><DeliveryTag o={sentByBrain} /></div>} />
             <pre className="mt-4 font-sans leading-relaxed whitespace-pre-wrap">{sentByBrain.body}</pre>
-            <p className="muted mt-4 text-xs">Invio simulato: nella demo non parte nessuna email reale.</p>
+            <p className="muted mt-4 text-xs">
+              {sentByBrain.delivery === "simulated" ? "Invio simulato: nella demo non parte nessuna email reale."
+                : `Per sicurezza le email reali arrivano solo alla casella demo (${state.mail.to}), mai ai destinatari veri.`}
+            </p>
           </>
         )}
       </article>

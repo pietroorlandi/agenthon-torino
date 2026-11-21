@@ -258,6 +258,8 @@ class OutboxItem(BaseModel):
     body: str
     approved_by: str
     sent_at: str
+    delivery: str = "simulated"  # simulated | sending | sent | failed (real email, see services/mailer.py)
+    delivery_error: Optional[str] = None
 
 
 class TimelineMoment(BaseModel):

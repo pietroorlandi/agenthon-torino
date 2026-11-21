@@ -6,6 +6,7 @@ from .config import settings
 from .models import User
 from .services.brief import build_brief
 from .services import orders
+from .services.mailer import mask
 from .services.taxonomy import classify
 from .store import can_see
 
@@ -111,6 +112,7 @@ def state_for(brain, user: User) -> dict:
                      "next": {"at": nxt.at, "label": nxt.label} if nxt else None},
         "llm": {"mode": settings.llm_mode, "model": settings.model, "model_lite": settings.model_lite,
                 "tts": settings.tts_enabled, "trace_exporter": settings.trace_exporter},
+        "mail": {"enabled": settings.mail_enabled, "to": mask(settings.mail_to) if settings.mail_enabled else None},
         "counters": dict(brain.counters),
         "suggestions": SUGGESTIONS,
     }

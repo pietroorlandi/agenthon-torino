@@ -48,10 +48,20 @@ class Settings:
     seed_dir: Path
     cache_dir: Path
     static_dir: Path
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    mail_from: str = ""
+    mail_to: str = ""  # the ONLY address real emails can go to (demo safety)
 
     @property
     def tts_enabled(self) -> bool:
         return bool(self.elevenlabs_api_key and self.elevenlabs_voice_id)
+
+    @property
+    def mail_enabled(self) -> bool:
+        return bool(self.smtp_host and self.smtp_user and self.smtp_password and self.mail_to)
 
 
 def load_settings() -> Settings:
@@ -85,6 +95,12 @@ def load_settings() -> Settings:
         seed_dir=Path(_env("SEED_DIR") or data_dir / "seed"),
         cache_dir=Path(_env("LLM_CACHE_DIR") or data_dir / "llm_cache"),
         static_dir=Path(_env("STATIC_DIR") or REPO_ROOT / "src" / "frontend" / "dist"),
+        smtp_host=_env("SMTP_HOST"),
+        smtp_port=int(_env("SMTP_PORT", "587") or 587),
+        smtp_user=_env("SMTP_USER"),
+        smtp_password=_env("SMTP_PASSWORD").replace(" ", ""),  # Gmail shows app passwords in groups of 4
+        mail_from=_env("MAIL_FROM") or _env("SMTP_USER"),
+        mail_to=_env("MAIL_TO"),
     )
 
 

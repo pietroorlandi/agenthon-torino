@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ..models import Action, OutboxItem, User
+from . import mailer
 
 
 class Forbidden(Exception):
@@ -28,7 +29,9 @@ def approve(brain, user: User, a: Action) -> None:
         product.incoming += a.qty or 0
     elif a.effect == "block" and product:
         product.blocked = True
-    brain.outbox.insert(0, OutboxItem(action_id=a.id, title=a.title, body=a.draft, approved_by=user.name, sent_at=brain.now))
+    item = OutboxItem(action_id=a.id, title=a.title, body=a.draft, approved_by=user.name, sent_at=brain.now)
+    brain.outbox.insert(0, item)
+    mailer.deliver(brain, item, a, user)  # real email only to MAIL_TO, only here, i.e. only after a human approval
     brain.log(f"user:{user.id}", "action.executed", f"{user.name} ha approvato: {a.title}", refs=[a.id])
     brain.push(user.id, kind="done", sources=a.source_ids, action_id=a.id,
                text=f"Fatto: **{a.title}**. L'ho eseguito solo dopo la tua approvazione.")

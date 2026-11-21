@@ -14,6 +14,9 @@ ENV+=",LLM_MODE=${LLM_MODE:-live},TRACE_EXPORTER=gcp,LLM_BUDGET_USD=${LLM_BUDGET
 if [[ -n "${ELEVENLABS_API_KEY:-}" ]]; then
   ENV+=",ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY},ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-},ELEVENLABS_MODEL_ID=${ELEVENLABS_MODEL_ID:-eleven_multilingual_v2}"
 fi
+if [[ -n "${SMTP_PASSWORD:-}" ]]; then  # real email for approved actions (only to MAIL_TO). Cloud Run allows SMTP on 587/465, not 25
+  ENV+=",SMTP_HOST=${SMTP_HOST},SMTP_PORT=${SMTP_PORT:-587},SMTP_USER=${SMTP_USER},SMTP_PASSWORD=${SMTP_PASSWORD// /},MAIL_FROM=${MAIL_FROM:-},MAIL_TO=${MAIL_TO}"
+fi
 
 # min=max=1: the demo state lives in memory, so exactly one always-on instance.
 gcloud run deploy "$SERVICE" --source . --project "$GOOGLE_CLOUD_PROJECT" --region "$REGION" \

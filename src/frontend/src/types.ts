@@ -47,7 +47,7 @@ export interface ActionView {
 export interface Product { sku: string; name: string; price: number; stock: number; threshold: number; sold7d: number; blocked: boolean; incoming: number }
 export interface Order { id: string; date: string; customer: string; country: string; kind: string; total: number; status: string; carrier: string; flag: string }
 export interface AuditEntry { id: number; real_ts: string; sim_ts: string; actor: string; op: string; text: string; trace_id?: string | null }
-export interface OutboxItem { action_id: string; title: string; body: string; approved_by: string; sent_at: string }
+export interface OutboxItem { action_id: string; title: string; body: string; approved_by: string; sent_at: string; delivery?: "simulated" | "sending" | "sent" | "failed"; delivery_error?: string | null }
 
 export interface State {
   now: string; me: User; users: User[]; roles: Record<Role, string>; knowledge_topics: { id: string; label: string }[];
@@ -59,6 +59,7 @@ export interface State {
   products: Product[]; orders: Order[]; audit: AuditEntry[];
   timeline: { done: number; total: number; next: { at: string; label: string } | null };
   llm: { mode: string; model: string; model_lite: string; tts: boolean; trace_exporter: string };
+  mail: { enabled: boolean; to: string | null };
   counters: Record<string, number>;
   suggestions: string[];
 }

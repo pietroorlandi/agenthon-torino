@@ -37,6 +37,22 @@ def main() -> None:
         print("✓ ElevenLabs" if synthesize("Ciao, sono il Brain di Bottega Sabauda.") else "✗ ElevenLabs: controlla chiave e voice id")
     else:
         print("– ElevenLabs non configurato (opzionale)")
+    if settings.mail_enabled:
+        import smtplib
+
+        from app.services.mailer import mask
+
+        try:  # login only: no email is sent by the check
+            cls = smtplib.SMTP_SSL if settings.smtp_port == 465 else smtplib.SMTP
+            with cls(settings.smtp_host, settings.smtp_port, timeout=20) as s:
+                if settings.smtp_port != 465:
+                    s.starttls()
+                s.login(settings.smtp_user, settings.smtp_password)
+            print(f"✓ Email reale: login SMTP ok, le approvazioni arriveranno a {mask(settings.mail_to)}")
+        except Exception as e:
+            print(f"✗ Email reale: {type(e).__name__}: {e}")
+    else:
+        print("– Email reale non configurata (opzionale): le email restano simulate")
 
 
 if __name__ == "__main__":
