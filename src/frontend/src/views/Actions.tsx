@@ -1,4 +1,4 @@
-import { Check, Pencil, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Pencil, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import { api } from "../api";
 import type { ActionView } from "../types";
@@ -15,6 +15,13 @@ const EFFECT: Record<string, string> = {
   notify: "invia l'avviso ai clienti",
 };
 
+function WrittenBy({ a }: { a: ActionView }) {
+  if (a.writing) return null;
+  if (a.text_engine === "riserva")
+    return <p className="mt-2"><Tag tone="gray">testo di riserva: Gemini non disponibile</Tag></p>;
+  return <p className="mt-2"><Tag tone="purple"><Sparkles size={12} className="mr-1 inline" />scritta da {a.draft_by}</Tag></p>;
+}
+
 export function ActionCard({ a }: { a: ActionView }) {
   const { state } = useApp();
   const { run, busy } = useAct();
@@ -29,8 +36,13 @@ export function ActionCard({ a }: { a: ActionView }) {
         {!pending && <Tag tone={a.status === "executed" ? "green" : "gray"}>{a.status === "executed" ? `approvata da ${a.decided_by}` : `rifiutata da ${a.decided_by}`}</Tag>}
       </div>
       <p className="mt-1 text-stone-700">{a.why}</p>
+      <WrittenBy a={a} />
 
-      {editing ? (
+      {a.writing ? (
+        <div className="mt-3 flex items-center gap-2 rounded-md border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-800">
+          <Loader2 size={14} className="animate-spin" /> Gemini sta leggendo le fonti e scrivendo la bozza…
+        </div>
+      ) : editing ? (
         <textarea className="input mt-3 font-mono text-xs" rows={9} value={draft} onChange={(e) => setDraft(e.target.value)} />
       ) : (
         <div className="mt-3 rounded-md border border-stone-200 bg-stone-50">

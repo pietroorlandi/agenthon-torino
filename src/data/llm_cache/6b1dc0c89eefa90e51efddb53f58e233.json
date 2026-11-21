@@ -1,0 +1,49 @@
+{
+ "items": [
+  {
+   "text": "Il laboratorio richiede di **sospendere subito la vendita del lotto L26-1108 dei Gianduiotti al caffè**, isolare le giacenze e contattare i clienti acquirenti poiché l'etichetta omette l'allergene latte; una cliente allergica (ordine #10465) ha già chiesto chiarimenti. L'azione collegata la trovi in *Oggi*.",
+   "sources": [
+    "em-lotto",
+    "em-cli-latte",
+    "dc-faq"
+   ]
+  },
+  {
+   "text": "BRT segnala **ritardi di 24/48 ore nelle consegne in Piemonte e Lombardia** dal 21/11 al 28/11 per sciopero e volumi, con impatto su ordini già spediti o in partenza come #10482 e #10485; occorre avvisare i clienti. L'azione collegata la trovi in *Oggi*.",
+   "sources": [
+    "em-brt-ritardo",
+    "ch-s9",
+    "ch-s10"
+   ]
+  },
+  {
+   "text": "Il cliente P. Martin richiede il **rimborso per collo danneggiato sull'ordine #10481 (69,80€)**; GLS ha aperto il reclamo e l'importo sotto i 100€ può essere autorizzato direttamente dal Servizio clienti. L'azione collegata la trovi in *Oggi*.",
+   "sources": [
+    "em-cli-martin",
+    "em-gls-reclamo",
+    "ch-c3",
+    "ch-c4",
+    "ch-c5",
+    "dc-resi"
+   ]
+  },
+  {
+   "text": "La newsletter programmata per le 10:00 promuove i Gianduiotti al caffè con codice CAFFE15 a 8.400 iscritti, ma **la campagna contrasta con il blocco del lotto non conforme** e va coordinata con urgenza.",
+   "sources": [
+    "em-newsletter",
+    "em-lotto",
+    "ch-sh5"
+   ]
+  },
+  {
+   "text": "A causa del mancato blocco nel checkout, **il codice NATALE10 si è cumulato con BENVENUTO5 su 14 ordini**, azzerando quasi il margine sui Box Natale; Marco sta intervenendo sul checkout e ai clienti che chiedono va confermata la regola di un solo codice per ordine.",
+   "sources": [
+    "ch-sh2",
+    "ch-sh3",
+    "ch-sh4",
+    "dc-promo",
+    "dc-sconti"
+   ]
+  }
+ ]
+}

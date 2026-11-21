@@ -1,0 +1,13 @@
+{
+ "candidates": [
+  {
+   "text": "Anche durante il Black Friday il cut-off per le spedizioni in giornata resta alle 14:00, mentre gli ordini successivi partono il giorno lavorativo seguente.",
+   "type": "policy",
+   "quote": "anche durante il Black Friday il cut-off resta alle 14:00, gli ordini arrivati dopo partono il giorno lavorativo successivo",
+   "relation": "confirms",
+   "memory_id": "M6",
+   "value": "14:00"
+  }
+ ],
+ "actions": []
+}

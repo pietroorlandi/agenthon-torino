@@ -1,0 +1,13 @@
+{
+ "candidates": [
+  {
+   "text": "Lo sconto per il Black Friday è del 50% su tutto il catalogo.",
+   "type": "price",
+   "quote": "il Black Friday è -50% su tutto.",
+   "relation": "contradicts",
+   "memory_id": "M3",
+   "value": "50%"
+  }
+ ],
+ "actions": []
+}

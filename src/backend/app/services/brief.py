@@ -1,4 +1,5 @@
-"""Morning brief per person: deterministic content and order (seed items + live quarantine, gaps, pending memory)."""
+"""Morning brief per person: the news part is written by Gemini (services/writer.py) from the sources the person can
+see; the seed items are only the fallback. Live items (quarantine, gaps, pending memory, counters) are added in code."""
 from __future__ import annotations
 
 import re
@@ -9,7 +10,13 @@ from ..models import BriefItem, User
 def build_brief(brain, user: User) -> dict:
     from ..store import can_see
 
-    items = [i.model_copy() for i in brain.brief_items.get(user.role, [])]
+    written = brain.llm_brief.get(user.id)
+    if written:
+        items, engine = [i.model_copy() for i in written[0]], written[1]
+    elif f"brief:{user.id}" in brain.writing:
+        items, engine = [], "writing"
+    else:
+        items, engine = [i.model_copy() for i in brain.brief_items.get(user.role, [])], "riserva"
     for q in brain.quarantine:
         if q.status != "pending" or user.role not in q.authority:
             continue
@@ -28,7 +35,7 @@ def build_brief(brain, user: User) -> dict:
     if c["observed"]:
         items.append(BriefItem(text=f"Da stamattina ho osservato **{c['observed']} nuovi eventi**: {c['ignored']} ignorati, "
                                     f"{c['quarantined']} in quarantena, {c['proposed']} proposte di memoria, {c['corroborated']} conferme.", derived=True))
-    return {"text": f"Buongiorno {user.name.split()[0]}, ecco cosa richiede la tua attenzione oggi:", "items": items, "time": "08:00"}
+    return {"text": f"Buongiorno {user.name.split()[0]}, ecco cosa richiede la tua attenzione oggi:", "items": items, "time": "08:00", "engine": engine}
 
 
 def plain(text: str) -> str:

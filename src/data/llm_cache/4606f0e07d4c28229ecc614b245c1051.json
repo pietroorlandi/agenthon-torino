@@ -1,0 +1,37 @@
+{
+ "items": [
+  {
+   "text": "Il Laboratorio Sant'Anna ha segnalato che il **lotto L26-1108 dei Gianduiotti al caffè ha un'etichetta non conforme priva dell'allergene latte**: occorre sospendere la vendita e isolare subito le giacenze nello scaffale Q; la trovi in *Oggi*.",
+   "sources": [
+    "em-lotto",
+    "dc-magazzino"
+   ]
+  },
+  {
+   "text": "Le scorte di **Gianduiotti fondenti 70% sono scese a 38 pezzi** a fronte di una soglia di 60, e la consegna del riordino è slittata al 28/11 per un ritardo sul cacao.",
+   "sources": [
+    "STORE-GIA-FON",
+    "em-lab-conferma",
+    "ch-m5"
+   ]
+  },
+  {
+   "text": "L'ordine B2B #10480 di Dolce Vita Torino richiede 20 kg di gianduiotti classici sfusi per il 25/11, ma **la giacenza attuale è di soli 15 kg**.",
+   "sources": [
+    "em-b2b-dolcevita",
+    "STORE-GIA-B2B",
+    "#10480",
+    "ch-m3",
+    "ch-m4"
+   ]
+  },
+  {
+   "text": "Per gestire il picco del Black Friday **mancano 60 cartoni esterni 40x30** (ne abbiamo 90 su 150 necessari), indispensabili per la pianificazione del picking di 160 colli.",
+   "sources": [
+    "ch-m10",
+    "tk-bf",
+    "ch-s8"
+   ]
+  }
+ ]
+}

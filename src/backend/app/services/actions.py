@@ -9,7 +9,14 @@ class Forbidden(Exception):
     pass
 
 
-def _check(user: User, a: Action) -> None:
+# Who decides each effect: fixed in code, the LLM cannot pick the approver
+EFFECT_OWNER = {"refund": "clienti", "notify": "clienti", "intercept": "spedizioni", "reorder": "magazzino",
+                "quarantine": "magazzino", "block": "shop", "payment": "shop"}
+
+
+def _check(brain, user: User, a: Action) -> None:
+    if f"action:{a.id}" in brain.writing:
+        raise Forbidden("Gemini sta ancora scrivendo la bozza: riprova tra qualche secondo")
     if a.owner != user.role:
         raise Forbidden(f"Azione di competenza {a.owner}: il ruolo {user.role} non può deciderla")
     if a.status != "pending":
@@ -17,7 +24,7 @@ def _check(user: User, a: Action) -> None:
 
 
 def approve(brain, user: User, a: Action) -> None:
-    _check(user, a)
+    _check(brain, user, a)
     a.status, a.decided_by = "executed", user.name
     order = brain.order_by_id(a.order_id) if a.order_id else None
     product = brain.products.get(a.sku) if a.sku else None
@@ -38,12 +45,12 @@ def approve(brain, user: User, a: Action) -> None:
 
 
 def reject(brain, user: User, a: Action) -> None:
-    _check(user, a)
+    _check(brain, user, a)
     a.status, a.decided_by = "rejected", user.name
     brain.log(f"user:{user.id}", "action.rejected", f"{user.name} ha rifiutato: {a.title} (nessuna modifica)", refs=[a.id])
 
 
 def edit_draft(brain, user: User, a: Action, draft: str) -> None:
-    _check(user, a)
+    _check(brain, user, a)
     a.draft, a.edited_by = draft, user.name
     brain.log(f"user:{user.id}", "action.edited", f"{user.name} ha modificato la bozza di {a.id}", access=[a.owner], refs=[a.id])

@@ -67,12 +67,14 @@ class Brain:
             self._audit_seq = itertools.count(1)
             self.users: dict[str, User] = {u.id: u for u in self.company.users}
             self._seed_conflicts()
-            from .services.brief import build_brief  # local import: avoids a cycle
-
-            for u in self.company.users:
-                b = build_brief(self, u)
-                self.push(u.id, kind="brief", text=b["text"], items=b["items"], time="08:00")
+            # background LLM writing (services/writer.py): a reset invalidates jobs still running for the old state
+            self.epoch = getattr(self, "epoch", 0) + 1
+            self.writing: set[str] = set()
+            self.llm_brief: dict[str, tuple[list[BriefItem], str]] = {}
             self.log("system", "demo.reset", "Demo riportata allo stato iniziale (21/11 08:10)")
+            from .services import writer  # local import: avoids a cycle
+
+            writer.start(self)  # Gemini writes the action texts and the morning briefs (the brief is pushed when ready)
 
     def _seed_conflicts(self) -> None:
         """Seed claims (pre-annotated extraction) that contradict approved memory go to quarantine, never to memory."""

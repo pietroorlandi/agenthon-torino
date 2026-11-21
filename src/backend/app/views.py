@@ -83,7 +83,9 @@ def state_for(brain, user: User) -> dict:
     actions = []
     for a in brain.actions:
         if a.owner == role:
-            actions.append({**a.model_dump(), "owner_label": brain.role_label(a.owner), "can_decide": a.status == "pending"})
+            writing = f"action:{a.id}" in brain.writing
+            actions.append({**a.model_dump(), "owner_label": brain.role_label(a.owner), "writing": writing,
+                            "can_decide": a.status == "pending" and not writing})
         else:
             actions.append({"id": a.id, "status": a.status, "locked": True, "owner_label": brain.role_label(a.owner)})
     nxt = brain.timeline[brain.cursor] if brain.cursor < len(brain.timeline) else None
@@ -97,7 +99,8 @@ def state_for(brain, user: User) -> dict:
         "channels": [{"id": c.id, "locked": not can_see(c.access, role)} for c in brain.company.channels],
         "dm": [m.model_dump() for m in brain.dm[user.id]],
         "unread": brain.unread.get(user.id, 0),
-        "brief": {**build_brief(brain, user), "items": [i.model_dump() for i in build_brief(brain, user)["items"]]},
+        "brief": {**(b := build_brief(brain, user)), "items": [i.model_dump() for i in b["items"]]},
+        "llm_busy": bool(brain.writing),
         "memory": memory,
         "quarantine": quarantine,
         "gaps": gaps,

@@ -1,0 +1,41 @@
+{
+ "items": [
+  {
+   "text": "Il laboratorio Sant'Anna richiede di **isolare subito le giacenze del lotto L26-1108** di Gianduiotti al caffè per mancata dicitura dell'allergene latte, fermando le spedizioni (coinvolto anche l'ordine in preparazione #10487).",
+   "sources": [
+    "em-lotto",
+    "dc-magazzino",
+    "ch-c6",
+    "STORE-GIA-CAF"
+   ]
+  },
+  {
+   "text": "È necessario **intercettare la spedizione BRT dell'ordine #10479** di G. Russo per correggere l'indirizzo di consegna da via Po 12 a via Po 112; la trovi in *Oggi*.",
+   "sources": [
+    "em-cli-russo",
+    "ch-s5",
+    "ch-s6",
+    "em-conferma-russo"
+   ]
+  },
+  {
+   "text": "BRT segnala **ritardi di consegna di 24/48 ore in Piemonte e Lombardia** tra il 21/11 e il 28/11 per sciopero e volumi elevati, impattando ordini in partenza come #10482 e #10485.",
+   "sources": [
+    "em-brt-ritardo",
+    "ch-s9",
+    "ch-s10"
+   ]
+  },
+  {
+   "text": "Mancano 60 cartoni esterni 40x30 rispetto ai 150 necessari per il Black Friday, mentre **BRT ha concesso il secondo ritiro solo dal 26/11 con limite di 140 colli**, mettendo a rischio la gestione dei 160 colli previsti per venerdì 27/11.",
+   "sources": [
+    "em-brt-ritiri",
+    "em-brt-ritiri-r",
+    "ch-m10",
+    "ch-s7",
+    "ch-s8",
+    "tk-bf"
+   ]
+  }
+ ]
+}

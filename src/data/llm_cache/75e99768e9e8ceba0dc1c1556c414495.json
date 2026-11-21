@@ -1,0 +1,37 @@
+{
+ "items": [
+  {
+   "text": "Il Laboratorio Sant'Anna segnala che il lotto L26-1108 dei Gianduiotti al caffè è privo della dicitura **«contiene LATTE»**: bisogna **sospendere subito la vendita**, isolare le giacenze, bloccare la promozione nella newsletter delle 10:00 e avvisare i clienti; la trovi in *Oggi*.",
+   "sources": [
+    "em-lotto",
+    "em-newsletter",
+    "ch-sh5",
+    "ch-c6"
+   ]
+  },
+  {
+   "text": "La fattura n. 889 da 3.450€ del Laboratorio Sant'Anna è **scaduta il 15/11** e il fornitore minaccia di rivedere le priorità di produzione dei riordini natalizi; la trovi in *Oggi*.",
+   "sources": [
+    "em-fattura",
+    "em-lab-conferma"
+   ]
+  },
+  {
+   "text": "Stanotte 14 ordini hanno sfruttato il **cumulo indebito dei codici sconto** NATALE10 e BENVENUTO5, azzerando quasi il margine sui Box Natale: è urgente completare il blocco al checkout.",
+   "sources": [
+    "ch-sh2",
+    "tk-cumulo",
+    "dc-promo"
+   ]
+  },
+  {
+   "text": "La consegna di 300 Gianduiotti fondenti 70% slitta al 28/11 e le scorte a scaffale sono scese a 38 pezzi, richiedendo di **aggiornare la disponibilità sul sito** prima delle vendite promozionali.",
+   "sources": [
+    "em-lab-conferma",
+    "ch-m5",
+    "ch-m6",
+    "STORE-GIA-FON"
+   ]
+  }
+ ]
+}

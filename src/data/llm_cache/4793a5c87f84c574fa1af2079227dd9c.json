@@ -1,0 +1,13 @@
+{
+ "candidates": [],
+ "actions": [
+  {
+   "effect": "refund",
+   "order_id": "#10478",
+   "sku": null,
+   "qty": null,
+   "quote": "heute ist meine Bestellung #10478 angekommen, aber der Karton war eingedrückt und die Gianduiotti sind völlig zerbrochen. Fotos habe ich angehängt. Ich hätte gerne eine Rückerstattung.",
+   "reason": "Il cliente richiede il rimborso per l'ordine #10478 arrivato danneggiato con foto allegate."
+  }
+ ]
+}

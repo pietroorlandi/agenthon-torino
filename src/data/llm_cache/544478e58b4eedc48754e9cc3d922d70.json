@@ -1,0 +1,40 @@
+{
+ "items": [
+  {
+   "text": "Il laboratorio richiede di **sospendere subito la vendita del lotto L26-1108 dei Gianduiotti al caffè e avvisare i clienti** perché l'etichetta è priva dell'indicazione dell'allergene latte; una cliente allergica ha già chiesto chiarimenti sull'ordine #10465: la trovi in *Oggi*.",
+   "sources": [
+    "em-lotto",
+    "em-cli-latte",
+    "dc-faq"
+   ]
+  },
+  {
+   "text": "BRT segnala **ritardi di consegna di 24/48 ore in Piemonte e Lombardia** dal 21/11 al 28/11 per sciopero e volumi, con impatto su ordini come #10482 e #10485: la trovi in *Oggi*.",
+   "sources": [
+    "em-brt-ritardo",
+    "ch-s9",
+    "ch-s10"
+   ]
+  },
+  {
+   "text": "Il cliente P. Martin richiede il **rimborso per l'ordine #10481 arrivato danneggiato**, con reclamo aperto da GLS e approvazione di competenza del Servizio clienti secondo la policy resi: la trovi in *Oggi*.",
+   "sources": [
+    "em-cli-martin",
+    "em-gls-reclamo",
+    "dc-resi",
+    "ch-c3",
+    "ch-c4",
+    "ch-c5"
+   ]
+  },
+  {
+   "text": "Nel checkout si è verificato un **cumulo non autorizzato dei codici sconto NATALE10 e BENVENUTO5** su 14 ordini notturni; Marco sta bloccando la cumulabilità e per le richieste clienti vale la regola di un solo codice per ordine.",
+   "sources": [
+    "ch-sh2",
+    "ch-sh3",
+    "ch-sh4",
+    "dc-promo"
+   ]
+  }
+ ]
+}
