@@ -75,7 +75,7 @@ make deploy   # Cloud Run (scripts/deploy.sh)
 - `src/data/seed/*.json` — **dataset della demo, fonte di verità** (convertito da `data.js`): company, store, sources, memory, actions, brief, `timeline.json` (eventi di ▶ Avanti). `src/data/llm_cache/` — cache delle risposte Gemini
 - `src/web/` — UI statica dello step 1 (`data.js`, `app.js`): resta come fallback ma **non è più aggiornata**; i dati nuovi vanno nei JSON seed
 - `Dockerfile`, `Makefile`, `scripts/` — build, avvio e deploy
-- `docs/` — brief, criteri, scenario demo, decisioni, script del pitch
+- `docs/` — brief, criteri, scenario demo, decisioni, script del pitch; [docs/flow.md](docs/flow.md) = schema del flusso (per le slide)
 - `docs/decisions.md` — log delle decisioni (data, cosa, perché)
 - `.env.example` — variabili richieste; i segreti reali vanno in `.env` (mai committato)
 
