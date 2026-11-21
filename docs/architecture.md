@@ -244,9 +244,39 @@ Prima si cercano gli item (pending e approved) con `entities` in comune; poi l'L
 
 **Cosa NON prendiamo:** l'agente che scrive in memoria senza approvazione, o che sceglie da solo cosa leggere. Da noi **scrive solo l'approvazione umana** e **legge solo ciò che il codice gli passa**.
 
-### Implementazione
-Uno store in memoria dietro un'interfaccia `MemoryRepo` (`list(status, scopes)`, `get`, `propose`, `approve`, `reject`, `supersede`), con un seed JSON e il reset.
-Passare a SQLite o Firestore cambia solo l'implementazione dell'interfaccia **[DA DECIDERE]**.
+### Implementazione (demo)
+Lo stato sta **solo in RAM** nell'oggetto `Brain` di `src/backend/app/store.py`. `reset()` lo ricarica dai seed JSON (`src/data/seed/`) a ogni avvio del processo e su `POST /api/reset`.
+Non c'è un database. Un riavvio, o il reload di `make dev`, riporta la demo al 21/11 08:10 e cancella:
+- le approvazioni;
+- le decisioni sulla quarantena;
+- i gap risolti (`K<n>`);
+- le azioni eseguite;
+- i messaggi;
+- l'audit.
+
+L'unica cosa scritta su disco è la cache LLM (`src/data/llm_cache/`).
+Per la demo è voluto: ogni prova parte da uno stato noto e riproducibile, e lo smoke test ci conta.
+Nota: l'interfaccia `MemoryRepo` prevista all'inizio **non esiste ancora**. Servizi e pipeline modificano direttamente le liste del `Brain` (`brain.memory.append(...)`, `m.status = ...`).
+
+### Persistenza in produzione (decisa, non implementata)
+**Scelta: PostgreSQL su Cloud SQL + pgvector.** Firestore è più rapido da collegare, ma è scomodo proprio dove servono garanzie.
+
+| Esigenza | Perché Postgres |
+|---|---|
+| Approvazioni atomiche (accetta contraddizione + aggiorna memoria + aggiorna ordine) | Transazioni. Oggi le garantisce un `RLock`, che vale solo con un'istanza |
+| Più istanze Cloud Run | Lo stato condiviso sta nel DB. Oggi serve `min=max=1` |
+| Filtri per ruolo (P1, P2) | Query SQL. In seguito Row-Level Security come seconda barriera |
+| Audit verificabile | Tabella di sola aggiunta (niente UPDATE né DELETE) |
+| Scala della memoria | Oggi il Q&A passa a Gemini **tutta** la memoria visibile. Con migliaia di item: embedding Vertex + pgvector per recuperare i top-k, poi gli stessi validatori di oggi |
+
+**Percorso di migrazione:**
+1. **Livello repository.** `Brain` diventa un'interfaccia (`add_memory`, `update_memory`, `usable_memory(role)`, `add_quarantine`, `add_gap`, `log`…) con due implementazioni: `InMemoryBrain` (demo e test, comportamento di oggi) e `PostgresBrain`.
+2. **Seed come import una tantum.** I JSON si caricano con uno script e non più a ogni avvio. `/api/reset` resta attivo solo in modalità demo.
+3. **Concorrenza nel DB.** I controlli tipo "già deciso" diventano `UPDATE … WHERE status='pending'` con verifica delle righe modificate, così due persone non approvano la stessa cosa due volte.
+4. **Id dal DB** (sequenza o UUID) al posto di `_new_memory_id` (max+1 in RAM), che con più istanze produrrebbe duplicati.
+5. **Identità reale.** SSO aziendale e mappatura utente→ruolo nel DB, al posto dell'utente scelto nell'interfaccia.
+
+Per l'hackathon resta in RAM. Al pitch: "in produzione: Cloud SQL Postgres + pgvector, audit append-only, transazioni sulle approvazioni".
 
 ---
 
@@ -463,7 +493,7 @@ L'utente corrente arriva nell'header `X-User` (selettore utente della demo). Il 
 | Agenti | **Google ADK** (`google-adk`, versione fissata) solo per il **draft agent** e, se la facciamo, per l'estensione fatture (§19) | Lì serve un agente vero che usa tool; vedi §13.1 |
 | Voce | ElevenLabs API (TTS), via `httpx` | Brief audio; premio speciale |
 | Frontend | **Vite + React + TypeScript + Tailwind CSS v4**, con TanStack Query per le chiamate API e lucide-react per le icone | Veloce da sviluppare, hot reload, componenti riusabili per le card (memoria, azioni, alert); Tailwind evita di scrivere CSS a mano |
-| Stato | In memoria dietro `MemoryRepo` + seed JSON + reset. Cloud Run con `min=max=1` istanze | Semplice e deterministico. Firestore o SQLite solo se serve persistenza **[DA DECIDERE]** |
+| Stato | Demo: in RAM (`Brain` in `store.py`) + seed JSON + reset. Cloud Run con `min=max=1` istanze. Produzione: Cloud SQL Postgres + pgvector (§7) | Semplice e deterministico per la demo; transazioni, più istanze e audit in produzione |
 | Osservabilità | OpenTelemetry → Cloud Trace + log JSON → Cloud Logging + pannello in app (§14) | Nativa su Cloud Run, nessun servizio in più da gestire |
 | Deploy | **Un solo servizio Cloud Run**: Dockerfile multi-stage (build Vite → immagine Python che serve API e frontend statico). Regione `europe-west1` o `europe-west4` | Un URL, niente CORS. Da verificare il giorno stesso che i modelli siano disponibili nella regione |
 
@@ -634,7 +664,7 @@ Settimana simulata: **lunedì 23/11 e martedì 24/11/2026.**
 2. **Item `team`:** li può approvare chiunque (proposta) o solo le persone coinvolte nella fonte?
 3. **Mittenti `unknown` non sospetti** (es. un nuovo potenziale cliente): estraiamo candidati marcati "fonte non verificata" (proposta) o solo alert senza memoria?
 4. **Memoria aggiunta a mano (F20):** la facciamo o resta un Could?
-5. **Persistenza:** solo in memoria (proposta), SQLite o Firestore?
+5. ~~**Persistenza:** solo in memoria (proposta), SQLite o Firestore?~~ Deciso: RAM per la demo, Cloud SQL Postgres + pgvector in produzione (§7).
 6. **Brief audio:** una voce sola per l'agente, o anche per gli alert urgenti?
 7. **Osservabilità esterna:** ci basta Cloud Trace + pannello in app (proposta), o qualcuno vuole Langfuse/Phoenix? (§14.3)
 8. **Estensione fatture:** la teniamo come extra (proposta) o la escludiamo del tutto per concentrarci su A? (§19)
